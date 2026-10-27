@@ -138,3 +138,57 @@ async def mock_land_registry(survey_number: str, response: Response):
         "land_record": record,
         "verified_at": datetime.utcnow().isoformat()
     }
+
+
+# 5. Generic Verification Adapter Layer Endpoint (Prompt B3)
+class AuthorityVerificationRequest(BaseModel):
+    reference_no: str
+    institute_id: Optional[str] = None
+    fields: Optional[dict] = None
+
+
+@router.post("/{code}/verify")
+async def verify_mock_authority(code: str, req: AuthorityVerificationRequest, response: Response):
+    """
+    Standardized Verification Adapter Layer:
+    Simulates external issuing authority APIs (UGC, NAAC, NBA, UNIVERSITY, FIRE_DEPT, TRUST_REGISTRAR, MUNICIPAL, DIGILOCKER).
+    Always includes is_simulated=true and realistic latency simulation.
+    """
+    add_simulated_headers(response)
+    code_upper = code.upper()
+
+    authorities_map = {
+        "UGC": "University Grants Commission Official Registry",
+        "NAAC": "National Assessment and Accreditation Council Repository",
+        "NBA": "National Board of Accreditation Verification Gateway",
+        "UNIVERSITY": "State University Affiliation Portal",
+        "FIRE_DEPT": "Municipal Fire Prevention Directorate",
+        "TRUST_REGISTRAR": "Office of the Charity Commissioner & Registrar of Societies",
+        "MUNICIPAL": "Town Planning and Municipal Corporation Directorate",
+        "DIGILOCKER": "National DigiLocker Repository (MeitY)"
+    }
+    source_name = authorities_map.get(code_upper, f"{code_upper} Gateway (Simulated)")
+
+    # Status outcomes
+    status_val = "VERIFIED"
+    if "EXPIRED" in req.reference_no.upper():
+        status_val = "EXPIRED"
+    elif "MISMATCH" in req.reference_no.upper():
+        status_val = "MISMATCH_DETECTED"
+    elif "UNTRUSTED" in req.reference_no.upper():
+        status_val = "NOT_FOUND"
+
+    return {
+        "status": status_val,
+        "source_name": f"SIMULATED SOURCE: {source_name}",
+        "is_simulated": True,
+        "authority_code": code_upper,
+        "reference_no": req.reference_no,
+        "signed_response": {
+            "token": f"GATEWAY-SIG-{code_upper}-7721",
+            "issuer": source_name,
+            "status": status_val,
+            "latency_ms": 420
+        },
+        "timestamp": datetime.utcnow().isoformat()
+    }
