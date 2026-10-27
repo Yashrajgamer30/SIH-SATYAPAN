@@ -8,6 +8,7 @@ import { AdminRuleBuilder } from './pages/AdminRuleBuilder';
 import { LoginPage } from './pages/LoginPage';
 import { InstituteDashboard } from './pages/InstituteDashboard';
 import { OfficialsDashboard } from './pages/OfficialsDashboard';
+import { ScanView } from './pages/ScanView';
 import { InstitutePortalShell } from './components/layout/InstitutePortalShell';
 import { OfficialsPortalShell } from './components/layout/OfficialsPortalShell';
 import { SessionTimeoutModal } from './components/login/SessionTimeoutModal';
@@ -32,6 +33,7 @@ function AppShell() {
 
   const [currentRole, setCurrentRole] = useState<string>(() => user?.role || 'OFFICIAL_SCRUTINY');
   const [selectedAppId, setSelectedAppId] = useState<number | null>(null);
+  const [activeScanDoc, setActiveScanDoc] = useState<string | null>(null);
   const [isLogoutTransition, setIsLogoutTransition] = useState(false);
   const [instituteNav, setInstituteNav] = useState('dashboard');
   const [officialsNav, setOfficialsNav] = useState('command');
@@ -69,11 +71,13 @@ function AppShell() {
   const isInstitute = currentRole.startsWith('INSTITUTE');
 
   const handleSelectApp = (id: number) => {
-    setSelectedAppId(id);
+    // Open the full-screen forensic Scan View directly
+    setActiveScanDoc('fire_noc_clean.pdf');
   };
 
   const handleBackFromDetail = () => {
     setSelectedAppId(null);
+    setActiveScanDoc(null);
   };
 
   return (
@@ -85,20 +89,11 @@ function AppShell() {
           onNavChange={(nav) => {
             setInstituteNav(nav);
             setSelectedAppId(null);
-            if (nav === 'profile' || nav === 'vault' || nav === 'faculty' || nav === 'students') {
-              // Stay on institute portal
-            }
+            setActiveScanDoc(null);
           }}
           onLogout={handleLogout}
         >
-          {selectedAppId ? (
-            <ScrutinyDetail 
-              appId={selectedAppId} 
-              onBack={handleBackFromDetail} 
-            />
-          ) : (
-            <InstituteDashboard />
-          )}
+          <InstituteDashboard />
         </InstitutePortalShell>
       ) : (
         /* Officials Portal Shell Layout (Scrutiny Workbench) */
@@ -108,8 +103,11 @@ function AppShell() {
             setOfficialsNav(nav);
             if (nav === 'admin') {
               navigate('/rules');
+            } else if (nav === 'verification-centre') {
+              setActiveScanDoc('fire_noc_clean.pdf');
             } else {
               setSelectedAppId(null);
+              setActiveScanDoc(null);
             }
           }}
           onLogout={handleLogout}
@@ -117,17 +115,19 @@ function AppShell() {
             window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
           }}
         >
-          {selectedAppId ? (
-            <ScrutinyDetail 
-              appId={selectedAppId} 
-              onBack={handleBackFromDetail} 
-            />
-          ) : (
-            <OfficialsDashboard 
-              onSelectApplication={handleSelectApp} 
-            />
-          )}
+          <OfficialsDashboard 
+            onSelectApplication={handleSelectApp} 
+          />
         </OfficialsPortalShell>
+      )}
+
+      {/* Full-Screen Forensic Document Scan View Modal (Showpiece 2) */}
+      {activeScanDoc && (
+        <ScanView
+          documentId="demo-doc-01"
+          initialFileName={activeScanDoc}
+          onClose={() => setActiveScanDoc(null)}
+        />
       )}
 
       {/* Regulatory Session Timeout Warning Modal */}
