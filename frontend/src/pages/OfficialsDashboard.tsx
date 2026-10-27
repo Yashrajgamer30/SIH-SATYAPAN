@@ -208,6 +208,14 @@ export const OfficialsDashboard: React.FC<OfficialsDashboardProps> = ({ onSelect
     { day: 'Sat', intake: 14, disposal: 19 }
   ];
 
+  const slaAgeingStackedData = [
+    { region: 'Western (MH/GJ)', within3d: 14, fourTo7d: 8, eightTo14d: 4, breached: 1 },
+    { region: 'Northern (UP/DL)', within3d: 11, fourTo7d: 9, eightTo14d: 5, breached: 2 },
+    { region: 'Southern (TN/KA)', within3d: 16, fourTo7d: 6, eightTo14d: 2, breached: 0 },
+    { region: 'Central (MP/CG)', within3d: 9, fourTo7d: 4, eightTo14d: 1, breached: 0 },
+    { region: 'Eastern (WB/OR)', within3d: 8, fourTo7d: 5, eightTo14d: 3, breached: 1 }
+  ];
+
   const slaAgeing = [
     { bucket: '< 3 Days', count: 18, color: '#138808' },
     { bucket: '4 - 7 Days', count: 9, color: '#FF9933' },
@@ -576,6 +584,13 @@ export const OfficialsDashboard: React.FC<OfficialsDashboardProps> = ({ onSelect
               </h3>
               <p className="text-12 text-gov-muted">Ranked by frequency across western jurisdiction</p>
             </div>
+            <button
+              onClick={() => alert("Exporting deficiency reasons as PNG image...")}
+              className="text-gov-muted hover:text-navy-900 dark:hover:text-white p-1 rounded hover:bg-slate-100 dark:hover:bg-navy-800 transition-colors"
+              title="Export as image"
+            >
+              <Download className="w-3.5 h-3.5" />
+            </button>
           </div>
 
           <div className="h-60 w-full">
@@ -589,6 +604,42 @@ export const OfficialsDashboard: React.FC<OfficialsDashboardProps> = ({ onSelect
               </BarChart>
             </ResponsiveContainer>
           </div>
+        </div>
+      </div>
+
+      {/* 7. SLA Ageing Stacked Bar Chart */}
+      <div className="p-6 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-15 font-bold text-navy-900 dark:text-white flex items-center gap-2">
+              <Clock className="w-4 h-4 text-amber-500" />
+              <span>SLA Ageing Analysis (Regional Breakdown)</span>
+            </h3>
+            <p className="text-12 text-gov-muted">Active scrutiny file ageing against citizen charter SLAs (&lt;3d, 4-7d, 8-14d, &gt;14d breached)</p>
+          </div>
+          <button
+            onClick={() => alert("Exporting SLA Ageing chart as PNG image...")}
+            className="text-11 font-semibold text-gov-muted hover:text-navy-900 dark:hover:text-white inline-flex items-center gap-1.5 border border-slate-200 dark:border-navy-700 px-2.5 py-1 rounded-lg hover:bg-slate-50 dark:hover:bg-navy-800 transition-colors"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Export as image</span>
+          </button>
+        </div>
+
+        <div className="h-64 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={slaAgeingStackedData} margin={{ top: 10, right: 30, left: 10, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+              <XAxis dataKey="region" tick={{ fontSize: 11 }} />
+              <YAxis tick={{ fontSize: 11 }} />
+              <Tooltip />
+              <Legend wrapperStyle={{ fontSize: 12, paddingTop: 10 }} />
+              <Bar dataKey="within3d" name="< 3 Days (Within SLA)" stackId="sla" fill="#138808" />
+              <Bar dataKey="fourTo7d" name="4 - 7 Days (Attention)" stackId="sla" fill="#FF9933" />
+              <Bar dataKey="eightTo14d" name="8 - 14 Days (Escalated)" stackId="sla" fill="#E65100" />
+              <Bar dataKey="breached" name="> 14 Days (Breached SLA)" stackId="sla" fill="#C62828" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>

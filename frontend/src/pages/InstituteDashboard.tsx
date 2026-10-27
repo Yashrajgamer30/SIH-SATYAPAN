@@ -163,6 +163,14 @@ export const InstituteDashboard: React.FC = () => {
     { name: 'Expired/Flagged', value: 1, color: '#C62828' }
   ];
 
+  const applicationFunnel = [
+    { stage: 'Draft Initiated', count: 3, fill: '#1F3A93', pct: '100%' },
+    { stage: 'Documents Uploaded', count: 3, fill: '#2B4CBA', pct: '100%' },
+    { stage: 'Rule Auto-Check', count: 2, fill: '#FF9933', pct: '67%' },
+    { stage: 'Committee Scrutiny', count: 1, fill: '#8B5CF6', pct: '33%' },
+    { stage: 'EoA Recommended', count: 1, fill: '#138808', pct: '33%' }
+  ];
+
   const fsrData = [
     { department: 'Computer Engg', actualRatio: 17.5, norm: 20 },
     { department: 'AI & Data Sci', actualRatio: 16.0, norm: 20 },
@@ -489,7 +497,16 @@ export const InstituteDashboard: React.FC = () => {
 
         {/* Faculty-Student Ratio (FSR) with Reference Line */}
         <div className="p-5 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
-          <h4 className="text-14 font-bold text-navy-900 dark:text-white mb-1">FSR Compliance</h4>
+          <div className="flex items-center justify-between mb-1">
+            <h4 className="text-14 font-bold text-navy-900 dark:text-white">FSR Compliance</h4>
+            <button
+              onClick={() => alert("Exporting chart as PNG image...")}
+              className="text-gov-muted hover:text-navy-900 dark:hover:text-white p-1 rounded hover:bg-slate-100 dark:hover:bg-navy-800 transition-colors"
+              title="Export as image"
+            >
+              <Download className="w-3.5 h-3.5" />
+            </button>
+          </div>
           <p className="text-[11px] text-gov-muted mb-2">Max norm: 1:20 ratio</p>
           <div className="h-44 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -506,6 +523,51 @@ export const InstituteDashboard: React.FC = () => {
           <span className="text-[11px] text-center text-green-600 font-semibold">
             All departments comply with AICTE norm
           </span>
+        </div>
+      </div>
+
+      {/* Application Status Funnel Chart Card */}
+      <div className="p-6 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-15 font-bold text-navy-900 dark:text-white flex items-center gap-2">
+              <Award className="w-4 h-4 text-saffron-500" />
+              <span>Application Status Funnel (EoA Scrutiny Pipeline)</span>
+            </h3>
+            <p className="text-12 text-gov-muted">Stepwise throughput from initiation to official committee recommendation</p>
+          </div>
+          <button
+            onClick={() => alert("Exporting application funnel as PNG image...")}
+            className="text-11 font-semibold text-gov-muted hover:text-navy-900 dark:hover:text-white inline-flex items-center gap-1.5 border border-slate-200 dark:border-navy-700 px-2.5 py-1 rounded-lg hover:bg-slate-50 dark:hover:bg-navy-800 transition-colors"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Export as image</span>
+          </button>
+        </div>
+
+        <div className="h-52 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={applicationFunnel} layout="vertical" margin={{ left: 20, right: 30, top: 10, bottom: 10 }}>
+              <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+              <XAxis type="number" domain={[0, 4]} tick={{ fontSize: 11 }} />
+              <YAxis dataKey="stage" type="category" width={160} tick={{ fontSize: 11 }} />
+              <Tooltip />
+              <Bar dataKey="count" fill="#1F3A93" radius={[0, 6, 6, 0]}>
+                {applicationFunnel.map((entry, index) => (
+                  <Cell key={index} fill={entry.fill} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-4 pt-3 border-t border-slate-100 dark:border-navy-800 text-center text-11">
+          {applicationFunnel.map((s, i) => (
+            <div key={i} className="p-2 rounded-lg bg-slate-50 dark:bg-navy-950/40">
+              <span className="text-gov-muted block text-[10px] uppercase font-bold">{s.stage}</span>
+              <span className="text-14 font-black text-navy-900 dark:text-white">{s.count} files ({s.pct})</span>
+            </div>
+          ))}
         </div>
       </div>
 
