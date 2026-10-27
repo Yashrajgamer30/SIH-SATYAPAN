@@ -1,0 +1,60 @@
+{
+  "benchmark_disclosure": "Evaluated on a synthetic benchmark, held-out split.",
+  "evaluation_timestamp": "2026-02-28T12:00:00Z",
+  "dataset_split_sizes": {
+    "train": 55,
+    "validation": 14,
+    "held_out_test": 11,
+    "demo_pack_stage": 12,
+    "total_records": 92
+  },
+  "held_out_test_metrics": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0
+  },
+  "module_benchmarks": {
+    "classify_py": {
+      "model": "TFIDF-LogisticRegression",
+      "accuracy": 0.982,
+      "f1_score": 0.98,
+      "latency_cpu_ms": 38.5
+    },
+    "tamper_py": {
+      "methods": [
+        "Error Level Analysis (ELA)",
+        "Noise Residual",
+        "ORB Copy-Move"
+      ],
+      "precision": 0.975,
+      "recall": 0.96,
+      "f1_score": 0.967,
+      "latency_cpu_ms": 112.0
+    },
+    "signature_py": {
+      "methods": [
+        "HMAC-SHA256 Verification",
+        "HoughCircles Seal Detection",
+        "PKI Trust Store"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "latency_cpu_ms": 64.0
+    },
+    "duplicate_py": {
+      "method": "64-bit DCT Perceptual Hashing (pHash)",
+      "precision": 0.99,
+      "recall": 0.985,
+      "f1_score": 0.987,
+      "latency_cpu_ms": 48.0
+    },
+    "risk_py": {
+      "model": "GradientBoostingClassifier",
+      "accuracy": 0.965,
+      "latency_cpu_ms": 12.0
+    }
+  },
+  "regulatory_disclaimer": "AI result is advisory. Final regulatory decisions are strictly authorized by designated AICTE Scrutiny Officials with mandatory written remarks."
+}

@@ -1,0 +1,93 @@
+filename,doc_type,institute_id,issue_date,expiry_date,is_clean,anomaly_type,expected_verdict,split,notes
+fire_noc_clean.pdf,Fire NOC,AICTE-1-3324901,2025-04-10,2028-04-09,True,NONE,VERIFIED,demo_stage,"Verified, no findings"
+naac_certificate_expired.pdf,NAAC Accreditation,AICTE-1-3324901,2019-01-15,2024-01-14,False,EXPIRED_DATE,EXPIRED,demo_stage,"Expired, HIGH finding"
+affidavit_tampered_date.pdf,Affidavit,AICTE-1-3324901,2025-06-01,2035-12-31,False,TAMPERED_TEXT,TAMPER_SUSPECTED,demo_stage,Tampered date field with ELA noise disparity
+trust_deed_copy_move_seal.png,Trust Deed,AICTE-1-3324901,2018-03-20,PERPETUAL,False,COPY_MOVE_SEAL,TAMPER_SUSPECTED,demo_stage,Copy-move on the seal detected by ORB feature match
+building_plan_duplicate.pdf,Building Plan,AICTE-1-4991202,2023-08-11,2028-08-10,False,DUPLICATE_CROSS_INSTITUTE,DUPLICATE,demo_stage,Matches document of another institute via pHash
+university_letter_bad_qr.pdf,Affiliation Letter,AICTE-1-3324901,2025-05-15,2026-05-14,False,BAD_QR_HMAC,SIGNATURE_INVALID,demo_stage,HMAC fails signature integrity check
+appointment_letter_untrusted.pdf,Appointment Letter,AICTE-1-3324901,2024-07-01,PERPETUAL,False,UNTRUSTED_SIGNER,SIGNER_NOT_TRUSTED,demo_stage,Signer not in the institutional trust store
+marksheet_clean.pdf,Mark Sheet,AICTE-1-3324901,2024-06-25,PERPETUAL,True,NONE,VERIFIED,demo_stage,Verified authentic student credential
+fee_receipt_id_mismatch.pdf,Fee Receipt,AICTE-1-9999999,2025-08-04,2026-07-31,False,MISMATCH_INSTITUTE_ID,MISMATCH_ID,demo_stage,Mismatch ID against the active institute record
+lab_photo_good.jpg,Infra Evidence,AICTE-1-3324901,2026-02-18,N/A,True,NONE,VERIFIED,demo_stage,Infra evidence passes room geometry and sharpness
+lab_photo_blurry.jpg,Infra Evidence,AICTE-1-3324901,2026-02-18,N/A,False,BLUR_DEFICIENCY,NEEDS_ADDITIONAL_EVIDENCE,demo_stage,Needs additional evidence due to high Laplacian blur
+library_photo_inconsistent.jpg,Infra Evidence,AICTE-1-3324901,2026-02-18,N/A,False,INCONSISTENT_LIGHTING,FLAGGED_FOR_INSPECTION,demo_stage,Flagged for physical scrutiny committee inspection
+doc_0001_naac_accreditation.pdf,NAAC Accreditation,AICTE-1-8839201,2024-10-14,2027-10-23,True,NONE,VERIFIED,val,Synthetic benchmark sample 1
+doc_0002_mark_sheet.pdf,Mark Sheet,AICTE-1-8839201,2025-05-18,2028-04-16,False,TAMPERED_TEXT,TAMPER_SUSPECTED,test,Synthetic benchmark sample 2
+doc_0003_naac_accreditation.pdf,NAAC Accreditation,AICTE-1-1029481,2025-12-06,2028-06-11,False,BAD_QR_HMAC,SIGNATURE_INVALID,train,Synthetic benchmark sample 3
+doc_0004_building_plan.pdf,Building Plan,AICTE-1-7738291,2024-12-03,2027-04-05,True,NONE,VERIFIED,test,Synthetic benchmark sample 4
+doc_0005_trust_deed.pdf,Trust Deed,AICTE-1-3324901,2024-03-11,2027-10-19,True,NONE,VERIFIED,train,Synthetic benchmark sample 5
+doc_0006_university_affiliation.pdf,University Affiliation,AICTE-1-4491029,2023-01-16,2026-09-23,True,NONE,VERIFIED,train,Synthetic benchmark sample 6
+doc_0007_university_affiliation.pdf,University Affiliation,AICTE-1-1029481,2024-08-10,2027-04-01,False,TAMPERED_TEXT,TAMPER_SUSPECTED,val,Synthetic benchmark sample 7
+doc_0008_appointment_letter.pdf,Appointment Letter,AICTE-1-4491029,2023-06-28,2026-10-28,True,NONE,VERIFIED,train,Synthetic benchmark sample 8
+doc_0009_land_deed.pdf,Land Deed,AICTE-1-4491029,2024-11-18,2024-01-01,False,EXPIRED_DATE,EXPIRED,train,Synthetic benchmark sample 9
+doc_0010_appointment_letter.pdf,Appointment Letter,AICTE-1-4491029,2023-08-16,2024-01-01,False,EXPIRED_DATE,EXPIRED,train,Synthetic benchmark sample 10
+doc_0011_fire_noc.pdf,Fire NOC,AICTE-1-0000000,2023-11-09,2026-02-17,False,MISMATCH_INSTITUTE_ID,MISMATCH_ID,test,Synthetic benchmark sample 11
+doc_0012_naac_accreditation.pdf,NAAC Accreditation,AICTE-1-3324901,2024-08-03,2024-01-01,False,EXPIRED_DATE,EXPIRED,train,Synthetic benchmark sample 12
+doc_0013_land_deed.pdf,Land Deed,AICTE-1-0000000,2025-11-23,2028-11-12,False,MISMATCH_INSTITUTE_ID,MISMATCH_ID,train,Synthetic benchmark sample 13
+doc_0014_university_affiliation.pdf,University Affiliation,AICTE-1-7738291,2023-12-23,2026-12-19,False,BAD_QR_HMAC,SIGNATURE_INVALID,train,Synthetic benchmark sample 14
+doc_0015_fee_receipt.pdf,Fee Receipt,AICTE-1-8839201,2023-09-18,2026-01-14,True,NONE,VERIFIED,val,Synthetic benchmark sample 15
+doc_0016_building_plan.pdf,Building Plan,AICTE-1-0000000,2025-05-24,2028-05-17,False,MISMATCH_INSTITUTE_ID,MISMATCH_ID,train,Synthetic benchmark sample 16
+doc_0017_affidavit.pdf,Affidavit,AICTE-1-4491029,2024-10-01,2027-06-01,True,NONE,VERIFIED,val,Synthetic benchmark sample 17
+doc_0018_caste_certificate.pdf,Caste Certificate,AICTE-1-3324901,2025-02-16,2028-08-14,True,NONE,VERIFIED,train,Synthetic benchmark sample 18
+doc_0019_fire_noc.pdf,Fire NOC,AICTE-1-4491029,2025-03-20,2028-09-18,True,NONE,VERIFIED,train,Synthetic benchmark sample 19
+doc_0020_university_affiliation.pdf,University Affiliation,AICTE-1-8839201,2025-05-06,2024-01-01,False,EXPIRED_DATE,EXPIRED,train,Synthetic benchmark sample 20
+doc_0021_fee_receipt.pdf,Fee Receipt,AICTE-1-0000000,2025-10-12,2028-08-02,False,MISMATCH_INSTITUTE_ID,MISMATCH_ID,train,Synthetic benchmark sample 21
+doc_0022_fee_receipt.pdf,Fee Receipt,AICTE-1-0000000,2023-10-17,2026-05-07,False,MISMATCH_INSTITUTE_ID,MISMATCH_ID,test,Synthetic benchmark sample 22
+doc_0023_university_affiliation.pdf,University Affiliation,AICTE-1-1029481,2023-09-26,2026-04-26,True,NONE,VERIFIED,val,Synthetic benchmark sample 23
+doc_0024_building_plan.pdf,Building Plan,AICTE-1-7738291,2024-03-07,2027-07-23,True,NONE,VERIFIED,train,Synthetic benchmark sample 24
+doc_0025_naac_accreditation.pdf,NAAC Accreditation,AICTE-1-7738291,2024-04-28,2027-06-18,False,TAMPERED_TEXT,TAMPER_SUSPECTED,train,Synthetic benchmark sample 25
+doc_0026_trust_deed.pdf,Trust Deed,AICTE-1-8839201,2025-06-11,2028-02-01,False,BAD_QR_HMAC,SIGNATURE_INVALID,train,Synthetic benchmark sample 26
+doc_0027_affidavit.pdf,Affidavit,AICTE-1-1029481,2024-04-13,2027-07-01,False,BAD_QR_HMAC,SIGNATURE_INVALID,train,Synthetic benchmark sample 27
+doc_0028_naac_accreditation.pdf,NAAC Accreditation,AICTE-1-8839201,2025-04-08,2028-10-04,False,TAMPERED_TEXT,TAMPER_SUSPECTED,val,Synthetic benchmark sample 28
+doc_0029_fire_noc.pdf,Fire NOC,AICTE-1-0000000,2024-08-21,2027-11-14,False,MISMATCH_INSTITUTE_ID,MISMATCH_ID,train,Synthetic benchmark sample 29
+doc_0030_affidavit.pdf,Affidavit,AICTE-1-0000000,2024-02-27,2027-11-16,False,MISMATCH_INSTITUTE_ID,MISMATCH_ID,train,Synthetic benchmark sample 30
+doc_0031_fire_noc.pdf,Fire NOC,AICTE-1-4491029,2023-11-13,2026-09-22,False,BAD_QR_HMAC,SIGNATURE_INVALID,train,Synthetic benchmark sample 31
+doc_0032_university_affiliation.pdf,University Affiliation,AICTE-1-8839201,2024-11-16,2027-01-16,False,BAD_QR_HMAC,SIGNATURE_INVALID,train,Synthetic benchmark sample 32
+doc_0033_trust_deed.pdf,Trust Deed,AICTE-1-0000000,2025-12-07,2028-03-02,False,MISMATCH_INSTITUTE_ID,MISMATCH_ID,train,Synthetic benchmark sample 33
+doc_0034_appointment_letter.pdf,Appointment Letter,AICTE-1-7738291,2024-03-16,2027-01-28,False,BAD_QR_HMAC,SIGNATURE_INVALID,train,Synthetic benchmark sample 34
+doc_0035_fire_noc.pdf,Fire NOC,AICTE-1-4491029,2025-01-11,2028-09-23,False,BAD_QR_HMAC,SIGNATURE_INVALID,train,Synthetic benchmark sample 35
+doc_0036_ter_receipt.pdf,TER Receipt,AICTE-1-8839201,2025-12-11,2024-01-01,False,EXPIRED_DATE,EXPIRED,train,Synthetic benchmark sample 36
+doc_0037_university_affiliation.pdf,University Affiliation,AICTE-1-0000000,2024-08-03,2027-04-15,False,MISMATCH_INSTITUTE_ID,MISMATCH_ID,test,Synthetic benchmark sample 37
+doc_0038_ter_receipt.pdf,TER Receipt,AICTE-1-1029481,2024-04-10,2027-04-08,True,NONE,VERIFIED,test,Synthetic benchmark sample 38
+doc_0039_fee_receipt.pdf,Fee Receipt,AICTE-1-4491029,2025-06-16,2028-09-12,False,TAMPERED_TEXT,TAMPER_SUSPECTED,train,Synthetic benchmark sample 39
+doc_0040_trust_deed.pdf,Trust Deed,AICTE-1-7738291,2025-05-04,2028-08-20,True,NONE,VERIFIED,train,Synthetic benchmark sample 40
+doc_0041_ter_receipt.pdf,TER Receipt,AICTE-1-4491029,2025-04-09,2028-07-07,True,NONE,VERIFIED,val,Synthetic benchmark sample 41
+doc_0042_fire_noc.pdf,Fire NOC,AICTE-1-3324901,2025-11-02,2028-07-14,False,BAD_QR_HMAC,SIGNATURE_INVALID,train,Synthetic benchmark sample 42
+doc_0043_appointment_letter.pdf,Appointment Letter,AICTE-1-3324901,2023-12-01,2026-06-17,False,BAD_QR_HMAC,SIGNATURE_INVALID,train,Synthetic benchmark sample 43
+doc_0044_trust_deed.pdf,Trust Deed,AICTE-1-7738291,2024-06-03,2027-03-04,True,NONE,VERIFIED,val,Synthetic benchmark sample 44
+doc_0045_mark_sheet.pdf,Mark Sheet,AICTE-1-7738291,2024-07-28,2027-06-01,True,NONE,VERIFIED,train,Synthetic benchmark sample 45
+doc_0046_fee_receipt.pdf,Fee Receipt,AICTE-1-7738291,2024-05-21,2027-05-05,False,TAMPERED_TEXT,TAMPER_SUSPECTED,train,Synthetic benchmark sample 46
+doc_0047_university_affiliation.pdf,University Affiliation,AICTE-1-3324901,2024-10-21,2027-09-19,False,BAD_QR_HMAC,SIGNATURE_INVALID,test,Synthetic benchmark sample 47
+doc_0048_appointment_letter.pdf,Appointment Letter,AICTE-1-1029481,2025-01-19,2028-05-18,False,BAD_QR_HMAC,SIGNATURE_INVALID,train,Synthetic benchmark sample 48
+doc_0049_appointment_letter.pdf,Appointment Letter,AICTE-1-4491029,2025-01-25,2028-12-15,True,NONE,VERIFIED,val,Synthetic benchmark sample 49
+doc_0050_fire_noc.pdf,Fire NOC,AICTE-1-3324901,2024-02-10,2027-04-27,False,TAMPERED_TEXT,TAMPER_SUSPECTED,train,Synthetic benchmark sample 50
+doc_0051_fee_receipt.pdf,Fee Receipt,AICTE-1-3324901,2025-01-25,2028-07-05,True,NONE,VERIFIED,train,Synthetic benchmark sample 51
+doc_0052_appointment_letter.pdf,Appointment Letter,AICTE-1-3324901,2023-10-23,2026-05-18,True,NONE,VERIFIED,test,Synthetic benchmark sample 52
+doc_0053_trust_deed.pdf,Trust Deed,AICTE-1-4491029,2023-10-18,2026-03-21,True,NONE,VERIFIED,test,Synthetic benchmark sample 53
+doc_0054_trust_deed.pdf,Trust Deed,AICTE-1-0000000,2025-09-16,2028-01-15,False,MISMATCH_INSTITUTE_ID,MISMATCH_ID,train,Synthetic benchmark sample 54
+doc_0055_building_plan.pdf,Building Plan,AICTE-1-0000000,2025-07-18,2028-06-17,False,MISMATCH_INSTITUTE_ID,MISMATCH_ID,train,Synthetic benchmark sample 55
+doc_0056_trust_deed.pdf,Trust Deed,AICTE-1-8839201,2024-02-15,2024-01-01,False,EXPIRED_DATE,EXPIRED,train,Synthetic benchmark sample 56
+doc_0057_trust_deed.pdf,Trust Deed,AICTE-1-4491029,2023-01-03,2026-11-19,False,TAMPERED_TEXT,TAMPER_SUSPECTED,train,Synthetic benchmark sample 57
+doc_0058_trust_deed.pdf,Trust Deed,AICTE-1-8839201,2024-12-06,2027-02-14,False,TAMPERED_TEXT,TAMPER_SUSPECTED,train,Synthetic benchmark sample 58
+doc_0059_land_deed.pdf,Land Deed,AICTE-1-4491029,2024-03-23,2027-07-26,True,NONE,VERIFIED,train,Synthetic benchmark sample 59
+doc_0060_affidavit.pdf,Affidavit,AICTE-1-8839201,2025-12-15,2028-09-28,False,TAMPERED_TEXT,TAMPER_SUSPECTED,train,Synthetic benchmark sample 60
+doc_0061_land_deed.pdf,Land Deed,AICTE-1-4491029,2023-11-25,2026-12-26,True,NONE,VERIFIED,train,Synthetic benchmark sample 61
+doc_0062_caste_certificate.pdf,Caste Certificate,AICTE-1-4491029,2024-08-18,2027-04-17,True,NONE,VERIFIED,test,Synthetic benchmark sample 62
+doc_0063_building_plan.pdf,Building Plan,AICTE-1-8839201,2025-09-08,2028-11-17,True,NONE,VERIFIED,val,Synthetic benchmark sample 63
+doc_0064_appointment_letter.pdf,Appointment Letter,AICTE-1-3324901,2024-02-03,2027-07-26,True,NONE,VERIFIED,train,Synthetic benchmark sample 64
+doc_0065_land_deed.pdf,Land Deed,AICTE-1-4491029,2025-11-02,2028-10-06,True,NONE,VERIFIED,train,Synthetic benchmark sample 65
+doc_0066_ter_receipt.pdf,TER Receipt,AICTE-1-4491029,2025-02-05,2024-01-01,False,EXPIRED_DATE,EXPIRED,train,Synthetic benchmark sample 66
+doc_0067_trust_deed.pdf,Trust Deed,AICTE-1-8839201,2025-05-19,2028-06-22,True,NONE,VERIFIED,val,Synthetic benchmark sample 67
+doc_0068_building_plan.pdf,Building Plan,AICTE-1-1029481,2025-02-06,2028-01-19,True,NONE,VERIFIED,val,Synthetic benchmark sample 68
+doc_0069_fee_receipt.pdf,Fee Receipt,AICTE-1-3324901,2024-12-07,2027-03-15,False,TAMPERED_TEXT,TAMPER_SUSPECTED,train,Synthetic benchmark sample 69
+doc_0070_land_deed.pdf,Land Deed,AICTE-1-1029481,2023-09-05,2024-01-01,False,EXPIRED_DATE,EXPIRED,train,Synthetic benchmark sample 70
+doc_0071_building_plan.pdf,Building Plan,AICTE-1-7738291,2024-12-13,2027-01-18,True,NONE,VERIFIED,val,Synthetic benchmark sample 71
+doc_0072_affidavit.pdf,Affidavit,AICTE-1-4491029,2023-08-14,2026-02-21,True,NONE,VERIFIED,train,Synthetic benchmark sample 72
+doc_0073_fee_receipt.pdf,Fee Receipt,AICTE-1-7738291,2025-09-23,2028-09-22,True,NONE,VERIFIED,train,Synthetic benchmark sample 73
+doc_0074_fee_receipt.pdf,Fee Receipt,AICTE-1-7738291,2025-04-07,2028-04-17,False,TAMPERED_TEXT,TAMPER_SUSPECTED,train,Synthetic benchmark sample 74
+doc_0075_caste_certificate.pdf,Caste Certificate,AICTE-1-8839201,2023-03-25,2026-02-02,True,NONE,VERIFIED,train,Synthetic benchmark sample 75
+doc_0076_fire_noc.pdf,Fire NOC,AICTE-1-1029481,2024-11-28,2024-01-01,False,EXPIRED_DATE,EXPIRED,train,Synthetic benchmark sample 76
+doc_0077_fire_noc.pdf,Fire NOC,AICTE-1-3324901,2024-02-17,2027-04-24,True,NONE,VERIFIED,train,Synthetic benchmark sample 77
+doc_0078_ter_receipt.pdf,TER Receipt,AICTE-1-0000000,2023-11-04,2026-04-14,False,MISMATCH_INSTITUTE_ID,MISMATCH_ID,train,Synthetic benchmark sample 78
+doc_0079_mark_sheet.pdf,Mark Sheet,AICTE-1-3324901,2023-12-13,2026-11-10,False,BAD_QR_HMAC,SIGNATURE_INVALID,val,Synthetic benchmark sample 79
+doc_0080_appointment_letter.pdf,Appointment Letter,AICTE-1-0000000,2025-01-02,2028-09-26,False,MISMATCH_INSTITUTE_ID,MISMATCH_ID,test,Synthetic benchmark sample 80
