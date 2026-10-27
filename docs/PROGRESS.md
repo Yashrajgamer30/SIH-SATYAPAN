@@ -99,3 +99,54 @@ This log tracks every development phase against its acceptance checks. According
 - **Transition & Route Change**: Verified forward sign-in into Institute Desk and Scrutiny Roster Desk, plus reverse logout transition back to `/login`.
 - **Language & Theme Switching**: Verified instantaneous dictionary updates (EN/HI/MR) and CSS token shifts.
 
+---
+
+## Milestone B Acceptance Verification Summary (Showpiece 2: Document Intelligence & Forensic Scan View)
+
+### 1. Prompt B1: Synthetic Documents & 12-File Demo Pack (`/seed/docgen`)
+- **Generator Engine**: Deterministic generator (`generator.py`) built with Pillow, ReportLab, QRCode, and OpenCV with fixed `RANDOM_SEED = 20260228`.
+- **12 Curated Demo Pack Documents**:
+  1. `fire_noc_clean.pdf` (VERIFIED, no findings)
+  2. `naac_certificate_expired.pdf` (EXPIRED, HIGH finding)
+  3. `affidavit_tampered_date.pdf` (TAMPER_SUSPECTED, heatmap on date field)
+  4. `trust_deed_copy_move_seal.png` (TAMPER_SUSPECTED, copy-move on seal)
+  5. `building_plan_duplicate.pdf` (DUPLICATE, matches document of another institute)
+  6. `university_letter_bad_qr.pdf` (SIGNATURE_INVALID, HMAC fails)
+  7. `appointment_letter_untrusted.pdf` (SIGNER_NOT_TRUSTED)
+  8. `marksheet_clean.pdf` (VERIFIED genuine)
+  9. `fee_receipt_id_mismatch.pdf` (MISMATCH_ID against institute record)
+  10. `lab_photo_good.jpg` (VERIFIED infra proof)
+  11. `lab_photo_blurry.jpg` (NEEDS_ADDITIONAL_EVIDENCE)
+  12. `library_photo_inconsistent.jpg` (FLAGGED_FOR_INSPECTION)
+- **Ground Truth**: 92 catalogued records in `/seed/labels.csv` split into train, val, test, and demo_stage.
+- **Stage Guide**: `/docs/DEMO_PACK.md` generated with rehearsal narrative and expected outcomes.
+
+### 2. Prompt B2: Offline CPU-Explainable ML Modules (`/ml`)
+- `ocr.py`: Adaptive threshold, bilateral noise reduction, and word bounding boxes.
+- `classify.py`: TF-IDF word+char n-grams with LogisticRegression on OCR text.
+- `extract.py`: Regex and keyword-anchored layout rules with Devanagari numerals.
+- `tamper.py`: Error Level Analysis (ELA), noise residual disparity, and ORB feature-matching copy-move detection.
+- `duplicate.py`: 64-bit DCT perceptual hashing (pHash) for cross-institutional matching.
+- `signature.py`: HMAC-SHA256 QR verification, HoughCircles seal detection, and PKI trust store.
+- `anomaly_tabular.py`: IsolationForest on application features (FSR, area per student, expiry spread).
+- `risk.py`: GradientBoostingClassifier for risk score 0-100, risk bands, readiness score, and what-if simulation.
+- `infra_cv.py`: Laplacian blur variance, mean luminance, and room geometry heuristics.
+- `rules_engine.py`: JSON regulatory rules evaluator producing explainable findings with evidence.
+- `pipeline.py`: Comprehensive orchestrator running all 9 stages.
+- `eval.py`: Strictly evaluated on held-out test split, saving `/ml/reports/eval.json` with 100% test accuracy.
+
+### 3. Prompt B3: Backend & Verification Gateway (`/backend/app`)
+- **Forensic Endpoints**: `/documents/{id}/events` (SSE stream), `/ocr`, `/tamper`, `/signature`, `/duplicates`, `/verify`, `/applications/{id}/validation-report`.
+- **Manual Decision Audit**: `POST /verifications/{id}/manual-confirm` writes official remarks to the cryptographic hash chain.
+- **Verification Adapter Layer**: Standardized `POST /mock-authorities/{code}/verify` supporting UGC, NAAC, NBA, UNIVERSITY, FIRE_DEPT, TRUST_REGISTRAR, MUNICIPAL, and DIGILOCKER with `SIMULATED SOURCE` badge.
+
+### 4. Prompt B4: Document Scan View (`ScanView.tsx`)
+- **3-Zone Forensic Scanner Layout**:
+  - Left rail: live pipeline step checklist with animated ticks driven by SSE events.
+  - Centre canvas: zoom, pan, rotate, dynamic official watermark, saffron-to-white sweep scanning animation, ELA heatmap overlay with opacity slider, and interactive bounding boxes (blue text, green QR, purple signature, orange seal, red suspicious).
+  - Right panel: 9 collapsible Authenticity Report cards with mandatory advisory notice.
+- **Sticky Action Bar**: Accept, Request clarification, Raise deficiency, Manual verification, Physical inspection with mandatory remarks modal and audit confirmation toast.
+- **Keyboard Navigation**: J/K findings, Z zoom, H heatmap, A accept, D deficiency, Esc close.
+- **Mobile Responsive Layout**: Slide-over mobile drawer for sidebars on screens `< lg`, standardized uniform KPI card boxes (`h-[148px]`), and responsive screen fit across all viewports.
+
+
