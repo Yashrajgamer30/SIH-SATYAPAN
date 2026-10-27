@@ -34,7 +34,7 @@ export const GovFooter: React.FC = () => {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left text-11 text-slate-400">
           <div>
             <p className="font-semibold text-white">
-              AICTE SATYAPAN • National Regulatory Verification & Decision Support System
+              SATYAPAN • National Regulatory Verification & Decision Support System
             </p>
             <p className="mt-1">
               {t('footer.copyright')}

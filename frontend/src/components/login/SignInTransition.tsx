@@ -255,7 +255,7 @@ export const SignInTransition: React.FC<SignInTransitionProps> = ({
           </div>
 
           <h1 className="text-24 sm:text-28 font-extrabold text-white tracking-tight drop-shadow-md">
-            Welcome to AICTE SATYAPAN
+            Welcome to SATYAPAN
           </h1>
 
           <div className="flex items-center gap-2 text-13 font-medium text-slate-200">

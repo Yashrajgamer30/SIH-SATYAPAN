@@ -1,20 +1,145 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTranslation } from 'react-i18next';
 import {
   Lock, Mail, Eye, EyeOff, RotateCw, ShieldCheck,
   Copy, Check, AlertCircle, ArrowRight, KeyRound, Building
 } from 'lucide-react';
 import { useAuthStore } from '../../context/authStore';
+import { useTheme } from '../../context/ThemeContext';
 
 interface LoginCardProps {
   onSuccess: (user: any) => void;
   isTransitioning?: boolean;
 }
 
+const LOGIN_STRINGS: Record<string, Record<string, string>> = {
+  en: {
+    officialPortal: "Official Scrutiny",
+    institutionalPortal: "Institutional EoA Portal",
+    instituteTab: "Institute Login",
+    officialTab: "Officials Login",
+    emailLabel: "User ID or Official Email",
+    passwordLabel: "Password",
+    showPassword: "Show password",
+    hidePassword: "Hide password",
+    captchaPlaceholder: "Result",
+    refreshCaptcha: "Refresh CAPTCHA problem",
+    rememberMe: "Remember me",
+    forgotPassword: "Forgot password?",
+    forgotAlert: "Contact institutional policy administrator to reset regulatory credentials.",
+    signInInstitute: "Sign in to Institute Desk",
+    signInOfficial: "Sign in to Officials Portal",
+    completeMfa: "Complete MFA Verification",
+    authenticating: "Authenticating with Gateway...",
+    verifiedSessionStarting: "Verified • Session Starting",
+    mfaTitle: "Multi-Factor Authentication",
+    mfaDesc: "Enter the 6-digit one-time authorization code generated for",
+    autoFillDemoOtp: "Click to auto-fill Demo OTP",
+    resendIn: "Resend code in",
+    resendCode: "Resend code",
+    backToCredentials: "Back to credentials",
+    securityNotice: "Authorised users only. All logins and mutations are cryptographically logged.",
+    demoAccountsTitle: "Demo Accounts for Presentation",
+    syntheticCredentials: "Synthetic credentials",
+    faculty: "Faculty",
+    facultyDesc: "Academic Dossier",
+    instituteAdmin: "Institute Admin",
+    instituteAdminDesc: "Principal / Management",
+    scrutinyOfficer: "Scrutiny Officer",
+    scrutinyOfficerDesc: "Official MFA",
+    seniorOfficer: "Senior Officer",
+    seniorOfficerDesc: "Regional Director",
+    validationOtpLength: "Please enter the complete 6-digit verification code.",
+    validationCaptcha: "Security calculation is incorrect. Please re-check the sum."
+  },
+  hi: {
+    officialPortal: "आधिकारिक जांच",
+    institutionalPortal: "संस्थान ईओए पोर्टल",
+    instituteTab: "संस्थान लॉगिन",
+    officialTab: "अधिकारी लॉगिन",
+    emailLabel: "यूज़र आईडी या आधिकारिक ईमेल",
+    passwordLabel: "पासवर्ड",
+    showPassword: "पासवर्ड दिखाएं",
+    hidePassword: "पासवर्ड छुपाएं",
+    captchaPlaceholder: "उत्तर",
+    refreshCaptcha: "सुरक्षा गणना बदलें",
+    rememberMe: "मुझे याद रखें",
+    forgotPassword: "पासवर्ड भूल गए?",
+    forgotAlert: "नियामक क्रेडेंशियल रीसेट करने के लिए संस्थागत व्यवस्थापक से संपर्क करें।",
+    signInInstitute: "संस्थान डेस्क में प्रवेश करें",
+    signInOfficial: "अधिकारी पोर्टल में प्रवेश करें",
+    completeMfa: "एमएफए सत्यापन पूर्ण करें",
+    authenticating: "गेटवे से सत्यापन जारी है...",
+    verifiedSessionStarting: "सत्यापित • सत्र प्रारंभ हो रहा है",
+    mfaTitle: "मल्टी-फ़ैक्टर प्रमाणीकरण",
+    mfaDesc: "के लिए उत्पन्न 6-अंकीय एकमुश्त प्रमाणीकरण कोड दर्ज करें",
+    autoFillDemoOtp: "डेमो ओटीपी ऑटो-फिल करें",
+    resendIn: "पुनः कोड भेजें",
+    resendCode: "कोड पुनः भेजें",
+    backToCredentials: "क्रेडेंशियल्स पर वापस जाएं",
+    securityNotice: "केवल अधिकृत उपयोगकर्ता। सभी लॉगिन और संशोधन क्रिप्टोग्राफ़िक रूप से रिकॉर्ड किए जाते हैं।",
+    demoAccountsTitle: "प्रस्तुति हेतु डेमो खाते",
+    syntheticCredentials: "सिंथेटिक क्रेडेंशियल्स",
+    faculty: "संकाय (Faculty)",
+    facultyDesc: "शैक्षणिक विवरणिका",
+    instituteAdmin: "संस्थान प्रशासक",
+    instituteAdminDesc: "प्राचार्य / प्रबंधन",
+    scrutinyOfficer: "जांच अधिकारी",
+    scrutinyOfficerDesc: "आधिकारिक एमएफए",
+    seniorOfficer: "वरिष्ठ अधिकारी",
+    seniorOfficerDesc: "क्षेत्रीय निदेशक",
+    validationOtpLength: "कृपया पूरा 6-अंकीय सत्यापन कोड दर्ज करें।",
+    validationCaptcha: "सुरक्षा गणना सही नहीं है। कृपया जोड़ की पुनः जांच करें।"
+  },
+  mr: {
+    officialPortal: "अधिकृत तपासणी",
+    institutionalPortal: "संस्था ईओए पोर्टल",
+    instituteTab: "संस्था लॉगिन",
+    officialTab: "अधिकारी लॉगिन",
+    emailLabel: "वापरकर्ता आयडी किंवा अधिकृत ईमेल",
+    passwordLabel: "पासवर्ड",
+    showPassword: "पासवर्ड दाखवा",
+    hidePassword: "पासवर्ड लपवा",
+    captchaPlaceholder: "उत्तर",
+    refreshCaptcha: "सुरक्षा गणित बदला",
+    rememberMe: "माझी नोंद ठेवा",
+    forgotPassword: "पासवर्ड विसरलात?",
+    forgotAlert: "नियामक क्रेडेन्शियल्स रीसेट करण्यासाठी संस्थात्मक प्रशासकाशी संपर्क साधा.",
+    signInInstitute: "संस्था कक्षात प्रवेश करा",
+    signInOfficial: "अधिकारी पोर्टलमध्ये प्रवेश करा",
+    completeMfa: "एमएफए पडताळणी पूर्ण करा",
+    authenticating: "गेटवेसह प्रमाणीकरण सुरू आहे...",
+    verifiedSessionStarting: "प्रमाणित • सत्र सुरू होत आहे",
+    mfaTitle: "मल्टी-फॅक्टर प्रमाणीकरण",
+    mfaDesc: "या खात्यासाठी निर्माण केलेला ६-अंकी पडताळणी कोड प्रविष्ट करा",
+    autoFillDemoOtp: "डेमो ओटीपी ऑटो-फिल करा",
+    resendIn: "पुन्हा कोड पाठवा",
+    resendCode: "कोड पुन्हा पाठवा",
+    backToCredentials: "माहितीवर परत जा",
+    securityNotice: "केवळ अधिकृत वापरकर्त्यांसाठी. सर्व लॉगिन व बदल क्रिप्टोग्राफिकरीत्या नोंदवले जातात.",
+    demoAccountsTitle: "सादरीकरणासाठी डेमो खाती",
+    syntheticCredentials: "सिंथेटिक क्रेडेन्शियल्स",
+    faculty: "प्राध्यापक (Faculty)",
+    facultyDesc: "शैक्षणिक संचिका",
+    instituteAdmin: "संस्था प्रशासक",
+    instituteAdminDesc: "प्राचार्य / व्यवस्थापन",
+    scrutinyOfficer: "तपासणी अधिकारी",
+    scrutinyOfficerDesc: "अधिकृत एमएफए",
+    seniorOfficer: "वरिष्ठ अधिकारी",
+    seniorOfficerDesc: "विभागीय संचालक",
+    validationOtpLength: "कृपया संपूर्ण ६-अंकी पडताळणी कोड प्रविष्ट करा.",
+    validationCaptcha: "सुरक्षा गणना चुकीची आहे. कृपया बेरजेची पुनर्तपासणी करा."
+  }
+};
+
 export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning = false }) => {
-  const { t } = useTranslation();
-  const { login, verifyOtp, isLoading, mfaChallenge } = useAuthStore();
+  const { language } = useTheme();
+  const { login, verifyOtp, isLoading } = useAuthStore();
+
+  const txt = (key: string): string => {
+    const dict = LOGIN_STRINGS[language] || LOGIN_STRINGS.en;
+    return dict[key] || LOGIN_STRINGS.en[key] || key;
+  };
 
   // Active Tab: 'institute' vs 'official'
   const [activeTab, setActiveTab] = useState<'institute' | 'official'>('institute');
@@ -68,36 +193,36 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
   // Demo Accounts Data
   const demoAccounts = [
     {
-      roleKey: 'login.faculty',
+      roleKey: 'faculty',
       role: 'Faculty',
       tab: 'institute' as const,
       email: 'faculty@demo-institute.in',
       password: 'Demo@1234',
-      badgeKey: 'login.facultyDesc'
+      badgeKey: 'facultyDesc'
     },
     {
-      roleKey: 'login.instituteAdmin',
+      roleKey: 'instituteAdmin',
       role: 'Institute Admin',
       tab: 'institute' as const,
       email: 'admin@demo-institute.in',
       password: 'Demo@1234',
-      badgeKey: 'login.instituteAdminDesc'
+      badgeKey: 'instituteAdminDesc'
     },
     {
-      roleKey: 'login.scrutinyOfficer',
+      roleKey: 'scrutinyOfficer',
       role: 'Scrutiny Officer',
       tab: 'official' as const,
       email: 'scrutiny@aicte.demo',
       password: 'Demo@1234',
-      badgeKey: 'login.scrutinyOfficerDesc'
+      badgeKey: 'scrutinyOfficerDesc'
     },
     {
-      roleKey: 'login.seniorOfficer',
+      roleKey: 'seniorOfficer',
       role: 'Senior Officer',
       tab: 'official' as const,
       email: 'senior@aicte.demo',
       password: 'Demo@1234',
-      badgeKey: 'login.seniorOfficerDesc'
+      badgeKey: 'seniorOfficerDesc'
     }
   ];
 
@@ -107,7 +232,6 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
     setOtpStep(false);
     setErrorMessage(null);
 
-    // Fast typewriter effect into inputs
     setEmail('');
     setPassword('');
     const targetEmail = acc.email;
@@ -120,7 +244,6 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
       if (emailIdx >= targetEmail.length) {
         clearInterval(emailInterval);
         setPassword(targetPw);
-        // Auto-solve arithmetic captcha for frictionless presentation
         setCaptchaInput(String(captchaNum1 + captchaNum2));
       }
     }, 15);
@@ -138,11 +261,10 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
     e.preventDefault();
     setErrorMessage(null);
 
-    // 1. If currently in OTP Step
     if (otpStep) {
       const fullOtp = otpDigits.join('');
       if (fullOtp.length !== 6) {
-        setErrorMessage('Please enter the complete 6-digit verification code.');
+        setErrorMessage(txt('validationOtpLength'));
         setShakeTrigger((prev) => prev + 1);
         return;
       }
@@ -158,15 +280,13 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
       return;
     }
 
-    // 2. Validate Captcha
     if (parseInt(captchaInput, 10) !== captchaNum1 + captchaNum2) {
-      setErrorMessage('Security calculation is incorrect. Please re-check the sum.');
+      setErrorMessage(txt('validationCaptcha'));
       setShakeTrigger((prev) => prev + 1);
       refreshCaptcha();
       return;
     }
 
-    // 3. Authenticate with Backend
     try {
       const result = await login(email, password);
 
@@ -174,10 +294,8 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
         setOtpStep(true);
         setDemoOtpHint(result.demoHint || '123456');
         setOtpTimer(30);
-        // Auto-focus first digit
         setTimeout(() => otpInputRefs.current[0]?.focus(), 150);
       } else {
-        // Direct Login Success
         setIsSuccessTick(true);
         const { user } = useAuthStore.getState();
         setTimeout(() => onSuccess(user), 500);
@@ -188,14 +306,12 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
     }
   };
 
-  // OTP Digits Handling
   const handleOtpChange = (index: number, value: string) => {
     const clean = value.replace(/\D/g, '').slice(-1);
     const newDigits = [...otpDigits];
     newDigits[index] = clean;
     setOtpDigits(newDigits);
 
-    // Auto-advance focus
     if (clean && index < 5) {
       otpInputRefs.current[index + 1]?.focus();
     }
@@ -222,7 +338,6 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
   };
 
   const isOfficial = activeTab === 'official';
-  const accentColor = isOfficial ? 'navy' : 'saffron';
 
   return (
     <motion.div
@@ -233,12 +348,11 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
         scale: isTransitioning ? 0.94 : 1
       }}
       transition={{ duration: 0.45 }}
-      className="relative w-full max-w-md rounded-2xl bg-white/70 dark:bg-navy-900/75 backdrop-blur-md border border-white/70 dark:border-navy-700/70 shadow-2xl p-6 sm:p-8 flex flex-col justify-between transition-colors"
-      style={{
-        boxShadow: isOfficial
-          ? '0 20px 45px -12px rgba(31, 58, 147, 0.22)'
-          : '0 20px 45px -12px rgba(255, 153, 51, 0.22)'
-      }}
+      className={`relative w-full max-w-md rounded-2xl bg-white/90 dark:bg-navy-900/90 backdrop-blur-md p-6 sm:p-8 flex flex-col justify-between transition-all ${
+        isOfficial 
+          ? 'border-2 border-navy-700/60 dark:border-navy-500/80 ring-4 ring-navy-700/15 dark:ring-navy-500/25 shadow-[0_20px_50px_rgba(15,28,63,0.3)]' 
+          : 'border-2 border-saffron-500/60 dark:border-saffron-500/70 ring-4 ring-saffron-500/20 dark:ring-saffron-500/25 shadow-[0_20px_50px_rgba(255,153,51,0.25)]'
+      }`}
     >
       <div>
         {/* Card Header & Portal Segmented Switch */}
@@ -246,10 +360,9 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
           <div className="flex items-center justify-between">
             <span className="text-11 uppercase font-bold tracking-wider text-gov-muted flex items-center gap-1.5">
               <span
-                className={`w-2 h-2 rounded-full ${isOfficial ? 'bg-navy-700 dark:bg-navy-500' : 'bg-saffron-500'
-                  }`}
+                className={`w-2 h-2 rounded-full ${isOfficial ? 'bg-navy-700 dark:bg-navy-500' : 'bg-saffron-500'}`}
               />
-              {isOfficial ? t('login.officialPortal') : t('login.institutionalPortal')}
+              {isOfficial ? txt('officialPortal') : txt('institutionalPortal')}
             </span>
             <span className="text-[11px] font-mono text-gov-muted bg-slate-100 dark:bg-navy-800/80 px-2 py-0.5 rounded border border-slate-200 dark:border-navy-700">
               HTTPS • AES-256
@@ -257,35 +370,38 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
           </div>
 
           {/* Segmented Toggle with Framer Motion layoutId */}
-          <div className="relative grid grid-cols-2 p-1 rounded-xl bg-slate-100/90 dark:bg-navy-950/80 border border-slate-200/80 dark:border-navy-800">
+          <div className="relative grid grid-cols-2 p-1 rounded-xl bg-slate-100/95 dark:bg-navy-950/90 border border-slate-200/80 dark:border-navy-800">
             <button
               type="button"
               onClick={() => { setActiveTab('institute'); setOtpStep(false); setErrorMessage(null); }}
-              className={`relative z-10 py-2 text-13 font-semibold text-center transition-colors flex items-center justify-center gap-1.5 ${!isOfficial ? 'text-navy-900 dark:text-white' : 'text-gov-muted hover:text-navy-900 dark:hover:text-white'
-                }`}
+              className={`relative z-10 py-2.5 text-13 font-bold text-center transition-colors flex items-center justify-center gap-1.5 ${
+                !isOfficial ? 'text-navy-900 dark:text-white' : 'text-gov-muted hover:text-navy-900 dark:hover:text-white'
+              }`}
             >
-              <Building className="w-3.5 h-3.5" />
-              <span>{t('login.instituteTab')}</span>
+              <Building className="w-4 h-4" />
+              <span>{txt('instituteTab')}</span>
             </button>
 
             <button
               type="button"
               onClick={() => { setActiveTab('official'); setOtpStep(false); setErrorMessage(null); }}
-              className={`relative z-10 py-2 text-13 font-semibold text-center transition-colors flex items-center justify-center gap-1.5 ${isOfficial ? 'text-navy-900 dark:text-white' : 'text-gov-muted hover:text-navy-900 dark:hover:text-white'
-                }`}
+              className={`relative z-10 py-2.5 text-13 font-bold text-center transition-colors flex items-center justify-center gap-1.5 ${
+                isOfficial ? 'text-navy-900 dark:text-white' : 'text-gov-muted hover:text-navy-900 dark:hover:text-white'
+              }`}
             >
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>{t('login.officialTab')}</span>
+              <ShieldCheck className="w-4 h-4" />
+              <span>{txt('officialTab')}</span>
             </button>
 
             {/* Sliding Pill Indicator */}
             <motion.div
               layoutId="loginTabIndicator"
               transition={{ type: "spring", stiffness: 450, damping: 35 }}
-              className={`absolute inset-y-1 rounded-lg shadow-sm ${!isOfficial
-                ? 'left-1 w-[calc(50%-4px)] bg-white dark:bg-navy-800 border-b-2 border-saffron-500'
-                : 'left-[50%] w-[calc(50%-4px)] bg-white dark:bg-navy-800 border-b-2 border-navy-700 dark:border-navy-500'
-                }`}
+              className={`absolute inset-y-1 rounded-lg shadow-sm ${
+                !isOfficial
+                  ? 'left-1 w-[calc(50%-4px)] bg-white dark:bg-navy-800 border-b-2 border-saffron-500'
+                  : 'left-[50%] w-[calc(50%-4px)] bg-white dark:bg-navy-800 border-b-2 border-navy-700 dark:border-navy-500'
+              }`}
             />
           </div>
         </div>
@@ -322,16 +438,17 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder=" "
-                  className={`peer w-full h-12 pl-10 pr-3 rounded-xl border bg-white/60 dark:bg-navy-950/50 text-gov-text text-14 outline-none transition-all placeholder-transparent focus:ring-2 ${isOfficial
-                    ? 'border-slate-300 dark:border-navy-700 focus:border-navy-700 focus:ring-navy-500/20'
-                    : 'border-slate-300 dark:border-navy-700 focus:border-saffron-500 focus:ring-saffron-500/20'
-                    }`}
+                  className={`peer w-full h-12 pl-10 pr-3 rounded-xl border bg-white/70 dark:bg-navy-950/70 text-gov-text text-14 outline-none transition-all placeholder-transparent focus:ring-2 ${
+                    isOfficial
+                      ? 'border-slate-300 dark:border-navy-700 focus:border-navy-700 focus:ring-navy-500/20'
+                      : 'border-slate-300 dark:border-navy-700 focus:border-saffron-500 focus:ring-saffron-500/20'
+                  }`}
                 />
                 <label
                   htmlFor="login-email"
-                  className="absolute left-10 -top-2.5 px-1 bg-white/90 dark:bg-navy-900 rounded text-11 font-medium text-gov-muted transition-all peer-placeholder-shown:text-14 peer-placeholder-shown:top-3 peer-placeholder-shown:bg-transparent peer-focus:-top-2.5 peer-focus:text-11 peer-focus:bg-white/90 dark:peer-focus:bg-navy-900"
+                  className="absolute left-10 -top-2.5 px-1 bg-white dark:bg-navy-900 rounded text-11 font-medium text-gov-muted transition-all peer-placeholder-shown:text-14 peer-placeholder-shown:top-3 peer-placeholder-shown:bg-transparent peer-focus:-top-2.5 peer-focus:text-11 peer-focus:bg-white dark:peer-focus:bg-navy-900"
                 >
-                  {t('login.emailLabel')}
+                  {txt('emailLabel')}
                 </label>
                 <Mail className="absolute left-3 top-3.5 w-4 h-4 text-gov-muted" />
               </div>
@@ -345,22 +462,23 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder=" "
-                  className={`peer w-full h-12 pl-10 pr-10 rounded-xl border bg-white/60 dark:bg-navy-950/50 text-gov-text text-14 outline-none transition-all placeholder-transparent focus:ring-2 ${isOfficial
-                    ? 'border-slate-300 dark:border-navy-700 focus:border-navy-700 focus:ring-navy-500/20'
-                    : 'border-slate-300 dark:border-navy-700 focus:border-saffron-500 focus:ring-saffron-500/20'
-                    }`}
+                  className={`peer w-full h-12 pl-10 pr-10 rounded-xl border bg-white/70 dark:bg-navy-950/70 text-gov-text text-14 outline-none transition-all placeholder-transparent focus:ring-2 ${
+                    isOfficial
+                      ? 'border-slate-300 dark:border-navy-700 focus:border-navy-700 focus:ring-navy-500/20'
+                      : 'border-slate-300 dark:border-navy-700 focus:border-saffron-500 focus:ring-saffron-500/20'
+                  }`}
                 />
                 <label
                   htmlFor="login-password"
-                  className="absolute left-10 -top-2.5 px-1 bg-white/90 dark:bg-navy-900 rounded text-11 font-medium text-gov-muted transition-all peer-placeholder-shown:text-14 peer-placeholder-shown:top-3 peer-placeholder-shown:bg-transparent peer-focus:-top-2.5 peer-focus:text-11 peer-focus:bg-white/90 dark:peer-focus:bg-navy-900"
+                  className="absolute left-10 -top-2.5 px-1 bg-white dark:bg-navy-900 rounded text-11 font-medium text-gov-muted transition-all peer-placeholder-shown:text-14 peer-placeholder-shown:top-3 peer-placeholder-shown:bg-transparent peer-focus:-top-2.5 peer-focus:text-11 peer-focus:bg-white dark:peer-focus:bg-navy-900"
                 >
-                  {t('login.passwordLabel')}
+                  {txt('passwordLabel')}
                 </label>
                 <Lock className="absolute left-3 top-3.5 w-4 h-4 text-gov-muted" />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? t('login.hidePassword') : t('login.showPassword')}
+                  aria-label={showPassword ? txt('hidePassword') : txt('showPassword')}
                   className="absolute right-3 top-3.5 text-gov-muted hover:text-gov-text transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -369,12 +487,12 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
 
               {/* Arithmetic Security Captcha */}
               <div className="flex items-center gap-2">
-                <div className="flex-1 flex items-center justify-between px-3 h-11 rounded-xl bg-slate-100/80 dark:bg-navy-950/80 border border-slate-200 dark:border-navy-800 text-13 font-mono font-bold select-none text-navy-900 dark:text-slate-200">
+                <div className="flex-1 flex items-center justify-between px-3 h-11 rounded-xl bg-slate-100/90 dark:bg-navy-950/90 border border-slate-200 dark:border-navy-800 text-13 font-mono font-bold select-none text-navy-900 dark:text-slate-200">
                   <span>{captchaNum1} + {captchaNum2} = ?</span>
                   <button
                     type="button"
                     onClick={refreshCaptcha}
-                    title={t('login.refreshCaptcha')}
+                    title={txt('refreshCaptcha')}
                     className="p-1 rounded hover:bg-slate-200 dark:hover:bg-navy-800 text-gov-muted hover:text-navy-900 dark:hover:text-white transition-colors"
                   >
                     <RotateCw className="w-3.5 h-3.5" />
@@ -387,11 +505,12 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
                     required
                     value={captchaInput}
                     onChange={(e) => setCaptchaInput(e.target.value.replace(/\D/g, ''))}
-                    placeholder={t('login.captchaPlaceholder')}
-                    className={`w-full h-11 px-3 text-center rounded-xl border bg-white/60 dark:bg-navy-950/50 text-gov-text text-14 font-mono font-bold outline-none focus:ring-2 ${isOfficial
-                      ? 'border-slate-300 dark:border-navy-700 focus:border-navy-700 focus:ring-navy-500/20'
-                      : 'border-slate-300 dark:border-navy-700 focus:border-saffron-500 focus:ring-saffron-500/20'
-                      }`}
+                    placeholder={txt('captchaPlaceholder')}
+                    className={`w-full h-11 px-3 text-center rounded-xl border bg-white/70 dark:bg-navy-950/70 text-gov-text text-14 font-mono font-bold outline-none focus:ring-2 ${
+                      isOfficial
+                        ? 'border-slate-300 dark:border-navy-700 focus:border-navy-700 focus:ring-navy-500/20'
+                        : 'border-slate-300 dark:border-navy-700 focus:border-saffron-500 focus:ring-saffron-500/20'
+                    }`}
                   />
                 </div>
               </div>
@@ -405,14 +524,14 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
                     onChange={(e) => setRememberMe(e.target.checked)}
                     className="rounded border-slate-300 text-saffron-500 focus:ring-saffron-500/30"
                   />
-                  <span>{t('login.rememberMe')}</span>
+                  <span>{txt('rememberMe')}</span>
                 </label>
                 <a
                   href="#forgot-password"
-                  onClick={(e) => { e.preventDefault(); alert(t('login.forgotAlert')); }}
+                  onClick={(e) => { e.preventDefault(); alert(txt('forgotAlert')); }}
                   className="hover:underline text-navy-700 dark:text-saffron-400 font-medium"
                 >
-                  {t('login.forgotPassword')}
+                  {txt('forgotPassword')}
                 </a>
               </div>
             </motion.div>
@@ -430,10 +549,10 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
                   <KeyRound className="w-5 h-5" />
                 </div>
                 <h3 className="text-15 font-bold text-navy-900 dark:text-white">
-                  {t('login.mfaTitle')}
+                  {txt('mfaTitle')}
                 </h3>
                 <p className="text-12 text-gov-muted">
-                  {t('login.mfaDesc')} <span className="font-semibold text-navy-900 dark:text-slate-200">{email}</span>.
+                  {txt('mfaDesc')} <span className="font-semibold text-navy-900 dark:text-slate-200">{email}</span>.
                 </p>
               </div>
 
@@ -465,20 +584,20 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
                     }}
                     className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-11 font-mono font-semibold bg-saffron-50 text-saffron-700 dark:bg-saffron-950/60 dark:text-saffron-300 border border-saffron-300 dark:border-saffron-800 hover:bg-saffron-100 transition-colors"
                   >
-                    <span>{t('login.autoFillDemoOtp')}: <strong>{demoOtpHint}</strong></span>
+                    <span>{txt('autoFillDemoOtp')}: <strong>{demoOtpHint}</strong></span>
                   </button>
                 )}
 
                 <div className="flex items-center gap-3 text-12 text-gov-muted">
                   {otpTimer > 0 ? (
-                    <span>{t('login.resendIn')} <strong className="tabular-nums font-mono">{otpTimer}s</strong></span>
+                    <span>{txt('resendIn')} <strong className="tabular-nums font-mono">{otpTimer}s</strong></span>
                   ) : (
                     <button
                       type="button"
                       onClick={() => setOtpTimer(30)}
                       className="text-navy-700 dark:text-saffron-400 font-semibold hover:underline"
                     >
-                      {t('login.resendCode')}
+                      {txt('resendCode')}
                     </button>
                   )}
                   <span>•</span>
@@ -487,7 +606,7 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
                     onClick={() => setOtpStep(false)}
                     className="text-gov-muted hover:underline"
                   >
-                    {t('login.backToCredentials')}
+                    {txt('backToCredentials')}
                   </button>
                 </div>
               </div>
@@ -498,26 +617,27 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
           <button
             type="submit"
             disabled={isLoading || isSuccessTick}
-            className={`w-full h-12 rounded-xl font-bold text-14 flex items-center justify-center gap-2 shadow-md transition-all active:scale-[0.99] disabled:opacity-85 ${isSuccessTick
-              ? 'bg-green-600 text-white'
-              : isOfficial
-                ? 'bg-navy-900 hover:bg-navy-800 text-white shadow-navy-900/20'
-                : 'bg-saffron-500 hover:bg-saffron-600 text-white shadow-saffron-500/25'
-              }`}
+            className={`w-full h-12 rounded-xl font-bold text-14 flex items-center justify-center gap-2 shadow-md transition-all active:scale-[0.99] disabled:opacity-85 ${
+              isSuccessTick
+                ? 'bg-green-600 text-white'
+                : isOfficial
+                  ? 'bg-navy-900 hover:bg-navy-800 text-white shadow-navy-900/20'
+                  : 'bg-saffron-500 hover:bg-saffron-600 text-white shadow-saffron-500/25'
+            }`}
           >
             {isSuccessTick ? (
               <span className="inline-flex items-center gap-2">
                 <Check className="w-5 h-5 text-white animate-bounce" />
-                <span>{t('login.verifiedSessionStarting')}</span>
+                <span>{txt('verifiedSessionStarting')}</span>
               </span>
             ) : isLoading ? (
               <span className="inline-flex items-center gap-2">
                 <RotateCw className="w-4 h-4 animate-spin" />
-                <span>{t('login.authenticating')}</span>
+                <span>{txt('authenticating')}</span>
               </span>
             ) : (
               <span className="inline-flex items-center gap-2">
-                <span>{otpStep ? t('login.completeMfa') : isOfficial ? t('login.signInOfficial') : t('login.signInInstitute')}</span>
+                <span>{otpStep ? txt('completeMfa') : isOfficial ? txt('signInOfficial') : txt('signInInstitute')}</span>
                 <ArrowRight className="w-4 h-4" />
               </span>
             )}
@@ -527,7 +647,7 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
         {/* Security Logging Banner */}
         <div className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-gov-muted font-medium">
           <ShieldCheck className="w-3.5 h-3.5 text-green-600" />
-          <span>{t('login.securityNotice')}</span>
+          <span>{txt('securityNotice')}</span>
         </div>
       </div>
 
@@ -535,10 +655,10 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
       <div className="mt-6 pt-4 border-t border-slate-200/80 dark:border-navy-700/80">
         <div className="flex items-center justify-between mb-2">
           <span className="text-11 font-bold tracking-wider text-navy-900 dark:text-slate-200 uppercase">
-            {t('login.demoAccountsTitle')}
+            {txt('demoAccountsTitle')}
           </span>
           <span className="text-[10px] text-gov-muted font-mono">
-            {t('login.syntheticCredentials')}
+            {txt('syntheticCredentials')}
           </span>
         </div>
 
@@ -548,13 +668,13 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
               key={acc.role}
               type="button"
               onClick={() => handleSelectDemoAccount(acc)}
-              title={`Click to fill ${acc.email} (${t(acc.roleKey)})`}
-              className="group text-left p-2 rounded-xl bg-slate-50/90 dark:bg-navy-950/70 hover:bg-white dark:hover:bg-navy-800/90 border border-slate-200/70 dark:border-navy-800 transition-all flex items-center justify-between shadow-2xs hover:shadow-xs"
+              title={`Click to fill ${acc.email} (${txt(acc.roleKey)})`}
+              className="group text-left p-2 rounded-xl bg-slate-50/90 dark:bg-navy-950/70 hover:bg-white dark:hover:bg-navy-800/90 border border-slate-200/70 dark:border-navy-800 transition-all flex items-center justify-between shadow-2xs hover:shadow-xs cursor-pointer"
             >
               <div className="overflow-hidden pr-1">
                 <div className="flex items-center gap-1">
                   <span className="text-12 font-bold text-navy-900 dark:text-white truncate">
-                    {t(acc.roleKey)}
+                    {txt(acc.roleKey)}
                   </span>
                 </div>
                 <div className="text-[10px] text-gov-muted truncate font-mono">

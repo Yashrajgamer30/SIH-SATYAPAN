@@ -7,7 +7,7 @@ export type SupportedLanguage = 'en' | 'hi' | 'mr';
 const resources = {
   en: {
     translation: {
-      appName: "AICTE SATYAPAN",
+      appName: "SATYAPAN",
       productName: "SATYAPAN",
       tagline: "National AI Scrutiny & Regulatory Compliance Platform",
       govIndia: "Government of India",
@@ -150,7 +150,7 @@ const resources = {
   },
   hi: {
     translation: {
-      appName: "एआईसीटीई सत्यापन",
+      appName: "सत्यापन",
       productName: "सत्यापन",
       tagline: "राष्ट्रीय एआई जांच एवं विनियामक अनुपालन पोर्टल",
       govIndia: "भारत सरकार",
@@ -286,7 +286,7 @@ const resources = {
   },
   mr: {
     translation: {
-      appName: "एआयसीटीई सत्यापन",
+      appName: "सत्यापन",
       productName: "सत्यापन",
       tagline: "राष्ट्रीय कृत्रिम बुद्धिमत्ता तपासणी व नियामक अनुपालन पोर्टल",
       govIndia: "भारत सरकार",
