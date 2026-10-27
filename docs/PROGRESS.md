@@ -1,4 +1,4 @@
-# AICTE SATYAPAN - Phase-by-Phase Progress Log
+# SATYAPAN - Phase-by-Phase Progress Log
 
 This log tracks every development phase against its acceptance checks. According to engineering rules, a phase is marked complete only after its tests and acceptance criteria pass.
 
