@@ -1,0 +1,232 @@
+@import "@fontsource/noto-sans/400.css";
+@import "@fontsource/noto-sans/500.css";
+@import "@fontsource/noto-sans/600.css";
+@import "@fontsource/noto-sans/700.css";
+@import "@fontsource/noto-sans-devanagari/400.css";
+@import "@fontsource/noto-sans-devanagari/500.css";
+@import "@fontsource/noto-sans-devanagari/600.css";
+@import "@fontsource/noto-sans-devanagari/700.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Core brand palette */
+  --navy-900: #0B1F4B;
+  --navy-700: #1F3A93;
+  --navy-500: #3B5BC4;
+  --navy-50: #EEF2FB;
+
+  --saffron-500: #FF9933;
+  --saffron-50: #FFF4E5;
+
+  --green-600: #138808;
+  --green-50: #E8F5E6;
+
+  --chakra-blue: #000080;
+
+  --danger: #C62828;
+  --danger-50: #FFEBEE;
+
+  --warning: #B26A00;
+  --warning-50: #FFF8E1;
+
+  --info: #0B6BCB;
+  --info-50: #E3F2FD;
+
+  /* Theme semantic variables (Default Light) */
+  --color-bg: #F5F7FB;
+  --color-surface: #FFFFFF;
+  --color-surface-subtle: #F0F4FA;
+  --color-border: #D9DFEA;
+  --color-border-strong: #BAC7DC;
+  --color-text: #1B2437;
+  --color-text-muted: #5B6579;
+  --color-focus: #FF9933;
+}
+
+[data-theme="dark"] {
+  --color-bg: #0A1226;
+  --color-surface: #121C38;
+  --color-surface-subtle: #19264A;
+  --color-border: #243255;
+  --color-border-strong: #3A4E7E;
+  --color-text: #E8ECF7;
+  --color-text-muted: #94A3B8;
+  --color-focus: #FF9933;
+
+  --navy-900: #081433;
+  --navy-700: #2C4CB3;
+  --navy-500: #4B6DD8;
+  --navy-50: #19264A;
+
+  --saffron-500: #FFA84D;
+  --saffron-50: #2B1D0E;
+
+  --green-600: #19A40B;
+  --green-50: #0E2914;
+
+  --danger: #E53935;
+  --danger-50: #2D1214;
+
+  --warning: #FFA000;
+  --warning-50: #2D1F08;
+
+  --info: #1E88E5;
+  --info-50: #0E223D;
+}
+
+[data-theme="high-contrast"] {
+  --color-bg: #000000;
+  --color-surface: #000000;
+  --color-surface-subtle: #111111;
+  --color-border: #FFFFFF;
+  --color-border-strong: #FFFFFF;
+  --color-text: #FFFFFF;
+  --color-text-muted: #E2E8F0;
+  --color-focus: #FFD600;
+
+  --navy-900: #000000;
+  --navy-700: #FFD600;
+  --navy-500: #FFD600;
+  --navy-50: #181818;
+
+  --saffron-500: #FFD600;
+  --saffron-50: #222200;
+
+  --green-600: #00FF00;
+  --green-50: #002200;
+
+  --danger: #FF4444;
+  --danger-50: #2E0505;
+
+  --warning: #FFD600;
+  --warning-50: #2B2200;
+
+  --info: #00FFFF;
+  --info-50: #002228;
+}
+
+/* Root font size scalers */
+html[data-font-size="sm"] {
+  font-size: 90%;
+}
+html[data-font-size="md"], html:not([data-font-size]) {
+  font-size: 100%;
+}
+html[data-font-size="lg"] {
+  font-size: 115%;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: 'Noto Sans', 'Noto Sans Devanagari', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--color-text);
+    font-weight: 600;
+    line-height: 1.3;
+    /* Ample padding/height to prevent Devanagari matra clipping */
+    padding-top: 0.1em;
+    padding-bottom: 0.1em;
+  }
+}
+
+/* Background Mesh Blob Keyframe Animations */
+@keyframes blobSlow {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(40px, -60px, 0) scale(1.08);
+  }
+  66% {
+    transform: translate3d(-30px, 45px, 0) scale(0.95);
+  }
+}
+
+@keyframes blobReverse {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(-50px, 40px, 0) scale(1.06);
+  }
+  66% {
+    transform: translate3d(35px, -35px, 0) scale(0.94);
+  }
+}
+
+@keyframes blobPulse {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate3d(25px, 35px, 0) scale(1.12);
+    opacity: 1;
+  }
+}
+
+.animate-blob-slow {
+  animation: blobSlow 28s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-blob-reverse {
+  animation: blobReverse 34s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-blob-pulse {
+  animation: blobPulse 30s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-spin-slow {
+  animation: spin 75s linear infinite;
+  will-change: transform;
+}
+
+/* Tabular numbers for regulatory data tables and KPI figures */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* High Contrast Enforcements (WCAG 2.1 AAA 7:1) */
+[data-theme="high-contrast"] button,
+[data-theme="high-contrast"] a,
+[data-theme="high-contrast"] input,
+[data-theme="high-contrast"] select,
+[data-theme="high-contrast"] textarea {
+  border-width: 2px !important;
+  border-color: #FFFFFF !important;
+}
+
+[data-theme="high-contrast"] a {
+  color: #FFD600 !important;
+  text-decoration: underline !important;
+}
+
+[data-theme="high-contrast"] :focus-visible {
+  outline: 3px solid #FFD600 !important;
+  outline-offset: 3px !important;
+}
+
+/* Reduced Motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
