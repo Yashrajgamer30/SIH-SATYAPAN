@@ -285,72 +285,84 @@ export const OfficialsDashboard: React.FC<OfficialsDashboardProps> = ({ onSelect
         </button>
       </div>
 
-      {/* 3. 6 Key Performance Metric Cards */}
+      {/* 3. 6 Key Performance Metric Cards with Uniform Heights */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
         {/* Pending Applications */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
+        <div className="h-[148px] p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
           <span className="text-11 font-bold text-gov-muted uppercase tracking-wider">Pending Roster</span>
-          <div className="my-2">
-            <span className="text-28 font-black text-navy-900 dark:text-white tabular-nums">
+          <div>
+            <span className="text-26 font-black text-navy-900 dark:text-white tabular-nums">
               {data?.kpis.pending_scrutiny || 6}
             </span>
           </div>
-          <span className="text-[11px] text-gov-muted">In Active Queue</span>
+          <div className="h-5 flex items-center">
+            <span className="text-[11px] text-gov-muted">In Active Queue</span>
+          </div>
         </div>
 
         {/* High-Risk Cases */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
+        <div className="h-[148px] p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
           <span className="text-11 font-bold text-gov-muted uppercase tracking-wider">High Risk Cases</span>
-          <div className="my-2">
-            <span className="text-28 font-black text-red-600 dark:text-red-400 tabular-nums">
+          <div>
+            <span className="text-26 font-black text-red-600 dark:text-red-400 tabular-nums">
               {data?.kpis.high_risk_applications || 3}
             </span>
           </div>
-          <span className="text-[11px] text-red-600 font-semibold">Priority Scrutiny</span>
+          <div className="h-5 flex items-center">
+            <span className="text-[11px] text-red-600 font-semibold">Priority Scrutiny</span>
+          </div>
         </div>
 
         {/* SLA Breaching in 3 Days */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
+        <div className="h-[148px] p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
           <span className="text-11 font-bold text-gov-muted uppercase tracking-wider">SLA at Risk</span>
-          <div className="my-2">
-            <span className="text-28 font-black text-amber-500 tabular-nums">
+          <div>
+            <span className="text-26 font-black text-amber-500 tabular-nums">
               2
             </span>
           </div>
-          <span className="text-[11px] text-amber-600 font-medium">Breach in 72h</span>
+          <div className="h-5 flex items-center">
+            <span className="text-[11px] text-amber-600 font-medium">Breach in 72h</span>
+          </div>
         </div>
 
         {/* Average Verification Time */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
+        <div className="h-[148px] p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
           <span className="text-11 font-bold text-gov-muted uppercase tracking-wider">Avg Scrutiny Time</span>
-          <div className="my-2">
-            <span className="text-28 font-black text-navy-900 dark:text-white tabular-nums">
+          <div>
+            <span className="text-26 font-black text-navy-900 dark:text-white tabular-nums">
               4.2<span className="text-14 font-semibold text-gov-muted ml-0.5">m</span>
             </span>
           </div>
-          <span className="text-[11px] text-green-600 font-semibold">-78% vs manual</span>
+          <div className="h-5 flex items-center">
+            <span className="text-[11px] text-green-600 font-semibold">-78% vs manual</span>
+          </div>
         </div>
 
         {/* Source Verification Success */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
+        <div className="h-[148px] p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
           <span className="text-11 font-bold text-gov-muted uppercase tracking-wider">Source Match Rate</span>
-          <div className="my-2">
-            <span className="text-28 font-black text-green-600 dark:text-green-400 tabular-nums">
+          <div>
+            <span className="text-26 font-black text-green-600 dark:text-green-400 tabular-nums">
               96.4%
             </span>
           </div>
-          <span className="text-[11px] text-gov-muted">DigiLocker / State DTE</span>
+          <div className="h-5 flex items-center">
+            <span className="text-[11px] text-gov-muted">DigiLocker / State DTE</span>
+          </div>
         </div>
 
         {/* Manual Review Queue */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
+        <div className="h-[148px] p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
           <span className="text-11 font-bold text-gov-muted uppercase tracking-wider">Manual Review</span>
-          <div className="my-2">
-            <span className="text-28 font-black text-purple-600 dark:text-purple-400 tabular-nums">
+          <div>
+            <span className="text-26 font-black text-purple-600 dark:text-purple-400 tabular-nums">
               4
             </span>
           </div>
-          <span className="text-[11px] text-gov-muted">Evidence Review</span>
+          <div className="h-5 flex items-center">
+            <span className="text-[11px] text-gov-muted">Evidence Review</span>
+          </div>
         </div>
       </div>
 

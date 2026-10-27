@@ -88,7 +88,7 @@ export const LoginLeftPanel: React.FC<{ isTransitioning?: boolean }> = ({ isTran
   }, [langTaglines.length]);
 
   return (
-    <div className="relative flex flex-col justify-between h-full p-8 sm:p-12 lg:p-16 z-10 max-w-2xl">
+    <div className="relative flex flex-col justify-between h-full p-4 sm:p-8 lg:p-14 z-10 max-w-2xl">
       {/* Top Header Badge */}
       <div className="flex items-center gap-2.5">
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-12 font-semibold bg-saffron-500/10 text-saffron-700 dark:text-saffron-400 border border-saffron-500/30 backdrop-blur-xs">
@@ -101,9 +101,9 @@ export const LoginLeftPanel: React.FC<{ isTransitioning?: boolean }> = ({ isTran
       </div>
 
       {/* Centerpiece: Floating Ashoka Lion Capital Emblem & Product Identity */}
-      <div className="my-auto py-6 flex flex-col items-center lg:items-start text-center lg:text-left w-full">
-        {/* Emblem with Floating Loop & Radial Pulse Glow - Grand National Emblem covering half left side */}
-        <div className="relative mb-6 flex justify-center">
+      <div className="my-auto py-4 sm:py-6 flex flex-col items-center lg:items-start text-center lg:text-left w-full">
+        {/* Emblem with Floating Loop & Radial Pulse Glow */}
+        <div className="relative mb-4 sm:mb-6 flex justify-center">
           {/* Subtle Golden Radial Glow */}
           <div 
             className="absolute -inset-10 rounded-full bg-saffron-500/20 dark:bg-saffron-500/25 blur-3xl animate-pulse pointer-events-none"
@@ -122,23 +122,23 @@ export const LoginLeftPanel: React.FC<{ isTransitioning?: boolean }> = ({ isTran
             <img 
               src={emblemSvg} 
               alt="State Emblem of India" 
-              className="w-48 h-64 sm:w-64 sm:h-80 lg:w-72 lg:h-[360px] object-contain drop-shadow-[0_12px_30px_rgba(255,153,51,0.35)]"
+              className="w-32 h-44 sm:w-56 sm:h-72 lg:w-72 lg:h-[360px] object-contain drop-shadow-[0_12px_30px_rgba(255,153,51,0.35)]"
             />
           </motion.div>
         </div>
 
         {/* 'सत्यमेव जयते' in Noto Sans Devanagari */}
-        <h2 className="text-20 sm:text-24 font-bold font-devanagari tracking-widest text-navy-900 dark:text-slate-100 uppercase mb-3">
+        <h2 className="text-18 sm:text-24 font-bold font-devanagari tracking-widest text-navy-900 dark:text-slate-100 uppercase mb-2 sm:mb-3">
           सत्यमेव जयते
         </h2>
 
         {/* Product Name: ONLY SATYAPAN */}
-        <div className="space-y-1 mb-6">
-          <h1 className="text-42 sm:text-54 font-black tracking-tight text-saffron-500 leading-none">
+        <div className="space-y-1 mb-4 sm:mb-6">
+          <h1 className="text-36 sm:text-48 lg:text-54 font-black tracking-tight text-saffron-500 leading-none">
             SATYAPAN
           </h1>
 
-          <p className="text-15 sm:text-17 font-medium text-navy-700 dark:text-slate-300 mt-2">
+          <p className="text-13 sm:text-16 font-medium text-navy-700 dark:text-slate-300 mt-2">
             AI-assisted validation for institutional regulatory approvals
           </p>
         </div>

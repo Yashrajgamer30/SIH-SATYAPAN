@@ -225,20 +225,20 @@ export const InstituteDashboard: React.FC = () => {
         </span>
       </div>
 
-      {/* 2. 6 KPI Cards with Sparklines */}
+      {/* 2. 6 KPI Cards with Uniform Proportions & Heights */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
         {/* Total Students */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
+        <div className="h-[152px] p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
           <div className="flex items-center justify-between text-gov-muted">
             <span className="text-11 font-bold uppercase tracking-wider">Total Students</span>
             <Users className="w-4 h-4 text-navy-700 dark:text-saffron-400" />
           </div>
-          <div className="my-2">
-            <span className="text-28 font-black text-navy-900 dark:text-white tabular-nums">
+          <div>
+            <span className="text-26 font-black text-navy-900 dark:text-white tabular-nums">
               {kpis.student_count.toLocaleString()}
             </span>
           </div>
-          <div className="h-6 w-full">
+          <div className="h-6 w-full flex items-center">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={sparklineData}>
                 <Line type="monotone" dataKey="v" stroke="#FF9933" strokeWidth={2} dot={false} />
@@ -248,93 +248,103 @@ export const InstituteDashboard: React.FC = () => {
         </div>
 
         {/* Faculty Count */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
+        <div className="h-[152px] p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
           <div className="flex items-center justify-between text-gov-muted">
             <span className="text-11 font-bold uppercase tracking-wider">Faculty Count</span>
             <UserCheck className="w-4 h-4 text-navy-700 dark:text-saffron-400" />
           </div>
-          <div className="my-2">
-            <span className="text-28 font-black text-navy-900 dark:text-white tabular-nums">
+          <div>
+            <span className="text-26 font-black text-navy-900 dark:text-white tabular-nums">
               {kpis.faculty_count}
             </span>
           </div>
-          <span className="text-[11px] text-green-600 font-semibold flex items-center gap-1">
-            <CheckCircle2 className="w-3 h-3" /> 1:15 FSR Met
-          </span>
+          <div className="h-6 flex items-center">
+            <span className="text-[11px] text-green-600 font-semibold flex items-center gap-1">
+              <CheckCircle2 className="w-3.5 h-3.5" /> 1:15 FSR Met
+            </span>
+          </div>
         </div>
 
         {/* Applications Active */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
+        <div className="h-[152px] p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
           <div className="flex items-center justify-between text-gov-muted">
             <span className="text-11 font-bold uppercase tracking-wider">Active EoA</span>
             <FileText className="w-4 h-4 text-navy-700 dark:text-saffron-400" />
           </div>
-          <div className="my-2">
-            <span className="text-28 font-black text-navy-900 dark:text-white tabular-nums">
+          <div>
+            <span className="text-26 font-black text-navy-900 dark:text-white tabular-nums">
               {kpis.total_applications}
             </span>
           </div>
-          <span className="text-[11px] text-gov-muted">
-            Cycle 2026-2027
-          </span>
+          <div className="h-6 flex items-center">
+            <span className="text-[11px] text-gov-muted">
+              Cycle 2026-2027
+            </span>
+          </div>
         </div>
 
         {/* Pending Deficiencies */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
+        <div className="h-[152px] p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
           <div className="flex items-center justify-between text-gov-muted">
             <span className="text-11 font-bold uppercase tracking-wider">Deficiencies</span>
             <AlertTriangle className="w-4 h-4 text-amber-500" />
           </div>
-          <div className="my-2">
-            <span className="text-28 font-black text-amber-600 dark:text-amber-400 tabular-nums">
+          <div>
+            <span className="text-26 font-black text-amber-600 dark:text-amber-400 tabular-nums">
               {kpis.active_deficiencies}
             </span>
           </div>
-          <span className="text-[11px] text-amber-700 dark:text-amber-400 font-medium">
-            1 requires reply
-          </span>
+          <div className="h-6 flex items-center">
+            <span className="text-[11px] text-amber-700 dark:text-amber-400 font-medium">
+              1 requires reply
+            </span>
+          </div>
         </div>
 
         {/* Documents Expiring */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
+        <div className="h-[152px] p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
           <div className="flex items-center justify-between text-gov-muted">
             <span className="text-11 font-bold uppercase tracking-wider">Expiring in 30d</span>
             <Clock className="w-4 h-4 text-saffron-500" />
           </div>
-          <div className="my-2">
-            <span className="text-28 font-black text-saffron-600 dark:text-saffron-400 tabular-nums">
+          <div>
+            <span className="text-26 font-black text-saffron-600 dark:text-saffron-400 tabular-nums">
               2
             </span>
           </div>
-          <span className="text-[11px] text-gov-muted">
-            Fire NOC, Land lease
-          </span>
+          <div className="h-6 flex items-center">
+            <span className="text-[11px] text-gov-muted">
+              Fire NOC, Land lease
+            </span>
+          </div>
         </div>
 
         {/* Readiness Score Gauge Card */}
-        <div className="relative p-4 rounded-2xl bg-gradient-to-br from-white to-saffron-50/50 dark:from-navy-900 dark:to-navy-950 border-2 border-saffron-500/30 shadow-xs flex flex-col justify-between">
+        <div className="relative h-[152px] p-4 rounded-2xl bg-gradient-to-br from-white to-saffron-50/50 dark:from-navy-900 dark:to-navy-950 border-2 border-saffron-500/30 shadow-xs flex flex-col justify-between">
           <div className="flex items-center justify-between text-gov-muted">
             <span className="text-11 font-bold uppercase tracking-wider text-saffron-700 dark:text-saffron-400">Readiness Score</span>
             <button
               type="button"
               onClick={() => setShowScoreInfo(!showScoreInfo)}
-              className="text-gov-muted hover:text-navy-900 dark:hover:text-white transition-colors"
+              className="text-gov-muted hover:text-navy-900 dark:hover:text-white transition-colors p-0.5 rounded"
               title="What affects this score?"
             >
               <Info className="w-4 h-4" />
             </button>
           </div>
-          <div className="my-1 flex items-baseline gap-1">
-            <span className="text-32 font-black text-navy-900 dark:text-white tabular-nums tracking-tight">
+          <div className="flex items-baseline gap-1">
+            <span className="text-26 font-black text-navy-900 dark:text-white tabular-nums tracking-tight">
               {kpis.readiness_score}
             </span>
-            <span className="text-12 font-bold text-gov-muted">/100</span>
+            <span className="text-11 font-bold text-gov-muted">/100</span>
           </div>
-          <div className="w-full bg-slate-200 dark:bg-navy-800 h-2 rounded-full overflow-hidden">
-            <div 
-              className="bg-gradient-to-r from-saffron-500 to-green-600 h-full rounded-full transition-all duration-1000"
-              style={{ width: `${kpis.readiness_score}%` }}
-            />
+          <div className="h-6 flex items-center">
+            <div className="w-full bg-slate-200 dark:bg-navy-800 h-2.5 rounded-full overflow-hidden">
+              <div 
+                className="bg-gradient-to-r from-saffron-500 to-green-600 h-full rounded-full transition-all duration-1000"
+                style={{ width: `${kpis.readiness_score}%` }}
+              />
+            </div>
           </div>
 
           {/* Readiness Score Popover */}

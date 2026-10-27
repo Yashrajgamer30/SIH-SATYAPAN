@@ -184,45 +184,75 @@ export const InstitutePortalShell: React.FC<InstitutePortalShellProps> = ({
         </div>
       </header>
 
-      {/* 3. Main Workspace with Collapsible Sidebar & Content */}
-      <div className="flex-1 flex max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 gap-6">
-        {/* Collapsible Left Sidebar */}
-        <aside 
-          className={`shrink-0 transition-all duration-300 ${
-            isSidebarCollapsed ? 'w-16' : 'w-64'
+      {/* 3. Main Workspace with Responsive Sidebar */}
+      <div className="flex-1 flex max-w-7xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-6 gap-6 relative">
+        {/* Mobile Backdrop Overlay */}
+        {!isSidebarCollapsed && (
+          <div
+            onClick={() => setIsSidebarCollapsed(true)}
+            className="fixed inset-0 bg-navy-950/60 backdrop-blur-xs z-40 lg:hidden transition-opacity"
+            aria-hidden="true"
+          />
+        )}
+
+        {/* Responsive Left Sidebar: Mobile Drawer (< lg) + Inline Collapsible (lg+) */}
+        <aside
+          className={`fixed inset-y-0 left-0 z-50 lg:static lg:z-0 lg:block transition-all duration-300 ${
+            isSidebarCollapsed
+              ? '-translate-x-full lg:translate-x-0 lg:w-16'
+              : 'translate-x-0 w-72 lg:w-64'
           }`}
         >
-          <div className="bg-white dark:bg-navy-900 rounded-2xl border border-slate-200/80 dark:border-navy-700/80 shadow-xs p-3 sticky top-24">
-            <nav className="space-y-1">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = activeNav === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => onNavChange?.(item.id)}
-                    title={isSidebarCollapsed ? item.label : undefined}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-13 font-semibold transition-all ${
-                      isActive
-                        ? 'bg-saffron-500 text-white shadow-sm shadow-saffron-500/20'
-                        : 'text-gov-muted hover:text-navy-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-navy-800'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4 shrink-0" />
-                    {!isSidebarCollapsed && (
-                      <span className="truncate flex-1 text-left">{item.label}</span>
-                    )}
-                    {!isSidebarCollapsed && item.badge && (
-                      <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-                        isActive ? 'bg-white text-saffron-600' : 'bg-red-600 text-white'
-                      }`}>
-                        {item.badge}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
+          <div className="h-full lg:h-auto bg-white dark:bg-navy-900 rounded-none lg:rounded-2xl border-r lg:border border-slate-200/80 dark:border-navy-700/80 shadow-2xl lg:shadow-xs p-4 lg:p-3 sticky top-0 lg:top-24 flex flex-col justify-between overflow-y-auto">
+            <div>
+              {/* Mobile Drawer Header */}
+              <div className="flex items-center justify-between pb-3 mb-2 border-b border-slate-100 dark:border-navy-800 lg:hidden">
+                <div className="flex items-center gap-2">
+                  <AshokaEmblem className="w-6 h-8 text-navy-900 dark:text-white" />
+                  <span className="font-black text-saffron-500 text-16">SATYAPAN</span>
+                </div>
+                <button
+                  onClick={() => setIsSidebarCollapsed(true)}
+                  className="p-1 rounded-lg text-gov-muted hover:text-navy-900 dark:hover:text-white"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+              </div>
+
+              <nav className="space-y-1">
+                {navItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeNav === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        onNavChange?.(item.id);
+                        if (window.innerWidth < 1024) setIsSidebarCollapsed(true);
+                      }}
+                      title={isSidebarCollapsed ? item.label : undefined}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-13 font-semibold transition-all ${
+                        isActive
+                          ? 'bg-saffron-500 text-white shadow-sm shadow-saffron-500/20'
+                          : 'text-gov-muted hover:text-navy-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-navy-800'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4 shrink-0" />
+                      {(!isSidebarCollapsed || window.innerWidth < 1024) && (
+                        <span className="truncate flex-1 text-left">{item.label}</span>
+                      )}
+                      {(!isSidebarCollapsed || window.innerWidth < 1024) && item.badge && (
+                        <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                          isActive ? 'bg-white text-saffron-600' : 'bg-red-600 text-white'
+                        }`}>
+                          {item.badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
 
             <div className="mt-4 pt-3 border-t border-slate-100 dark:border-navy-800">
               <button
@@ -238,7 +268,7 @@ export const InstitutePortalShell: React.FC<InstitutePortalShellProps> = ({
         </aside>
 
         {/* Dynamic Content Area */}
-        <main className="flex-1 min-w-0">
+        <main className="flex-1 min-w-0 w-full">
           {children}
         </main>
       </div>

@@ -662,7 +662,7 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
           </span>
         </div>
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {demoAccounts.map((acc) => (
             <button
               key={acc.role}
