@@ -58,7 +58,7 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
 
   // OTP Countdown timer
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (otpStep && otpTimer > 0) {
       interval = setInterval(() => setOtpTimer((prev) => prev - 1), 1000);
     }
@@ -68,32 +68,36 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
   // Demo Accounts Data
   const demoAccounts = [
     {
+      roleKey: 'login.faculty',
       role: 'Faculty',
       tab: 'institute' as const,
       email: 'faculty@demo-institute.in',
       password: 'Demo@1234',
-      badge: 'Academic Dossier'
+      badgeKey: 'login.facultyDesc'
     },
     {
+      roleKey: 'login.instituteAdmin',
       role: 'Institute Admin',
       tab: 'institute' as const,
       email: 'admin@demo-institute.in',
       password: 'Demo@1234',
-      badge: 'Principal / Management'
+      badgeKey: 'login.instituteAdminDesc'
     },
     {
+      roleKey: 'login.scrutinyOfficer',
       role: 'Scrutiny Officer',
       tab: 'official' as const,
       email: 'scrutiny@aicte.demo',
       password: 'Demo@1234',
-      badge: 'AICTE Official MFA'
+      badgeKey: 'login.scrutinyOfficerDesc'
     },
     {
+      roleKey: 'login.seniorOfficer',
       role: 'Senior Officer',
       tab: 'official' as const,
       email: 'senior@aicte.demo',
       password: 'Demo@1234',
-      badge: 'Regional Director'
+      badgeKey: 'login.seniorOfficerDesc'
     }
   ];
 
@@ -245,7 +249,7 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
                 className={`w-2 h-2 rounded-full ${isOfficial ? 'bg-navy-700 dark:bg-navy-500' : 'bg-saffron-500'
                   }`}
               />
-              {isOfficial ? 'Official AICTE Scrutiny' : 'Institutional EoA Portal'}
+              {isOfficial ? t('login.officialPortal') : t('login.institutionalPortal')}
             </span>
             <span className="text-[11px] font-mono text-gov-muted bg-slate-100 dark:bg-navy-800/80 px-2 py-0.5 rounded border border-slate-200 dark:border-navy-700">
               HTTPS • AES-256
@@ -261,7 +265,7 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
                 }`}
             >
               <Building className="w-3.5 h-3.5" />
-              <span>Institute Login</span>
+              <span>{t('login.instituteTab')}</span>
             </button>
 
             <button
@@ -271,7 +275,7 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
                 }`}
             >
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Officials Login</span>
+              <span>{t('login.officialTab')}</span>
             </button>
 
             {/* Sliding Pill Indicator */}
@@ -327,7 +331,7 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
                   htmlFor="login-email"
                   className="absolute left-10 -top-2.5 px-1 bg-white/90 dark:bg-navy-900 rounded text-11 font-medium text-gov-muted transition-all peer-placeholder-shown:text-14 peer-placeholder-shown:top-3 peer-placeholder-shown:bg-transparent peer-focus:-top-2.5 peer-focus:text-11 peer-focus:bg-white/90 dark:peer-focus:bg-navy-900"
                 >
-                  User ID or Official Email
+                  {t('login.emailLabel')}
                 </label>
                 <Mail className="absolute left-3 top-3.5 w-4 h-4 text-gov-muted" />
               </div>
@@ -350,13 +354,13 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
                   htmlFor="login-password"
                   className="absolute left-10 -top-2.5 px-1 bg-white/90 dark:bg-navy-900 rounded text-11 font-medium text-gov-muted transition-all peer-placeholder-shown:text-14 peer-placeholder-shown:top-3 peer-placeholder-shown:bg-transparent peer-focus:-top-2.5 peer-focus:text-11 peer-focus:bg-white/90 dark:peer-focus:bg-navy-900"
                 >
-                  Password
+                  {t('login.passwordLabel')}
                 </label>
                 <Lock className="absolute left-3 top-3.5 w-4 h-4 text-gov-muted" />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? t('login.hidePassword') : t('login.showPassword')}
                   className="absolute right-3 top-3.5 text-gov-muted hover:text-gov-text transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -370,7 +374,7 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
                   <button
                     type="button"
                     onClick={refreshCaptcha}
-                    title="Refresh CAPTCHA problem"
+                    title={t('login.refreshCaptcha')}
                     className="p-1 rounded hover:bg-slate-200 dark:hover:bg-navy-800 text-gov-muted hover:text-navy-900 dark:hover:text-white transition-colors"
                   >
                     <RotateCw className="w-3.5 h-3.5" />
@@ -383,7 +387,7 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
                     required
                     value={captchaInput}
                     onChange={(e) => setCaptchaInput(e.target.value.replace(/\D/g, ''))}
-                    placeholder="Result"
+                    placeholder={t('login.captchaPlaceholder')}
                     className={`w-full h-11 px-3 text-center rounded-xl border bg-white/60 dark:bg-navy-950/50 text-gov-text text-14 font-mono font-bold outline-none focus:ring-2 ${isOfficial
                       ? 'border-slate-300 dark:border-navy-700 focus:border-navy-700 focus:ring-navy-500/20'
                       : 'border-slate-300 dark:border-navy-700 focus:border-saffron-500 focus:ring-saffron-500/20'
@@ -401,14 +405,14 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
                     onChange={(e) => setRememberMe(e.target.checked)}
                     className="rounded border-slate-300 text-saffron-500 focus:ring-saffron-500/30"
                   />
-                  <span>Remember me</span>
+                  <span>{t('login.rememberMe')}</span>
                 </label>
                 <a
                   href="#forgot-password"
-                  onClick={(e) => { e.preventDefault(); alert("Contact institutional policy administrator to reset regulatory credentials."); }}
+                  onClick={(e) => { e.preventDefault(); alert(t('login.forgotAlert')); }}
                   className="hover:underline text-navy-700 dark:text-saffron-400 font-medium"
                 >
-                  Forgot password?
+                  {t('login.forgotPassword')}
                 </a>
               </div>
             </motion.div>
@@ -426,10 +430,10 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
                   <KeyRound className="w-5 h-5" />
                 </div>
                 <h3 className="text-15 font-bold text-navy-900 dark:text-white">
-                  Multi-Factor Authentication
+                  {t('login.mfaTitle')}
                 </h3>
                 <p className="text-12 text-gov-muted">
-                  Enter the 6-digit one-time authorization code generated for <span className="font-semibold text-navy-900 dark:text-slate-200">{email}</span>.
+                  {t('login.mfaDesc')} <span className="font-semibold text-navy-900 dark:text-slate-200">{email}</span>.
                 </p>
               </div>
 
@@ -461,20 +465,20 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
                     }}
                     className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-11 font-mono font-semibold bg-saffron-50 text-saffron-700 dark:bg-saffron-950/60 dark:text-saffron-300 border border-saffron-300 dark:border-saffron-800 hover:bg-saffron-100 transition-colors"
                   >
-                    <span>Click to auto-fill Demo OTP: <strong>{demoOtpHint}</strong></span>
+                    <span>{t('login.autoFillDemoOtp')}: <strong>{demoOtpHint}</strong></span>
                   </button>
                 )}
 
                 <div className="flex items-center gap-3 text-12 text-gov-muted">
                   {otpTimer > 0 ? (
-                    <span>Resend code in <strong className="tabular-nums font-mono">{otpTimer}s</strong></span>
+                    <span>{t('login.resendIn')} <strong className="tabular-nums font-mono">{otpTimer}s</strong></span>
                   ) : (
                     <button
                       type="button"
                       onClick={() => setOtpTimer(30)}
                       className="text-navy-700 dark:text-saffron-400 font-semibold hover:underline"
                     >
-                      Resend code
+                      {t('login.resendCode')}
                     </button>
                   )}
                   <span>•</span>
@@ -483,7 +487,7 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
                     onClick={() => setOtpStep(false)}
                     className="text-gov-muted hover:underline"
                   >
-                    Back to credentials
+                    {t('login.backToCredentials')}
                   </button>
                 </div>
               </div>
@@ -504,16 +508,16 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
             {isSuccessTick ? (
               <span className="inline-flex items-center gap-2">
                 <Check className="w-5 h-5 text-white animate-bounce" />
-                <span>Verified • Session Starting</span>
+                <span>{t('login.verifiedSessionStarting')}</span>
               </span>
             ) : isLoading ? (
               <span className="inline-flex items-center gap-2">
                 <RotateCw className="w-4 h-4 animate-spin" />
-                <span>Authenticating with AICTE Gateway...</span>
+                <span>{t('login.authenticating')}</span>
               </span>
             ) : (
               <span className="inline-flex items-center gap-2">
-                <span>{otpStep ? 'Complete MFA Verification' : isOfficial ? 'Sign in to Officials Portal' : 'Sign in to Institute Desk'}</span>
+                <span>{otpStep ? t('login.completeMfa') : isOfficial ? t('login.signInOfficial') : t('login.signInInstitute')}</span>
                 <ArrowRight className="w-4 h-4" />
               </span>
             )}
@@ -523,7 +527,7 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
         {/* Security Logging Banner */}
         <div className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-gov-muted font-medium">
           <ShieldCheck className="w-3.5 h-3.5 text-green-600" />
-          <span>Authorised users only. All logins and mutations are cryptographically logged.</span>
+          <span>{t('login.securityNotice')}</span>
         </div>
       </div>
 
@@ -531,10 +535,10 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
       <div className="mt-6 pt-4 border-t border-slate-200/80 dark:border-navy-700/80">
         <div className="flex items-center justify-between mb-2">
           <span className="text-11 font-bold tracking-wider text-navy-900 dark:text-slate-200 uppercase">
-            Demo Accounts for Presentation
+            {t('login.demoAccountsTitle')}
           </span>
           <span className="text-[10px] text-gov-muted font-mono">
-            Synthetic credentials
+            {t('login.syntheticCredentials')}
           </span>
         </div>
 
@@ -544,13 +548,13 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
               key={acc.role}
               type="button"
               onClick={() => handleSelectDemoAccount(acc)}
-              title={`Click to fill ${acc.email} (${acc.role})`}
+              title={`Click to fill ${acc.email} (${t(acc.roleKey)})`}
               className="group text-left p-2 rounded-xl bg-slate-50/90 dark:bg-navy-950/70 hover:bg-white dark:hover:bg-navy-800/90 border border-slate-200/70 dark:border-navy-800 transition-all flex items-center justify-between shadow-2xs hover:shadow-xs"
             >
               <div className="overflow-hidden pr-1">
                 <div className="flex items-center gap-1">
                   <span className="text-12 font-bold text-navy-900 dark:text-white truncate">
-                    {acc.role}
+                    {t(acc.roleKey)}
                   </span>
                 </div>
                 <div className="text-[10px] text-gov-muted truncate font-mono">
