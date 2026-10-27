@@ -8,4 +8,6 @@ __pycache__
 dist
 frontend/dist
 scratch/
+*.db
+*.db-journal
 .DS_Store
