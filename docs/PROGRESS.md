@@ -203,6 +203,19 @@ This log tracks every development phase against its acceptance checks. According
 - **Playwright Test**:
   - Created `frontend/tests/overlay_alignment.spec.ts` for Playwright canvas-level pixel inspection at 100% and 200% zoom.
 
+---
+
+## Fix Pass - Step 4: Synthetic Document Label Leak Purge & Demo Pack Regeneration
+- **Purged Explicit Label Leaks**:
+  - Removed `[MODIFIED]` string from `seed/docgen/generator.py` line 172. Date alteration on `affidavit_tampered_date.pdf` now renders authentic modified date `31/12/2035` in altered font/color without leaked text.
+  - Removed `[ANOMALY: DUPLICATE STAMP]` watermark from `seed/docgen/generator.py` line 298. Copy-move seal duplicate on `trust_deed_copy_move_seal.png` now pastes natural duplicate seal artifact without printed label.
+  - Removed `ANOMALOUS OVERLAY` banner from `seed/docgen/generator.py` line 337. `library_photo_inconsistent.jpg` now features illumination / architectural patch inconsistency without text leaks.
+- **Regenerated 12 Curated Demo Pack Documents**:
+  - Regenerated all 12 scenario files in `seed/demo_pack/`.
+  - Cleared rendered page cache at `backend/scratch/page_cache/`.
+  - Verified 3/3 tests pass against regenerated assets with zero regressions.
+
+
 
 
 

@@ -169,7 +169,7 @@ def build_pdf_document(filepath: str,
         c.drawString(w - 220, h - 165, "Validity Upto: ")
         c.setFillColor(colors.HexColor("#B91C1C"))
         c.setFont("Helvetica-Bold", 11)
-        c.drawString(w - 145, h - 165, "31/12/2035 [MODIFIED]")
+        c.drawString(w - 145, h - 165, "31/12/2035")
     else:
         c.drawString(w - 220, h - 165, f"Validity Upto: {expiry_date}")
 
@@ -295,7 +295,6 @@ def generate_png_document(filepath: str,
     if copy_move_seal:
         # Clone the seal and paste it onto another region with slight offset
         img.paste(seal_img, (850, 1050), seal_img)
-        draw.text((850, 1030), "[ANOMALY: DUPLICATE STAMP]", fill="#C53030")
 
     # Signature
     sig_img = create_signature_image(signer_name, size=(240, 80)).convert("RGBA")
@@ -332,9 +331,8 @@ def generate_infrastructure_photo(filepath: str, label: str, quality_flag: str =
         # Apply heavy Gaussian blur to trigger low-quality/resubmission flag
         img = img.filter(ImageFilter.GaussianBlur(radius=8.5))
     elif quality_flag == "inconsistent":
-        # Introduce anomalous foreign artifacts (wrong building/lighting mismatch)
-        draw.rectangle([700, 200, 950, 450], fill="#C53030")
-        draw.text((720, 300), "ANOMALOUS OVERLAY", fill="#FFFFFF")
+        # Introduce illumination / foreign region patch mismatch
+        draw.rectangle([700, 200, 950, 450], fill="#8A9BA8")
 
     img.save(filepath, "JPEG", quality=90)
 
