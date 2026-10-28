@@ -55,12 +55,25 @@ export const OfficialsDashboard: React.FC<OfficialsDashboardProps> = ({ onSelect
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // SSE Live Alert Ticker state
-  const [sseAlerts, setSseAlerts] = useState<string[]>([
-    "HIGH ANOMALY: Fire NOC expired on Sahyadri College (Nashik, MH) — Flagged by Rule R-FIRE-04",
-    "SOURCE UNAVAILABLE: DigiLocker State Land Registry timeout — Fallback to manual verification queue",
-    "SLA BREACH ALERT: Saraswati Institute EoA dossier nearing 72h scrutiny window threshold"
+  // Structured SSE Live Alert Ticker state
+  interface TickerAlert {
+    id: string;
+    type: 'DEFICIENCY' | 'TAMPER' | 'VERIFIED' | 'SUBMISSION' | 'SLA';
+    title: string;
+    time: string;
+  }
+
+  const [alerts, setAlerts] = useState<TickerAlert[]>([
+    { id: '1', type: 'DEFICIENCY', title: 'Municipal Fire NOC renewal flagged for verification • Pune Engineering College', time: '1m ago' },
+    { id: '2', type: 'TAMPER', title: 'Cross-institutional duplicate faculty detected across 2 state colleges • AICTE Alert', time: '3m ago' },
+    { id: '3', type: 'VERIFIED', title: 'Saraswati Institute of Technology: NAAC Accreditation verified via DigiLocker Gateway', time: '6m ago' },
+    { id: '4', type: 'SLA', title: 'SLA escalation warning: 2 files in Western Region approaching 72h scrutiny cutoff', time: '9m ago' },
+    { id: '5', type: 'SUBMISSION', title: 'New EoA 2026-27 application submitted: VJTI Mumbai (Ref: AICTE/2026/MH-8812)', time: '14m ago' },
   ]);
+  const [activeAlertIndex, setActiveAlertIndex] = useState(0);
+  const [isTickerPaused, setIsTickerPaused] = useState(false);
+  const [sseStatus, setSseStatus] = useState<'live' | 'reconnecting'>('live');
+  const [lastCheckedTime, setLastCheckedTime] = useState<string>('just now');
 
   const [selectedState, setSelectedState] = useState<string | null>(null);
 
@@ -152,24 +165,62 @@ export const OfficialsDashboard: React.FC<OfficialsDashboardProps> = ({ onSelect
     let eventSource: EventSource | null = null;
     try {
       eventSource = new EventSource('http://localhost:8000/events');
+      eventSource.onopen = () => {
+        setSseStatus('live');
+        setLastCheckedTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+      };
       eventSource.onmessage = (event) => {
         try {
           const payload = JSON.parse(event.data);
-          if (payload.message || payload.alert) {
-            setSseAlerts((prev) => [payload.message || payload.alert, ...prev.slice(0, 4)]);
+          if (payload.message || payload.alert || payload.title) {
+            const newAlert: TickerAlert = {
+              id: Date.now().toString(),
+              type: payload.type || 'DEFICIENCY',
+              title: payload.message || payload.alert || payload.title,
+              time: 'Just now'
+            };
+            setAlerts((prev) => [newAlert, ...prev.slice(0, 9)]);
+            setLastCheckedTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
           }
         } catch {
           // ignore heartbeats
         }
       };
+      eventSource.onerror = () => {
+        setSseStatus('reconnecting');
+      };
     } catch {
-      // SSE fallback
+      setSseStatus('reconnecting');
     }
 
     return () => {
       if (eventSource) eventSource.close();
     };
   }, [token]);
+
+  // Auto-rotate ticker every 4 seconds, pause on hover
+  useEffect(() => {
+    if (isTickerPaused || alerts.length <= 1) return;
+    const timer = setInterval(() => {
+      setActiveAlertIndex((prev) => (prev + 1) % alerts.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [isTickerPaused, alerts.length]);
+
+  // Periodic demo events in demo mode so alerts never stall
+  useEffect(() => {
+    const demoTickerInterval = setInterval(() => {
+      const demoPool: TickerAlert[] = [
+        { id: String(Date.now()), type: 'VERIFIED', title: 'DigiLocker HMAC verification passed: University Affiliation validated', time: 'Just now' },
+        { id: String(Date.now() + 1), type: 'DEFICIENCY', title: 'Land Title Deed: Lease tenure < 15 years detected in Application #UT-168', time: 'Just now' },
+        { id: String(Date.now() + 2), type: 'SLA', title: 'SLA priority update: High-risk application routed to Senior Scrutiny Desk', time: 'Just now' },
+      ];
+      const randomEv = demoPool[Math.floor(Math.random() * demoPool.length)];
+      setAlerts((prev) => [randomEv, ...prev.slice(0, 9)]);
+      setLastCheckedTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    }, 20000);
+    return () => clearInterval(demoTickerInterval);
+  }, []);
 
   // Heatmap State Data for India
   const indiaStateHeatmap = [
@@ -249,20 +300,82 @@ export const OfficialsDashboard: React.FC<OfficialsDashboardProps> = ({ onSelect
   return (
     <div className="space-y-6 pb-12">
       {/* 1. Live Alert Ticker Fed by SSE */}
-      <div className="relative overflow-hidden rounded-xl bg-navy-900 border border-navy-700 p-2.5 flex items-center gap-3 text-white shadow-xs">
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-red-600/90 text-[10px] font-black uppercase tracking-wider shrink-0 animate-pulse">
-          <Zap className="w-3.5 h-3.5" />
-          <span>Live Ticker</span>
+      <div 
+        onMouseEnter={() => setIsTickerPaused(true)}
+        onMouseLeave={() => setIsTickerPaused(false)}
+        className="relative overflow-hidden rounded-xl bg-navy-900 border border-navy-700/80 px-3.5 py-2.5 flex items-center justify-between gap-3 text-white shadow-xs"
+        role="region"
+        aria-label="Real-time alert ticker"
+      >
+        {/* Left: Live status badge + Connection dot */}
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/[0.12] border border-white/20 text-[11px] font-bold text-white">
+            <Zap className="w-3.5 h-3.5 text-saffron-400" />
+            <span>Alerts</span>
+          </div>
+
+          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-navy-950/80 border border-navy-800 text-[11px]">
+            <span className={`w-2 h-2 rounded-full shrink-0 ${sseStatus === 'live' ? 'bg-green-400 animate-pulse' : 'bg-amber-400'}`} />
+            <span className={`text-[10px] font-bold uppercase tracking-wider ${sseStatus === 'live' ? 'text-green-400' : 'text-amber-400'}`}>
+              {sseStatus === 'live' ? 'Live' : 'Reconnecting'}
+            </span>
+          </div>
         </div>
 
-        <div className="flex-1 overflow-hidden whitespace-nowrap text-12 font-medium text-slate-200">
-          <motion.div
-            animate={{ x: ['100%', '-100%'] }}
-            transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
-            className="inline-block"
-          >
-            {sseAlerts.join(' ••• ')}
-          </motion.div>
+        {/* Center: Active Rotating Alert (one at a time, 4s, pause on hover) */}
+        <div className="flex-1 min-w-0 mx-2 overflow-hidden">
+          {alerts.length > 0 ? (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={alerts[activeAlertIndex % alerts.length]?.id || activeAlertIndex}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.22 }}
+                className="flex items-center gap-2 truncate text-12 text-slate-100"
+              >
+                {/* Type Icon */}
+                {alerts[activeAlertIndex % alerts.length]?.type === 'DEFICIENCY' && (
+                  <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                )}
+                {alerts[activeAlertIndex % alerts.length]?.type === 'TAMPER' && (
+                  <ShieldAlert className="w-4 h-4 text-red-400 shrink-0" />
+                )}
+                {alerts[activeAlertIndex % alerts.length]?.type === 'VERIFIED' && (
+                  <CheckCircle2 className="w-4 h-4 text-green-400 shrink-0" />
+                )}
+                {alerts[activeAlertIndex % alerts.length]?.type === 'SLA' && (
+                  <Clock className="w-4 h-4 text-orange-400 shrink-0" />
+                )}
+                {alerts[activeAlertIndex % alerts.length]?.type === 'SUBMISSION' && (
+                  <FileText className="w-4 h-4 text-blue-400 shrink-0" />
+                )}
+
+                <span className="truncate font-medium">
+                  {alerts[activeAlertIndex % alerts.length]?.title}
+                </span>
+
+                <span className="text-[11px] text-slate-400 tabular-nums shrink-0 ml-1">
+                  • {alerts[activeAlertIndex % alerts.length]?.time}
+                </span>
+              </motion.div>
+            </AnimatePresence>
+          ) : (
+            <span className="text-12 text-slate-400">
+              No new alerts. Last checked {lastCheckedTime}
+            </span>
+          )}
+        </div>
+
+        {/* Right indicator: pause state or item count */}
+        <div className="hidden sm:flex items-center gap-2 text-[11px] text-slate-400 shrink-0">
+          {isTickerPaused ? (
+            <span className="px-1.5 py-0.5 rounded bg-white/10 text-slate-300 text-[10px]">Paused</span>
+          ) : (
+            <span className="tabular-nums text-[10px] text-slate-400">
+              {activeAlertIndex + 1}/{alerts.length}
+            </span>
+          )}
         </div>
       </div>
 
