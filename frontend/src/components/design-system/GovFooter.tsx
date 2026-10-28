@@ -1,17 +1,18 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { ShieldCheck, ExternalLink } from 'lucide-react';
 
 export const GovFooter: React.FC = () => {
   const { t } = useTranslation();
 
   const footerLinks = [
-    { label: t('footer.websitePolicies'), href: '#policies' },
-    { label: t('footer.accessibilityStatement'), href: '#accessibility' },
-    { label: t('footer.terms'), href: '#terms' },
-    { label: t('footer.help'), href: '#help' },
-    { label: t('footer.contact'), href: '#contact' },
-    { label: t('footer.feedback'), href: '#feedback' }
+    { label: t('footer.websitePolicies'), href: '/policies' },
+    { label: t('footer.accessibilityStatement'), href: '/accessibility' },
+    { label: t('footer.terms'), href: '/terms' },
+    { label: t('footer.help'), href: '/help' },
+    { label: t('footer.contact'), href: '/contact' },
+    { label: t('footer.feedback'), href: '/feedback' }
   ];
 
   return (
@@ -20,13 +21,13 @@ export const GovFooter: React.FC = () => {
         {/* Navigation Links Grid */}
         <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-6 gap-y-2 pb-6 border-b border-navy-700/60 font-medium">
           {footerLinks.map((link) => (
-            <a
+            <Link
               key={link.label}
-              href={link.href}
+              to={link.href}
               className="hover:text-saffron-500 transition-colors"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </div>
 

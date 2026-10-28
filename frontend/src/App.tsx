@@ -9,6 +9,7 @@ import { LoginPage } from './pages/LoginPage';
 import { InstituteDashboard } from './pages/InstituteDashboard';
 import { OfficialsDashboard } from './pages/OfficialsDashboard';
 import { ScanView } from './pages/ScanView';
+import { StaticInfoPage } from './pages/StaticInfoPage';
 import { InstitutePortalShell } from './components/layout/InstitutePortalShell';
 import { OfficialsPortalShell } from './components/layout/OfficialsPortalShell';
 import { SessionTimeoutModal } from './components/login/SessionTimeoutModal';
@@ -150,6 +151,12 @@ export function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/policies" element={<StaticInfoPage />} />
+          <Route path="/accessibility" element={<StaticInfoPage />} />
+          <Route path="/terms" element={<StaticInfoPage />} />
+          <Route path="/help" element={<StaticInfoPage />} />
+          <Route path="/contact" element={<StaticInfoPage />} />
+          <Route path="/feedback" element={<StaticInfoPage />} />
           <Route 
             path="/styleguide" 
             element={

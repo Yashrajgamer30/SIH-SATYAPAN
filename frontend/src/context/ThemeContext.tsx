@@ -53,12 +53,14 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setLanguageState(newLang);
     i18n.changeLanguage(newLang);
     localStorage.setItem('i18nextLng', newLang);
+    document.documentElement.setAttribute('lang', newLang);
   };
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     document.documentElement.setAttribute('data-font-size', fontSize);
-  }, [theme, fontSize]);
+    document.documentElement.setAttribute('lang', language);
+  }, [theme, fontSize, language]);
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme, fontSize, setFontSize, language, setLanguage }}>
