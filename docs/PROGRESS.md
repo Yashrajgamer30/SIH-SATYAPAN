@@ -254,6 +254,24 @@ This log tracks every development phase against its acceptance checks. According
 - **Build Verification**:
   - Frontend production build (`npm run build`) passed with zero errors in 21.93s.
 
+---
+
+## Fix Pass - Step 7: Playwright Guard Rails for Every Route
+- **Configuration & Setup** (`frontend/playwright.config.ts`):
+  - Configured test runner with Chromium desktop viewport (1440x900), trace recordings on retry, and automatic dev server lifecycle hook (`npm run dev` at `:5173`).
+- **Comprehensive Route Guard Rails** (`frontend/tests/routes.spec.ts`):
+  - **Public & Static Routes**: `/login`, `/policies`, `/accessibility`, `/terms`, `/help`, `/contact`, `/feedback`, `/styleguide`. Asserts proper render, zero 404/crash boundaries, and `document.title` containing `SATYAPAN`.
+  - **Institute Portal Routes**: `/institute/dashboard`, `/institute/profile`, `/institute/faculty`, `/institute/students`, `/institute/new-application`, `/institute/track`, `/institute/documents`, `/institute/reports`, `/institute/notifications`, `/institute/help`. Injects synthetic authenticated session and verifies crash-free rendering.
+  - **Official Scrutiny Routes**: `/official/dashboard`, `/official/applications/1`, `/official/admin/rules`, `/official/scan/fire_noc_clean.pdf?presenter=1`. Asserts complete layout mounting and title synchronization.
+- **Admin Rules Specification** (`frontend/tests/admin_rules.spec.ts`):
+  - Validates all 6 APH 2026-27 statutory rules render with code tags, descriptions, and version badges.
+  - Verifies interactive JSON editor expansion, JSON syntax validation error banners, and default restoration UI.
+- **Document Overlay Alignment Specification** (`frontend/tests/overlay_alignment.spec.ts`):
+  - Canvas-level pixel sampling asserting >= 3% non-blank dark pixels across all overlay regions at 100% and 200% zoom.
+- **Build Verification**:
+  - Full TypeScript check, i18n key audit, and Vite production bundle passed in 20.71s with zero errors.
+
+
 
 
 
