@@ -168,6 +168,41 @@ def view_document_decrypted(
     )
 
 
+@router.get("/{document_id}/pages/{page_num}.png")
+def get_document_page_png(document_id: str, page_num: int = 1):
+    """
+    Serves document page as a fixed 150 DPI raster image (PNG).
+    """
+    from app.services.document_renderer import render_page_png
+    try:
+        png_bytes, _, _ = render_page_png(document_id, page_num)
+        return Response(
+            content=png_bytes,
+            media_type="image/png",
+            headers={"Cache-Control": "public, max-age=3600"}
+        )
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail=f"Document {document_id} not found.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/{document_id}/metadata")
+@router.get("/{document_id}/pages/{page_num}/metadata")
+def get_document_metadata(document_id: str, page_num: int = 1):
+    """
+    Returns document metadata including 150 DPI pixel dimensions (page_width, page_height)
+    and exact bounding boxes for OCR tokens, text fields, QR codes, seals, and signatures.
+    """
+    from app.services.document_renderer import extract_document_page_data
+    try:
+        return extract_document_page_data(document_id, page_num)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail=f"Document {document_id} not found.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # ==============================================================================
 # Prompt B3 Forensic ML Endpoints & Live SSE Pipeline Stream
 # ==============================================================================

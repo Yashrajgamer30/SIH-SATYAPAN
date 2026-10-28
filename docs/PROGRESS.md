@@ -166,6 +166,14 @@ This log tracks every development phase against its acceptance checks. According
   - [ ] click-to-zoom animation (500ms, 20% padding) (MISSING)
   - [ ] tests (MISSING)
 
+### Step 3b: Real Detector Backend & Shared 150 DPI Coordinate Pipeline
+- **Real Detector Engine (`backend/app/services/document_renderer.py`)**:
+  - Replaced all hardcoded generator layout constants with OpenCV contour finder-pattern QR decoder, Hough Circles circular seal detector with blue ink density scoring, and signatory stroke contour extractor.
+  - Full support for both vector PDFs (`pypdfium2` at 150 DPI) and raster image formats (PNG, JPG) using Pytesseract OCR.
+  - Caches rendered 150 DPI page PNGs on disk at `backend/scratch/page_cache/`.
+  - Verified on `fire_noc_clean.pdf`, `university_letter_bad_qr.pdf`, `trust_deed_copy_move_seal.png` (detects authentic vs copy-move cloned seal), and `lab_photo_blurry.jpg`.
+
+
 
 ### 1. Item-by-Item Verification Benchmarks
 1. **i18n Leak Resolution & Static Bundling**:
