@@ -53,97 +53,118 @@ export const OfficialsPortalShell: React.FC<OfficialsPortalShellProps> = ({
       <CommandPalette />
 
       {/* 2. Deeper Navy Header: 'Scrutiny Workbench' */}
-      <header className="bg-navy-950 text-white border-b border-navy-800 sticky top-0 z-40 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-3 sm:gap-4">
-          {/* Left: Emblem, Brand & 'Scrutiny Workbench' Label */}
-          <div className="flex items-center gap-3">
+      <header className="bg-[#0B1F4B] text-white border-b border-navy-800 sticky top-0 z-40 shadow-sm h-[68px] flex items-center">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-3 sm:gap-4 whitespace-nowrap">
+          {/* Left: [menu] [emblem] [SATYAPAN / Scrutiny Workbench on two clean lines] */}
+          <div className="flex items-center gap-3 shrink-0">
             <button
               type="button"
               onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-              className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-navy-900 transition-colors"
+              className="p-1.5 rounded-lg text-white hover:bg-white/10 transition-colors shrink-0"
               title="Toggle sidebar"
+              aria-label="Toggle sidebar"
             >
-              <Menu className="w-5 h-5" />
+              <Menu className="w-5 h-5 text-white" />
             </button>
 
-            <div className="flex items-center gap-2.5">
-              <AshokaEmblem className="w-8 h-10 text-white shrink-0" />
-              <div>
-                <span className="text-18 font-black tracking-tight text-saffron-500 leading-none block">
+            <div className="flex items-center gap-2.5 shrink-0">
+              <AshokaEmblem className="h-10 w-auto text-white shrink-0 opacity-100" />
+              <div className="flex flex-col justify-center leading-none">
+                <span className="text-18 font-black tracking-tight text-white leading-tight block">
                   SATYAPAN
                 </span>
-                <span className="text-[10px] uppercase font-bold text-slate-300 tracking-wider">
+                <span className="text-[10px] uppercase font-bold text-navy-50/80 tracking-wider leading-tight">
                   Scrutiny Workbench
                 </span>
               </div>
             </div>
 
-            <div className="hidden xl:flex items-center gap-2 border-l border-navy-800 pl-4 ml-2">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-12 font-medium text-slate-300">
-                Western Regional Office (WRO) • Active Scrutiny Roster
-              </span>
+            {/* Office Chip: 'Western Regional Office (WRO)', truncates */}
+            <div
+              className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.12] border border-white/25 text-white text-12 font-medium shrink-0 max-w-[240px]"
+              title="Western Regional Office (WRO) • Active Scrutiny Roster"
+            >
+              <span className="w-2 h-2 rounded-full bg-green-400 shrink-0 animate-pulse" />
+              <span className="truncate">Western Regional Office (WRO)</span>
             </div>
           </div>
 
-          {/* Center: Global Search & Command Palette Ctrl+K */}
-          <div className="hidden md:flex items-center flex-1 max-w-md mx-4">
+          {/* Center: Search Box - flex-1, min 260px, max 420px, Ctrl+K hint */}
+          <div className="hidden md:flex items-center flex-1 min-w-[260px] max-w-[420px] mx-2">
             <div 
               onClick={onOpenCommandPalette}
-              className="w-full flex items-center justify-between px-3.5 py-1.5 rounded-xl bg-navy-900/90 border border-navy-700/80 hover:border-saffron-500 text-12 text-slate-400 hover:text-slate-200 cursor-pointer transition-colors shadow-inner"
+              className="w-full flex items-center justify-between px-3.5 py-1.5 rounded-xl bg-white/[0.12] border border-white/25 hover:border-white/50 text-white text-13 cursor-pointer transition-colors shadow-inner"
+              title="Search application no., institute or rule (Ctrl+K)"
             >
-              <div className="flex items-center gap-2">
-                <Search className="w-3.5 h-3.5 text-slate-400" />
-                <span>Search application no, institute, or rule...</span>
+              <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
+                <Search className="w-4 h-4 text-white/80 shrink-0" />
+                <span className="truncate text-white/90 text-12">
+                  Search application no., institute or rule
+                </span>
               </div>
-              <kbd className="px-1.5 py-0.5 rounded bg-navy-950 border border-navy-700 text-[10px] font-mono text-slate-300">
+              <kbd className="px-1.5 py-0.5 rounded bg-white/20 border border-white/30 text-[10px] font-medium text-white shrink-0">
                 Ctrl+K
               </kbd>
             </div>
           </div>
 
-          {/* Right: Security Chip, Notification Bell, Role Badge, Profile */}
-          <div className="flex items-center gap-2.5 sm:gap-3.5">
-            {/* Security Chip: 'Session secured | Activity logged' */}
-            <div className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full bg-navy-900 text-green-400 border border-navy-700/80 text-11 font-mono font-semibold">
-              <Lock className="w-3 h-3 text-green-400" />
-              <span>Session secured | Activity logged</span>
+          {/* Search Icon button for smaller viewports (< md) */}
+          <button
+            type="button"
+            onClick={onOpenCommandPalette}
+            className="md:hidden p-2 rounded-lg bg-white/[0.12] border border-white/25 text-white hover:bg-white/20 transition-colors shrink-0"
+            title="Search application no., institute or rule (Ctrl+K)"
+          >
+            <Search className="w-4 h-4 text-white" />
+          </button>
+
+          {/* Right: Session secured chip | Bell with count | Role badge | Profile chip */}
+          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+            {/* Session secured chip, compact: lock icon + 'Secured · Logged', full tooltip */}
+            <div 
+              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.12] border border-white/25 text-white text-11 font-medium shrink-0 cursor-default"
+              title="Session secured | Activity logged"
+            >
+              <Lock className="w-3.5 h-3.5 text-green-400 shrink-0" />
+              <span>Secured · Logged</span>
             </div>
 
-            {/* Notification Bell with count */}
+            {/* Bell with notification count */}
             <button
               type="button"
-              className="relative p-2 rounded-full text-slate-300 hover:text-white hover:bg-navy-900 transition-colors"
+              className="relative p-2 rounded-full text-white hover:bg-white/10 transition-colors shrink-0"
               title="Official alerts & SSE signals"
+              aria-label="Official alerts"
             >
-              <Bell className="w-5 h-5" />
+              <Bell className="w-5 h-5 text-white" />
               {notificationCount > 0 && (
-                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-red-600 text-white text-[10px] font-bold flex items-center justify-center">
+                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-red-600 text-white text-[10px] font-bold flex items-center justify-center tabular-nums">
                   {notificationCount}
                 </span>
               )}
             </button>
 
-            {/* Role Badge */}
-            <span className="hidden sm:inline-flex px-2.5 py-1 rounded-lg bg-saffron-500/20 text-saffron-300 border border-saffron-500/40 text-11 font-bold uppercase tracking-wider font-mono">
-              {user?.role || "OFFICIAL_SCRUTINY"}
+            {/* Role Badge: human label 'Scrutiny Officer' */}
+            <span className="hidden sm:inline-flex px-2.5 py-1 rounded-lg bg-white/[0.12] text-white border border-white/25 text-11 font-semibold uppercase tracking-wider shrink-0">
+              {user?.role === 'OFFICIAL_DIRECTOR' ? 'Regional Director' : 'Scrutiny Officer'}
             </span>
 
-            {/* Profile Dropdown */}
-            <div className="relative">
+            {/* Profile Chip: avatar, name, designation, truncated */}
+            <div className="relative shrink-0">
               <button
                 type="button"
                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                className="flex items-center gap-2 p-1.5 rounded-xl border border-navy-700 hover:border-saffron-500 transition-all text-left"
+                className="flex items-center gap-2 p-1.5 rounded-xl bg-white/[0.12] border border-white/25 hover:border-white/50 transition-all text-left max-w-[190px]"
+                title={`${user?.name || "Dr. Arvind Deshmukh"} • Official Signer`}
               >
-                <div className="w-8 h-8 rounded-lg bg-navy-800 text-saffron-400 border border-navy-700 font-bold flex items-center justify-center text-12">
-                  {(user?.name || "Dr. Arvind")[0]}
+                <div className="w-8 h-8 rounded-full bg-white/20 text-white font-bold flex items-center justify-center text-12 shrink-0">
+                  {user?.name ? user.name.split(' ').filter(Boolean).map(n => n[0]).join('').slice(0, 2) : "AD"}
                 </div>
-                <div className="hidden md:block pr-1">
-                  <div className="text-12 font-bold text-white leading-tight">
+                <div className="hidden md:block min-w-0 pr-1">
+                  <div className="text-12 font-bold text-white leading-tight truncate">
                     {user?.name || "Dr. Arvind Deshmukh"}
                   </div>
-                  <div className="text-[10px] text-slate-400 font-mono">
+                  <div className="text-[10px] text-navy-50/70 leading-tight truncate">
                     Official Signer
                   </div>
                 </div>
@@ -152,8 +173,8 @@ export const OfficialsPortalShell: React.FC<OfficialsPortalShellProps> = ({
               {isProfileMenuOpen && (
                 <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-navy-900 border border-navy-700 shadow-2xl py-2 z-50 text-13 text-white">
                   <div className="px-4 py-2 border-b border-navy-800">
-                    <p className="font-bold">{user?.name || "Dr. Arvind Deshmukh"}</p>
-                    <p className="text-[11px] text-slate-400 font-mono">{user?.email || "scrutiny@aicte.demo"}</p>
+                    <p className="font-bold truncate">{user?.name || "Dr. Arvind Deshmukh"}</p>
+                    <p className="text-[11px] text-slate-400 truncate">{user?.email || "scrutiny@aicte.demo"}</p>
                   </div>
                   <button
                     onClick={() => { setIsProfileMenuOpen(false); alert("Opening Official Key & Audit Delegation..."); }}
