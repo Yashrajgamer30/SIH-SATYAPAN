@@ -215,6 +215,26 @@ This log tracks every development phase against its acceptance checks. According
   - Cleared rendered page cache at `backend/scratch/page_cache/`.
   - Verified 3/3 tests pass against regenerated assets with zero regressions.
 
+---
+
+## Fix Pass - Step 5: Rebuilt Admin Rules Page & Configurable Rule Engine
+- **Backend Rules Endpoints** (`backend/app/routers/official.py`):
+  - `GET /official/rules`: Loads all 6 APH 2026-27 statutory rules, overlaying DB overrides from `ConfigVersion`.
+  - `PUT /official/rules/{rule_code}`: Updates rule JSON configuration, auto-increments version, updates timestamp, and writes an immutable audit log entry.
+  - `POST /official/rules/reset`: Purges database overrides and restores all rules to statutory AICTE APH 2026-27 defaults.
+- **Frontend Admin Rule Builder** (`frontend/src/pages/AdminRuleBuilder.tsx`):
+  - Connected live to `/official/rules` backend endpoints with zero hardcoded rule lists.
+  - Full card view displaying rule code badge, version badge, color-coded category tags, description, and collapsed JSON editor.
+  - In-place JSON editor with syntax error validation, live save button that posts to `PUT /official/rules/{code}`, and version bump toast.
+  - Active/Inactive toggle per rule that immediately persists state.
+  - "Reset to APH Defaults" button wired to `POST /official/rules/reset` with confirmation modal.
+  - Principle 1 advisory banner present at top.
+- **Automated Tests**:
+  - Created `backend/tests/test_admin_rules.py` covering full lifecycle: reset -> defaults -> update version bump -> persist -> reset.
+  - All 4 backend tests (overlay alignment + rules) passing 100%.
+  - Frontend TypeScript build passes with zero errors.
+
+
 
 
 
