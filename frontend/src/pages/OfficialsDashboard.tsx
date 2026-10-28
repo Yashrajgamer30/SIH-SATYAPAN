@@ -379,7 +379,7 @@ export const OfficialsDashboard: React.FC<OfficialsDashboardProps> = ({ onSelect
                 </h3>
                 <p className="text-12 text-gov-muted">Distribution of pending files across jurisdictions</p>
               </div>
-              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-navy-800 text-gov-muted">
+              <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-navy-800 text-gov-muted border border-slate-200 dark:border-navy-700">
                 National Roster
               </span>
             </div>
@@ -460,8 +460,8 @@ export const OfficialsDashboard: React.FC<OfficialsDashboardProps> = ({ onSelect
                         Risk: {item.risk_score}%
                       </span>
                     </div>
-                    <div className="text-12 text-gov-muted flex items-center gap-2 font-mono">
-                      <span>{item.application_no}</span>
+                    <div className="text-12 text-gov-muted flex items-center gap-2">
+                      <span className="font-mono text-[13px] font-semibold text-slate-800 dark:text-slate-200">{item.application_no}</span>
                       <span>•</span>
                       <span>{item.state}</span>
                     </div>

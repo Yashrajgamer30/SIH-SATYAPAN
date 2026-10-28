@@ -145,8 +145,8 @@ export const InstitutePortalShell: React.FC<InstitutePortalShellProps> = ({
                   <div className="text-12 font-bold text-navy-900 dark:text-white leading-tight">
                     {user?.name || "Dr. Meera Kulkarni"}
                   </div>
-                  <div className="text-[10px] text-gov-muted uppercase font-mono">
-                    {user?.role || "INSTITUTE_ADMIN"}
+                  <div className="text-[10px] text-gov-muted uppercase font-medium">
+                    {user?.role === 'INSTITUTE_ADMIN' ? 'Institute Admin' : (user?.role || 'Institute Admin')}
                   </div>
                 </div>
               </button>
@@ -155,7 +155,7 @@ export const InstitutePortalShell: React.FC<InstitutePortalShellProps> = ({
                 <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-700 shadow-xl py-2 z-50 text-13">
                   <div className="px-4 py-2 border-b border-slate-100 dark:border-navy-800">
                     <p className="font-bold text-navy-900 dark:text-white">{user?.name || "Dr. Meera Kulkarni"}</p>
-                    <p className="text-[11px] text-gov-muted font-mono">{user?.email || "admin@demo-institute.in"}</p>
+                    <p className="text-[11px] text-gov-muted">{user?.email || "admin@demo-institute.in"}</p>
                   </div>
                   <button
                     onClick={() => { setIsProfileMenuOpen(false); alert("Opening Profile & Regulatory Affiliation..."); }}

@@ -220,7 +220,7 @@ export const InstituteDashboard: React.FC = () => {
             All verification scores and readiness indicators are consultative support. Extension of Approval (EoA) decisions are authorized exclusively by AICTE Scrutiny Committees.
           </span>
         </div>
-        <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-saffron-500/20 text-saffron-700 dark:text-saffron-300 font-bold shrink-0">
+        <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-saffron-500/20 text-saffron-700 dark:text-saffron-300 shrink-0">
           APH 2026-27
         </span>
       </div>
@@ -395,7 +395,7 @@ export const InstituteDashboard: React.FC = () => {
               </h3>
               <p className="text-12 text-gov-muted">Official historical AICTE sanction records</p>
             </div>
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-navy-800 text-gov-muted">
+            <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-navy-800 text-gov-muted border border-slate-200 dark:border-navy-700">
               5 Academic Years
             </span>
           </div>
@@ -699,29 +699,29 @@ export const InstituteDashboard: React.FC = () => {
           <div className="relative pl-6 space-y-4 border-l-2 border-slate-200 dark:border-navy-800">
             <div className="relative">
               <span className="absolute -left-[31px] top-1 w-3.5 h-3.5 rounded-full bg-green-500 ring-4 ring-white dark:ring-navy-900" />
-              <span className="text-[11px] font-mono text-gov-muted">Today, 10:45 AM</span>
+              <span className="text-[11px] tabular-nums text-gov-muted">Today, 10:45 AM</span>
               <h5 className="text-13 font-bold text-navy-900 dark:text-white">
                 Application Submitted Successfully
               </h5>
               <p className="text-11 text-gov-muted">
-                EoA 2026-27 dossier (Ref: AICTE/EOA/2026/MH-PUNE-402) submitted for automated preliminary scrutiny.
+                EoA 2026-27 dossier (Ref: <span className="font-mono text-[13px] text-slate-800 dark:text-slate-200">AICTE/EOA/2026/MH-PUNE-402</span>) submitted for automated preliminary scrutiny.
               </p>
             </div>
 
             <div className="relative">
               <span className="absolute -left-[31px] top-1 w-3.5 h-3.5 rounded-full bg-navy-500 ring-4 ring-white dark:ring-navy-900" />
-              <span className="text-[11px] font-mono text-gov-muted">26-Oct-2026</span>
+              <span className="text-[11px] tabular-nums text-gov-muted">26-Oct-2026</span>
               <h5 className="text-13 font-bold text-navy-900 dark:text-white">
                 TER Payment Completed & Cryptographically Confirmed
               </h5>
               <p className="text-11 text-gov-muted">
-                Transaction ID: SBI-TER-98241088. Received by AICTE central account.
+                Transaction ID: <span className="font-mono text-[13px] text-slate-800 dark:text-slate-200">SBI-TER-98241088</span>. Received by AICTE central account.
               </p>
             </div>
 
             <div className="relative">
               <span className="absolute -left-[31px] top-1 w-3.5 h-3.5 rounded-full bg-slate-300 dark:bg-navy-700 ring-4 ring-white dark:ring-navy-900" />
-              <span className="text-[11px] font-mono text-gov-muted">24-Oct-2026</span>
+              <span className="text-[11px] tabular-nums text-gov-muted">24-Oct-2026</span>
               <h5 className="text-13 font-bold text-navy-900 dark:text-white">
                 Land Ownership Title Deed Verified
               </h5>
