@@ -11,6 +11,7 @@ import {
   ResponsiveContainer, BarChart, Bar, AreaChart, Area, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend
 } from 'recharts';
+import { IndiaChoroplethMap } from '../components/dashboard/IndiaChoroplethMap';
 
 interface OfficialDashboardData {
   advisory_banner: string;
@@ -514,62 +515,86 @@ export const OfficialsDashboard: React.FC<OfficialsDashboardProps> = ({ onSelect
       {/* 4. India State-Wise Heatmap & Priority Queue */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* India State Heatmap */}
-        <div className="lg:col-span-5 p-6 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
+        <div className="lg:col-span-5 p-5 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-3">
               <div>
                 <h3 className="text-15 font-bold text-navy-900 dark:text-white flex items-center gap-1.5">
                   <MapPin className="w-4 h-4 text-saffron-500" />
                   <span>State-Wise Scrutiny Heatmap</span>
                 </h3>
-                <p className="text-12 text-gov-muted">Distribution of pending files across jurisdictions</p>
+                <p className="text-12 text-gov-muted">Choropleth distribution by pending files</p>
               </div>
-              <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-navy-800 text-gov-muted border border-slate-200 dark:border-navy-700">
-                National Roster
-              </span>
-            </div>
-
-            {/* Grid of State Tiles */}
-            <div className="grid grid-cols-2 gap-2.5">
-              {indiaStateHeatmap.map((item) => {
-                const isSelected = selectedState === item.state;
-                return (
+              <div className="flex items-center gap-1.5">
+                {selectedState && (
                   <button
-                    key={item.code}
                     type="button"
-                    onClick={() => setSelectedState(item.state)}
-                    className={`p-3 rounded-xl border text-left transition-all flex items-center justify-between ${
-                      item.level === 'critical'
-                        ? 'bg-red-50/70 dark:bg-red-950/40 border-red-200 dark:border-red-800/60'
-                        : item.level === 'high'
-                          ? 'bg-saffron-50/70 dark:bg-saffron-950/40 border-saffron-200 dark:border-saffron-800/60'
-                          : 'bg-slate-50 dark:bg-navy-950/50 border-slate-200 dark:border-navy-800'
-                    } ${isSelected ? 'ring-2 ring-navy-700 dark:ring-saffron-500' : ''}`}
+                    onClick={() => setSelectedState(null)}
+                    className="text-[11px] font-semibold text-saffron-600 dark:text-saffron-400 hover:underline mr-1"
                   >
-                    <div>
-                      <span className="text-13 font-bold text-navy-900 dark:text-white block">
-                        {item.state}
-                      </span>
-                      <span className="text-[11px] text-gov-muted">
-                        {item.pending} Pending
-                      </span>
-                    </div>
-
-                    {item.highRisk > 0 && (
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-600 text-white">
-                        {item.highRisk} Flagged
-                      </span>
-                    )}
+                    Clear Filter
                   </button>
-                );
-              })}
+                )}
+                <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-navy-800 text-gov-muted border border-slate-200 dark:border-navy-700">
+                  National Roster
+                </span>
+              </div>
             </div>
-          </div>
 
-          <div className="mt-4 pt-3 border-t border-slate-100 dark:border-navy-800 flex items-center justify-between text-11 text-gov-muted">
-            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-slate-200 dark:bg-navy-800" /> Low</span>
-            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-saffron-400" /> Medium</span>
-            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-red-500" /> High / Critical</span>
+            {/* Choropleth SVG Map & Compact Top 5 Ranked List */}
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-start">
+              {/* Left: SVG Map */}
+              <div className="sm:col-span-7 flex justify-center">
+                <IndiaChoroplethMap
+                  selectedState={selectedState}
+                  onSelectState={(state) => setSelectedState(state)}
+                />
+              </div>
+
+              {/* Right: Top 5 Ranked States */}
+              <div className="sm:col-span-5 space-y-2">
+                <span className="text-[10px] uppercase font-bold text-gov-muted tracking-wider block">
+                  Top 5 Jurisdictions
+                </span>
+                {[...indiaStateHeatmap]
+                  .sort((a, b) => b.pending - a.pending)
+                  .slice(0, 5)
+                  .map((item, idx) => {
+                    const isSelected = selectedState === item.state;
+                    return (
+                      <button
+                        key={item.code}
+                        type="button"
+                        onClick={() => setSelectedState(isSelected ? null : item.state)}
+                        className={`w-full p-2 rounded-xl border text-left transition-all ${
+                          isSelected
+                            ? 'bg-navy-900 text-white border-navy-900 dark:bg-navy-800 dark:border-saffron-500 ring-1 ring-saffron-500'
+                            : 'bg-slate-50 dark:bg-navy-950/50 border-slate-200/80 dark:border-navy-800 hover:bg-slate-100 dark:hover:bg-navy-800/80 text-gov-text'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-1">
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <span className="text-[10px] font-bold text-gov-muted tabular-nums">#{idx + 1}</span>
+                            <span className="text-12 font-bold truncate">{item.state}</span>
+                          </div>
+                          <span className="text-11 font-semibold tabular-nums shrink-0">{item.pending}</span>
+                        </div>
+                        {/* Flagged badge in normal flow below the name, never overlapping */}
+                        <div className="flex items-center justify-between mt-1 text-[10px]">
+                          <span className="text-gov-muted">Pending files</span>
+                          {item.highRisk > 0 ? (
+                            <span className="px-1.5 py-0.2 rounded font-bold bg-red-600 text-white shrink-0">
+                              {item.highRisk} Flagged
+                            </span>
+                          ) : (
+                            <span className="text-green-600 dark:text-green-400 font-medium">Clear</span>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+              </div>
+            </div>
           </div>
         </div>
 
