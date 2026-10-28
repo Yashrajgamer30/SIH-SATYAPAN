@@ -166,7 +166,7 @@ export const ScrutinyDetail: React.FC<{ appId: number; onBack: () => void }> = (
 
         <div className="flex items-center gap-3">
           <span className="text-xs font-medium text-slate-500">
-            Application: <strong className="text-slate-900">{applicationData.application_number}</strong>
+            Application: <strong className="text-slate-900 font-mono text-[13px] tabular-nums">{applicationData.application_number}</strong>
           </span>
           <span className={`text-xs px-2.5 py-0.5 rounded-full font-bold ${
             applicationData.risk_level === 'LOW' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
@@ -317,14 +317,14 @@ export const ScrutinyDetail: React.FC<{ appId: number; onBack: () => void }> = (
                   {activeFinding.rule_code.replace(/_/g, ' ')} CERTIFICATION RECORD
                 </h4>
                 <p className="text-[10px] text-slate-500">
-                  Issued to: {applicationData.institute_name} ({applicationData.aicte_id})
+                  Issued to: {applicationData.institute_name} (<span className="font-mono text-[13px] tabular-nums font-semibold">{applicationData.aicte_id}</span>)
                 </p>
               </div>
 
               {/* Simulated Certificate Body with Dynamic Highlight Bounding Box */}
-              <div className="relative space-y-3 text-xs text-slate-700 leading-relaxed font-serif">
+              <div className="relative space-y-3 text-xs text-slate-700 leading-relaxed">
                 <p>
-                  This is to certify that the premises and records registered under Survey reference <strong>{activeFinding.evidence.authority_reference}</strong> located at {applicationData.district} have been inspected.
+                  This is to certify that the premises and records registered under Survey reference <strong className="font-mono text-[13px] tabular-nums">{activeFinding.evidence.authority_reference}</strong> located at {applicationData.district} have been inspected.
                 </p>
 
                 {/* Highlighted Evidence Area with Bounding Box Style */}
@@ -353,7 +353,7 @@ export const ScrutinyDetail: React.FC<{ appId: number; onBack: () => void }> = (
               {/* Document Footer */}
               <div className="mt-6 pt-3 border-t border-slate-300 flex items-center justify-between text-[10px] text-slate-500">
                 <span>Verification Engine: {activeFinding.model_name}</span>
-                <span className="font-mono">Timestamp: 2026-10-27T15:10:00Z</span>
+                <span className="tabular-nums">Timestamp: 2026-10-27T15:10:00Z</span>
               </div>
             </div>
 
@@ -361,7 +361,7 @@ export const ScrutinyDetail: React.FC<{ appId: number; onBack: () => void }> = (
             <div className="mt-4 p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2 text-xs">
               <div className="flex items-center justify-between">
                 <span className="font-bold text-slate-700">Detailed AI Rationale:</span>
-                <span className="text-blue-700 font-semibold font-mono">Confidence: {(activeFinding.confidence * 100).toFixed(0)}%</span>
+                <span className="text-blue-700 font-semibold tabular-nums">Confidence: {(activeFinding.confidence * 100).toFixed(0)}%</span>
               </div>
               <p className="text-slate-600 leading-relaxed">
                 {activeFinding.reason}

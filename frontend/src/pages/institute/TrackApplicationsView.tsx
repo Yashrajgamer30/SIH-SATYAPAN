@@ -135,11 +135,11 @@ export const TrackApplicationsView: React.FC = () => {
           <div className="flex items-center gap-2 text-11 font-bold text-saffron-600 dark:text-saffron-400 uppercase tracking-wider mb-1">
             <span>Application Status Dashboard</span>
             <span>•</span>
-            <span className="font-mono text-gov-muted">Academic Year {data?.academic_year || '2026-2027'}</span>
+            <span className="text-gov-muted">Academic Year {data?.academic_year || '2026-2027'}</span>
           </div>
           <h1 className="text-22 font-bold text-navy-950 dark:text-white flex items-center gap-2.5">
             <FileSearch className="w-6 h-6 text-saffron-500" />
-            <span>{data?.application_no || 'AICTE/EOA/2026/MH-402'}</span>
+            <span className="font-mono text-[13px] tabular-nums font-bold">{data?.application_no || 'AICTE/EOA/2026/MH-402'}</span>
           </h1>
         </div>
 

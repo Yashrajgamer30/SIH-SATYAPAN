@@ -593,7 +593,7 @@ export const InstituteDashboard: React.FC = () => {
                 {data?.institute.name || "Saraswati Institute of Technology"}
               </h3>
               <p className="text-12 text-gov-muted">
-                Permanent AICTE ID: <strong className="font-mono text-navy-900 dark:text-slate-200">{data?.institute.aicte_id}</strong> • {data?.institute.district}, {data?.institute.state}
+                Permanent AICTE ID: <strong className="font-mono text-[13px] tabular-nums text-navy-900 dark:text-slate-200">{data?.institute.aicte_id}</strong> • {data?.institute.district}, {data?.institute.state}
               </p>
             </div>
           </div>

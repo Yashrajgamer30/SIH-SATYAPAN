@@ -751,7 +751,7 @@ export const ScanView: React.FC<ScanViewProps> = ({
                             y="-6"
                             fill="#FFFFFF"
                             fontSize="12"
-                            fontFamily="system-ui, sans-serif"
+                            fontFamily="'Noto Sans', sans-serif"
                             fontWeight="600"
                           >
                             {box.field}: <tspan fill={colors.stroke}>{box.value.length > 28 ? box.value.slice(0, 28) + '…' : box.value}</tspan> ({Math.round(box.confidence * 100)}%)

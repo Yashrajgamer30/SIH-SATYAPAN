@@ -106,7 +106,7 @@ export const InstituteProfileView: React.FC = () => {
             {inst?.name || "Saraswati Institute of Technology"}
           </h2>
           <p className="text-13 text-gov-muted flex items-center gap-2 mt-0.5">
-            <span className="font-mono text-[13px] font-semibold text-slate-800 dark:text-slate-200">
+            <span className="font-mono text-[13px] tabular-nums font-semibold text-slate-800 dark:text-slate-200">
               {inst?.aicte_id || "AICTE-1-3324901"}
             </span>
             <span>•</span>

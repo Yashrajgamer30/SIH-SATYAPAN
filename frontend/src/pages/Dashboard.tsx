@@ -156,11 +156,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ currentRole, onSelectAppli
           >
             <div className="space-y-1.5 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs font-mono font-bold text-blue-900 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                <span className="font-mono text-[13px] tabular-nums font-bold text-blue-900 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
                   {app.application_number}
                 </span>
                 <span className="text-xs text-slate-500">
-                  AICTE ID: <strong className="text-slate-700">{app.aicte_id}</strong>
+                  AICTE ID: <strong className="font-mono text-[13px] tabular-nums text-slate-700">{app.aicte_id}</strong>
                 </span>
                 <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700">
                   {app.demo_scenario}

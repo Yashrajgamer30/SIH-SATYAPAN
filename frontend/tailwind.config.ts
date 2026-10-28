@@ -10,7 +10,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['"Noto Sans"', '"Noto Sans Devanagari"', 'system-ui', '-apple-system', 'sans-serif'],
-        mono: ['"Noto Sans Mono"', 'sans-serif'],
+        mono: ['"Noto Sans Mono"', 'monospace'],
       },
       fontSize: {
         '12': ['0.75rem', { lineHeight: '1.5' }],

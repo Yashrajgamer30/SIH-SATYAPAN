@@ -709,7 +709,7 @@ export const OfficialsDashboard: React.FC<OfficialsDashboardProps> = ({ onSelect
 
                       {/* Row 2: Application number (Noto Sans Mono), state, category */}
                       <div className="text-12 text-gov-muted flex flex-wrap items-center gap-x-2 gap-y-1">
-                        <span className="font-mono text-[13px] font-semibold text-slate-800 dark:text-slate-200">
+                        <span className="font-mono text-[13px] font-semibold tabular-nums text-slate-800 dark:text-slate-200">
                           {item.application_no}
                         </span>
                         <span className="text-slate-300 dark:text-navy-700">•</span>

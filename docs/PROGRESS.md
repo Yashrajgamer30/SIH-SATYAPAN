@@ -234,6 +234,27 @@ This log tracks every development phase against its acceptance checks. According
   - All 4 backend tests (overlay alignment + rules) passing 100%.
   - Frontend TypeScript build passes with zero errors.
 
+---
+
+## Fix Pass - Step 6: Font Cleanup – Enforce Noto Sans / Noto Sans Mono System-Wide
+- **Font Face & Token Audit**:
+  - Cleaned up unused boilerplate Vite template CSS in `frontend/src/App.css`.
+  - Audited `frontend/src/index.css`: verified exact `@fontsource/noto-sans`, `@fontsource/noto-sans-devanagari`, and `@fontsource/noto-sans-mono` declarations.
+  - Configured `tailwind.config.ts` monospace font stack with standard fallback: `mono: ['"Noto Sans Mono"', 'monospace']`.
+- **Replaced Non-Design System Fonts**:
+  - `frontend/src/components/design-system/Emblem.tsx`: replaced `fontFamily="serif"` with `fontFamily="'Noto Sans Devanagari', 'Noto Sans', sans-serif"`.
+  - `frontend/src/pages/ScanView.tsx`: replaced SVG tooltip `fontFamily="system-ui, sans-serif"` with `fontFamily="'Noto Sans', sans-serif"`.
+  - `frontend/src/pages/ScrutinyDetail.tsx`: removed `font-serif` from certificate view.
+- **Standardized Monospace for Regulatory IDs**:
+  - Purged ad-hoc monospace from UI chrome, headers, and timestamps.
+  - Enforced `font-mono text-[13px] tabular-nums` across all regulatory identifiers:
+    - Application numbers (`applicationData.application_number`, `item.application_no`, `data.application_no`)
+    - AICTE Permanent IDs (`appDetails.aicte_id`, `data.institute.aicte_id`, `inst.aicte_id`)
+    - Official Receipt and Transaction IDs
+- **Build Verification**:
+  - Frontend production build (`npm run build`) passed with zero errors in 21.93s.
+
+
 
 
 

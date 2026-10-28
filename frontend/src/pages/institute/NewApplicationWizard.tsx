@@ -568,8 +568,8 @@ export const NewApplicationWizard: React.FC = () => {
                 <div className="text-13 font-bold text-navy-950 dark:text-white">
                   {appDetails.institute_name}
                 </div>
-                <div className="text-[10px] text-gov-muted mt-1 font-mono">
-                  Permanent ID: {appDetails.aicte_id}
+                <div className="text-[10px] text-gov-muted mt-1">
+                  Permanent ID: <span className="font-mono text-[13px] tabular-nums font-semibold">{appDetails.aicte_id}</span>
                 </div>
               </div>
 
@@ -1153,13 +1153,13 @@ export const NewApplicationWizard: React.FC = () => {
               <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-navy-700">
                 <div>
                   <div className="text-11 font-bold text-gov-muted uppercase">Application Number</div>
-                  <div className="text-16 font-mono font-bold text-navy-950 dark:text-white mt-0.5">
+                  <div className="font-mono text-[13px] tabular-nums font-bold text-navy-950 dark:text-white mt-0.5">
                     {submissionSuccess.application_no}
                   </div>
                 </div>
                 <div className="text-right">
                   <div className="text-11 font-bold text-gov-muted uppercase">Receipt ID</div>
-                  <div className="text-13 font-mono text-gov-muted mt-0.5">
+                  <div className="font-mono text-[13px] tabular-nums text-gov-muted mt-0.5">
                     {submissionSuccess.acknowledgement.receipt_no}
                   </div>
                 </div>

@@ -34,7 +34,7 @@ export const AshokaEmblem: React.FC<{ className?: string }> = ({ className = "w-
       <path d="M 26 90 Q 50 100 74 90" fill="none" stroke="currentColor" strokeWidth="2.5" />
       {/* Satyameva Jayate Banner text representation */}
       <rect x="20" y="102" width="60" height="12" rx="1" fill="none" stroke="currentColor" strokeWidth="1.5" />
-      <text x="50" y="111" fontSize="7" fontWeight="bold" textAnchor="middle" fill="currentColor" fontFamily="serif">
+      <text x="50" y="111" fontSize="7" fontWeight="bold" textAnchor="middle" fill="currentColor" fontFamily="'Noto Sans Devanagari', 'Noto Sans', sans-serif">
         सत्यमेव जयते
       </text>
     </svg>
