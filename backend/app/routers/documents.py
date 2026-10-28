@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Query, Response, status
 from sqlalchemy.orm import Session
@@ -174,15 +175,33 @@ def view_document_decrypted(
 from sse_starlette.sse import EventSourceResponse
 import json
 import asyncio
+import sys
+from pathlib import Path
 from pydantic import BaseModel
-from ml.ocr import perform_ocr
-from ml.classify import classify_document_text
-from ml.extract import extract_document_fields
-from ml.tamper import analyze_tamper_forgery
-from ml.duplicate import check_document_duplicates
-from ml.signature import verify_document_signatures
-from ml.rules_engine import evaluate_regulatory_rules
-from ml.risk import classify_application_risk
+
+# Ensure root workspace directory is in sys.path so ml.* modules are importable
+_ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent
+if str(_ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(_ROOT_DIR))
+
+try:
+    from ml.ocr import perform_ocr
+    from ml.classify import classify_document_text
+    from ml.extract import extract_document_fields
+    from ml.tamper import analyze_tamper_forgery
+    from ml.duplicate import check_document_duplicates
+    from ml.signature import verify_document_signatures
+    from ml.rules_engine import evaluate_regulatory_rules
+    from ml.risk import classify_application_risk
+except Exception:
+    perform_ocr = None
+    classify_document_text = None
+    extract_document_fields = None
+    analyze_tamper_forgery = None
+    check_document_duplicates = None
+    verify_document_signatures = None
+    evaluate_regulatory_rules = None
+    classify_application_risk = None
 
 
 @router.get("/{document_id}/events")
