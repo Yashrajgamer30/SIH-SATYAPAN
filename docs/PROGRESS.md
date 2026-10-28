@@ -164,7 +164,7 @@ This log tracks every development phase against its acceptance checks. According
   - [x] viewer built as .stage (transform) > img + svg overlay (viewBox W H) (DONE)
   - [x] boxes only from real results (OCR words and fields, QR, signature, seal, suspicious regions); no decorative boxes (DONE)
   - [x] click-to-zoom animation (500ms, 20% padding) (DONE)
-  - [ ] tests (IN PROGRESS)
+  - [x] tests (DONE - 3/3 passed in 5.17s)
 
 ### Step 3b: Real Detector Backend & Shared 150 DPI Coordinate Pipeline
 - **Real Detector Engine (`backend/app/services/document_renderer.py`)**:
@@ -190,6 +190,19 @@ This log tracks every development phase against its acceptance checks. According
   - Dedicated 'Overview' button (`Compass` icon, keyboard shortcut `O` / `Esc`) animates the stage smoothly back to the centered overview.
   - Purged all decorative brackets and fake HTML document text.
   - Successfully built production bundle with zero TypeScript warnings.
+
+### Step 3d: Meaningful Test Suite (Overlap & Pixel Sampling)
+- **Field Extractor vs Independent OCR Overlap**:
+  - `backend/tests/test_overlay_alignment.py::test_validity_upto_bbox_overlaps_independent_tesseract_ocr` passed.
+  - Proves that 'Validity Upto' bbox from field extractor overlaps Tesseract's independent word token within 0.2px (exceeding the 8.0px threshold).
+- **Non-Blank Pixel Sampling (100% and 200% Zoom)**:
+  - `test_overlay_rectangles_contain_dark_pixels_at_100_and_200_zoom` passed.
+  - Verified that every overlay rectangle contains real non-blank dark pixels (well exceeding >= 3.0% threshold below 200 grey value: QR 58.3%, Seal 15.6%, Signature 8.9%, Validity 41.1%).
+- **Detector Coverage**:
+  - `test_real_detectors_on_demo_pack` passed across clean and tampered scenarios.
+- **Playwright Test**:
+  - Created `frontend/tests/overlay_alignment.spec.ts` for Playwright canvas-level pixel inspection at 100% and 200% zoom.
+
 
 
 
