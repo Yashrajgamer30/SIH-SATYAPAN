@@ -88,3 +88,4 @@ test.describe('Document Overlay Alignment & Pixel Sampling', () => {
     await verifyRectDarkPixels('200% Zoom');
   });
 });
+
