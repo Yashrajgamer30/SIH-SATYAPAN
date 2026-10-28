@@ -285,83 +285,115 @@ export const OfficialsDashboard: React.FC<OfficialsDashboardProps> = ({ onSelect
         </button>
       </div>
 
-      {/* 3. 6 Key Performance Metric Cards with Uniform Heights */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-        {/* Pending Applications */}
-        <div className="h-[148px] p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
-          <span className="text-11 font-bold text-gov-muted uppercase tracking-wider">Pending Roster</span>
-          <div>
-            <span className="text-26 font-black text-navy-900 dark:text-white tabular-nums">
+      {/* 3. 6 Key Performance Metric Cards with Uniform Heights & Baseline Alignment */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 min-[1440px]:grid-cols-6 gap-3 sm:gap-4">
+        {/* 1. Pending */}
+        <div className="h-[156px] p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
+          <div className="text-12 font-bold uppercase tracking-[0.04em] text-gov-muted min-h-[2rem] flex items-start line-clamp-2">
+            Pending
+          </div>
+          <div className="flex items-baseline">
+            <span className="text-32 font-semibold text-navy-900 dark:text-white tabular-nums leading-none">
               {data?.kpis.pending_scrutiny || 6}
             </span>
           </div>
-          <div className="h-5 flex items-center">
-            <span className="text-[11px] text-gov-muted">In Active Queue</span>
+          <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-navy-800">
+            <span className="text-12 text-gov-muted truncate">In Active Queue</span>
+            <svg width="48" height="18" className="overflow-visible shrink-0 opacity-80" aria-hidden="true">
+              <polyline fill="none" stroke="#1F3A93" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" points="0,14 12,8 24,12 36,4 48,9" />
+            </svg>
           </div>
         </div>
 
-        {/* High-Risk Cases */}
-        <div className="h-[148px] p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
-          <span className="text-11 font-bold text-gov-muted uppercase tracking-wider">High Risk Cases</span>
-          <div>
-            <span className="text-26 font-black text-red-600 dark:text-red-400 tabular-nums">
+        {/* 2. High risk */}
+        <div className="h-[156px] p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
+          <div className="text-12 font-bold uppercase tracking-[0.04em] text-gov-muted min-h-[2rem] flex items-start line-clamp-2">
+            High risk
+          </div>
+          <div className="flex items-baseline">
+            <span className="text-32 font-semibold text-red-600 dark:text-red-400 tabular-nums leading-none">
               {data?.kpis.high_risk_applications || 3}
             </span>
           </div>
-          <div className="h-5 flex items-center">
-            <span className="text-[11px] text-red-600 font-semibold">Priority Scrutiny</span>
+          <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-navy-800">
+            <span className="text-12 text-red-600 dark:text-red-400 font-semibold truncate">Priority Review</span>
+            <svg width="48" height="18" className="overflow-visible shrink-0 opacity-80" aria-hidden="true">
+              <polyline fill="none" stroke="#DC2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" points="0,15 12,12 24,6 36,9 48,2" />
+            </svg>
           </div>
         </div>
 
-        {/* SLA Breaching in 3 Days */}
-        <div className="h-[148px] p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
-          <span className="text-11 font-bold text-gov-muted uppercase tracking-wider">SLA at Risk</span>
-          <div>
-            <span className="text-26 font-black text-amber-500 tabular-nums">
+        {/* 3. SLA at risk */}
+        <div className="h-[156px] p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
+          <div className="text-12 font-bold uppercase tracking-[0.04em] text-gov-muted min-h-[2rem] flex items-start line-clamp-2">
+            SLA at risk
+          </div>
+          <div className="flex items-baseline">
+            <span className="text-32 font-semibold text-amber-500 tabular-nums leading-none">
               2
             </span>
           </div>
-          <div className="h-5 flex items-center">
-            <span className="text-[11px] text-amber-600 font-medium">Breach in 72h</span>
+          <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-navy-800">
+            <span className="text-12 text-amber-600 dark:text-amber-400 font-medium truncate">Breach in 72h</span>
+            <svg width="48" height="18" className="overflow-visible shrink-0 opacity-80" aria-hidden="true">
+              <polyline fill="none" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" points="0,12 12,14 24,8 36,11 48,4" />
+            </svg>
           </div>
         </div>
 
-        {/* Average Verification Time */}
-        <div className="h-[148px] p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
-          <span className="text-11 font-bold text-gov-muted uppercase tracking-wider">Avg Scrutiny Time</span>
-          <div>
-            <span className="text-26 font-black text-navy-900 dark:text-white tabular-nums">
-              4.2<span className="text-14 font-semibold text-gov-muted ml-0.5">m</span>
+        {/* 4. Avg scrutiny time */}
+        <div className="h-[156px] p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
+          <div className="text-12 font-bold uppercase tracking-[0.04em] text-gov-muted min-h-[2rem] flex items-start line-clamp-2">
+            Avg scrutiny time
+          </div>
+          <div className="flex items-baseline">
+            <span className="text-32 font-semibold text-navy-900 dark:text-white tabular-nums leading-none">
+              4.2
             </span>
+            <span className="text-16 font-normal text-gov-muted ml-1">m</span>
           </div>
-          <div className="h-5 flex items-center">
-            <span className="text-[11px] text-green-600 font-semibold">-78% vs manual</span>
+          <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-navy-800">
+            <span className="text-12 text-green-600 dark:text-green-400 font-semibold truncate">-78% vs manual</span>
+            <svg width="48" height="18" className="overflow-visible shrink-0 opacity-80" aria-hidden="true">
+              <polyline fill="none" stroke="#16A34A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" points="0,4 12,6 24,10 36,12 48,16" />
+            </svg>
           </div>
         </div>
 
-        {/* Source Verification Success */}
-        <div className="h-[148px] p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
-          <span className="text-11 font-bold text-gov-muted uppercase tracking-wider">Source Match Rate</span>
-          <div>
-            <span className="text-26 font-black text-green-600 dark:text-green-400 tabular-nums">
-              96.4%
+        {/* 5. Source match rate */}
+        <div className="h-[156px] p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
+          <div className="text-12 font-bold uppercase tracking-[0.04em] text-gov-muted min-h-[2rem] flex items-start line-clamp-2">
+            Source match rate
+          </div>
+          <div className="flex items-baseline">
+            <span className="text-32 font-semibold text-green-600 dark:text-green-400 tabular-nums leading-none">
+              96.4
             </span>
+            <span className="text-18 font-normal text-gov-muted ml-0.5">%</span>
           </div>
-          <div className="h-5 flex items-center">
-            <span className="text-[11px] text-gov-muted">DigiLocker / State DTE</span>
+          <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-navy-800">
+            <span className="text-12 text-gov-muted truncate">DigiLocker / DTE</span>
+            <svg width="48" height="18" className="overflow-visible shrink-0 opacity-80" aria-hidden="true">
+              <polyline fill="none" stroke="#138808" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" points="0,10 12,8 24,5 36,4 48,2" />
+            </svg>
           </div>
         </div>
 
-        {/* Manual Review Queue */}
-        <div className="h-[148px] p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
-          <span className="text-11 font-bold text-gov-muted uppercase tracking-wider">Manual Review</span>
-          <div>
-            <span className="text-26 font-black text-purple-600 dark:text-purple-400 tabular-nums">
+        {/* 6. Manual review */}
+        <div className="h-[156px] p-4 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs flex flex-col justify-between">
+          <div className="text-12 font-bold uppercase tracking-[0.04em] text-gov-muted min-h-[2rem] flex items-start line-clamp-2">
+            Manual review
+          </div>
+          <div className="flex items-baseline">
+            <span className="text-32 font-semibold text-purple-600 dark:text-purple-400 tabular-nums leading-none">
               4
             </span>
           </div>
-          <div className="h-5 flex items-center">
-            <span className="text-[11px] text-gov-muted">Evidence Review</span>
+          <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-navy-800">
+            <span className="text-12 text-gov-muted truncate">Evidence Review</span>
+            <svg width="48" height="18" className="overflow-visible shrink-0 opacity-80" aria-hidden="true">
+              <polyline fill="none" stroke="#9333EA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" points="0,12 12,14 24,9 36,11 48,6" />
+            </svg>
           </div>
         </div>
       </div>
