@@ -348,11 +348,10 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
         scale: isTransitioning ? 0.94 : 1
       }}
       transition={{ duration: 0.45 }}
-      className={`relative w-full max-w-md rounded-2xl bg-white/90 dark:bg-navy-900/90 backdrop-blur-md p-6 sm:p-8 flex flex-col justify-between transition-all ${
-        isOfficial 
-          ? 'border-2 border-navy-700/60 dark:border-navy-500/80 ring-4 ring-navy-700/15 dark:ring-navy-500/25 shadow-[0_20px_50px_rgba(15,28,63,0.3)]' 
+      className={`relative w-full max-w-md rounded-2xl bg-white/90 dark:bg-navy-900/90 backdrop-blur-md p-6 sm:p-8 flex flex-col justify-between transition-all ${isOfficial
+          ? 'border-2 border-navy-700/60 dark:border-navy-500/80 ring-4 ring-navy-700/15 dark:ring-navy-500/25 shadow-[0_20px_50px_rgba(15,28,63,0.3)]'
           : 'border-2 border-saffron-500/60 dark:border-saffron-500/70 ring-4 ring-saffron-500/20 dark:ring-saffron-500/25 shadow-[0_20px_50px_rgba(255,153,51,0.25)]'
-      }`}
+        }`}
     >
       <div>
         {/* Card Header & Portal Segmented Switch */}
@@ -374,9 +373,8 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
             <button
               type="button"
               onClick={() => { setActiveTab('institute'); setOtpStep(false); setErrorMessage(null); }}
-              className={`relative z-10 py-2.5 text-13 font-bold text-center transition-colors flex items-center justify-center gap-1.5 ${
-                !isOfficial ? 'text-navy-900 dark:text-white' : 'text-gov-muted hover:text-navy-900 dark:hover:text-white'
-              }`}
+              className={`relative z-10 py-2.5 text-13 font-bold text-center transition-colors flex items-center justify-center gap-1.5 ${!isOfficial ? 'text-navy-900 dark:text-white' : 'text-gov-muted hover:text-navy-900 dark:hover:text-white'
+                }`}
             >
               <Building className="w-4 h-4" />
               <span>{txt('instituteTab')}</span>
@@ -385,9 +383,8 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
             <button
               type="button"
               onClick={() => { setActiveTab('official'); setOtpStep(false); setErrorMessage(null); }}
-              className={`relative z-10 py-2.5 text-13 font-bold text-center transition-colors flex items-center justify-center gap-1.5 ${
-                isOfficial ? 'text-navy-900 dark:text-white' : 'text-gov-muted hover:text-navy-900 dark:hover:text-white'
-              }`}
+              className={`relative z-10 py-2.5 text-13 font-bold text-center transition-colors flex items-center justify-center gap-1.5 ${isOfficial ? 'text-navy-900 dark:text-white' : 'text-gov-muted hover:text-navy-900 dark:hover:text-white'
+                }`}
             >
               <ShieldCheck className="w-4 h-4" />
               <span>{txt('officialTab')}</span>
@@ -397,11 +394,10 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
             <motion.div
               layoutId="loginTabIndicator"
               transition={{ type: "spring", stiffness: 450, damping: 35 }}
-              className={`absolute inset-y-1 rounded-lg shadow-sm ${
-                !isOfficial
+              className={`absolute inset-y-1 rounded-lg shadow-sm ${!isOfficial
                   ? 'left-1 w-[calc(50%-4px)] bg-white dark:bg-navy-800 border-b-2 border-saffron-500'
                   : 'left-[50%] w-[calc(50%-4px)] bg-white dark:bg-navy-800 border-b-2 border-navy-700 dark:border-navy-500'
-              }`}
+                }`}
             />
           </div>
         </div>
@@ -438,11 +434,10 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder=" "
-                  className={`peer w-full h-12 pl-10 pr-3 rounded-xl border bg-white/70 dark:bg-navy-950/70 text-gov-text text-14 outline-none transition-all placeholder-transparent focus:ring-2 ${
-                    isOfficial
+                  className={`peer w-full h-12 pl-10 pr-3 rounded-xl border bg-white/70 dark:bg-navy-950/70 text-gov-text text-14 outline-none transition-all placeholder-transparent focus:ring-2 ${isOfficial
                       ? 'border-slate-300 dark:border-navy-700 focus:border-navy-700 focus:ring-navy-500/20'
                       : 'border-slate-300 dark:border-navy-700 focus:border-saffron-500 focus:ring-saffron-500/20'
-                  }`}
+                    }`}
                 />
                 <label
                   htmlFor="login-email"
@@ -462,11 +457,10 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder=" "
-                  className={`peer w-full h-12 pl-10 pr-10 rounded-xl border bg-white/70 dark:bg-navy-950/70 text-gov-text text-14 outline-none transition-all placeholder-transparent focus:ring-2 ${
-                    isOfficial
+                  className={`peer w-full h-12 pl-10 pr-10 rounded-xl border bg-white/70 dark:bg-navy-950/70 text-gov-text text-14 outline-none transition-all placeholder-transparent focus:ring-2 ${isOfficial
                       ? 'border-slate-300 dark:border-navy-700 focus:border-navy-700 focus:ring-navy-500/20'
                       : 'border-slate-300 dark:border-navy-700 focus:border-saffron-500 focus:ring-saffron-500/20'
-                  }`}
+                    }`}
                 />
                 <label
                   htmlFor="login-password"
@@ -506,11 +500,10 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
                     value={captchaInput}
                     onChange={(e) => setCaptchaInput(e.target.value.replace(/\D/g, ''))}
                     placeholder={txt('captchaPlaceholder')}
-                    className={`w-full h-11 px-3 text-center rounded-xl border bg-white/70 dark:bg-navy-950/70 text-gov-text text-14 font-mono font-bold outline-none focus:ring-2 ${
-                      isOfficial
+                    className={`w-full h-11 px-3 text-center rounded-xl border bg-white/70 dark:bg-navy-950/70 text-gov-text text-14 font-mono font-bold outline-none focus:ring-2 ${isOfficial
                         ? 'border-slate-300 dark:border-navy-700 focus:border-navy-700 focus:ring-navy-500/20'
                         : 'border-slate-300 dark:border-navy-700 focus:border-saffron-500 focus:ring-saffron-500/20'
-                    }`}
+                      }`}
                   />
                 </div>
               </div>
@@ -617,13 +610,12 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
           <button
             type="submit"
             disabled={isLoading || isSuccessTick}
-            className={`w-full h-12 rounded-xl font-bold text-14 flex items-center justify-center gap-2 shadow-md transition-all active:scale-[0.99] disabled:opacity-85 ${
-              isSuccessTick
+            className={`w-full h-12 rounded-xl font-bold text-14 flex items-center justify-center gap-2 shadow-md transition-all active:scale-[0.99] disabled:opacity-85 ${isSuccessTick
                 ? 'bg-green-600 text-white'
                 : isOfficial
                   ? 'bg-navy-900 hover:bg-navy-800 text-white shadow-navy-900/20'
                   : 'bg-saffron-500 hover:bg-saffron-600 text-white shadow-saffron-500/25'
-            }`}
+              }`}
           >
             {isSuccessTick ? (
               <span className="inline-flex items-center gap-2">
@@ -683,6 +675,7 @@ export const LoginCard: React.FC<LoginCardProps> = ({ onSuccess, isTransitioning
               </div>
 
               <div
+
                 onClick={(e) => handleCopyCredentials(e, acc)}
                 title="Copy email & password to clipboard"
                 className="p-1 rounded text-gov-muted hover:text-navy-900 dark:hover:text-white transition-colors"

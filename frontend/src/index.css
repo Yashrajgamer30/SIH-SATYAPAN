@@ -46,6 +46,7 @@
   --color-text: #1B2437;
   --color-text-muted: #5B6579;
   --color-focus: #FF9933;
+  --bg-forensic: #050B1A;
 }
 
 [data-theme="dark"] {
@@ -77,6 +78,7 @@
 
   --info: #1E88E5;
   --info-50: #0E223D;
+  --bg-forensic: #030712;
 }
 
 [data-theme="high-contrast"] {
@@ -88,6 +90,7 @@
   --color-text: #FFFFFF;
   --color-text-muted: #E2E8F0;
   --color-focus: #FFD600;
+  --bg-forensic: #000000;
 
   --navy-900: #000000;
   --navy-700: #FFD600;

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
 import { useAuthStore } from '../context/authStore';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   FileText, CheckCircle2, AlertTriangle, ShieldCheck, ShieldAlert,
   ZoomIn, ZoomOut, RotateCw, Maximize2, Minimize2, Eye, EyeOff,
@@ -12,7 +13,7 @@ import {
 } from 'lucide-react';
 
 interface ScanViewProps {
-  onClose: () => void;
+  onClose?: () => void;
   documentId?: string;
   initialFileName?: string;
 }
@@ -33,14 +34,29 @@ interface BoundingBox {
 export const ScanView: React.FC<ScanViewProps> = ({
   onClose,
   documentId = 'doc-demo-01',
-  initialFileName = 'fire_noc_clean.pdf'
+  initialFileName
 }) => {
+  const { appId, studentId, docId } = useParams<{ appId?: string; studentId?: string; docId?: string }>();
+  const navigate = useNavigate();
+
+  const handleExit = () => {
+    if (onClose) {
+      onClose();
+    } else {
+      navigate('/official/dashboard');
+    }
+  };
+
+  const defaultDoc = docId 
+    ? (docId.endsWith('.pdf') ? docId : `${docId}.pdf`) 
+    : (initialFileName || 'fire_noc_clean.pdf');
+
   const { theme, language } = useTheme();
   const { t } = useTranslation();
   const { user } = useAuthStore();
 
   // Selected Demo Pack document for stage evaluation
-  const [selectedDoc, setSelectedDoc] = useState<string>(initialFileName);
+  const [selectedDoc, setSelectedDoc] = useState<string>(defaultDoc);
   
   // Viewer state
   const [zoomLevel, setZoomLevel] = useState<number>(100);
@@ -215,7 +231,7 @@ export const ScanView: React.FC<ScanViewProps> = ({
       if (e.key === 'Escape') {
         if (activeBox) setActiveBox(null);
         else if (activeActionModal) setActiveActionModal(null);
-        else onClose();
+        else handleExit();
       } else if (e.key === 'h' || e.key === 'H') {
         setShowHeatmap((prev) => !prev);
       } else if (e.key === 'z' || e.key === 'Z') {
@@ -228,7 +244,7 @@ export const ScanView: React.FC<ScanViewProps> = ({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeBox, activeActionModal, onClose]);
+  }, [activeBox, activeActionModal, onClose, handleExit]);
 
   // Submit Official Regulatory Action with mandatory written remarks to audit trail
   const handleConfirmAction = (actionType: string) => {
@@ -267,12 +283,12 @@ export const ScanView: React.FC<ScanViewProps> = ({
       : 'bg-green-600 text-white';
 
   return (
-    <div className="fixed inset-0 z-50 bg-navy-950 text-slate-100 flex flex-col overflow-hidden font-sans select-none">
+    <div className="contents text-slate-100 font-sans select-none">
       {/* 1. Forensic Scanner Header */}
       <header className="h-14 bg-navy-900 border-b border-navy-800 px-4 sm:px-6 flex items-center justify-between gap-4 shrink-0 shadow-md">
         <div className="flex items-center gap-3">
           <button
-            onClick={onClose}
+            onClick={handleExit}
             className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-navy-800 transition-colors flex items-center gap-1.5 text-12 font-bold"
             title="Exit Scan View (Esc)"
           >

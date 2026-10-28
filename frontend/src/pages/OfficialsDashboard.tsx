@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { useAuthStore } from '../context/authStore';
@@ -52,6 +53,7 @@ interface OfficialsDashboardProps {
 }
 
 export const OfficialsDashboard: React.FC<OfficialsDashboardProps> = ({ onSelectApplication }) => {
+  const navigate = useNavigate();
   const { theme, language } = useTheme();
   const { token } = useAuthStore();
 
@@ -722,7 +724,14 @@ export const OfficialsDashboard: React.FC<OfficialsDashboardProps> = ({ onSelect
                     {/* Action button: 'Open dossier' with arrow, aligned right */}
                     <button
                       type="button"
-                      onClick={() => onSelectApplication?.(typeof item.id === 'string' ? parseInt(item.id, 10) || 1 : item.id)}
+                      onClick={() => {
+                        const appId = typeof item.id === 'string' ? parseInt(item.id, 10) || 1 : item.id;
+                        if (onSelectApplication) {
+                          onSelectApplication(appId);
+                        } else {
+                          navigate(`/official/applications/${appId}/students/STU-001/documents/fire_noc_clean/scan`);
+                        }
+                      }}
                       className="px-3.5 py-2 rounded-xl bg-navy-900 hover:bg-navy-800 dark:bg-navy-800 dark:hover:bg-navy-700 text-white text-12 font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95 shrink-0 self-end sm:self-center ml-auto"
                     >
                       <span>Open dossier</span>
