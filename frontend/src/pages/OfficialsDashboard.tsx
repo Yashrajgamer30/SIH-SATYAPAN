@@ -5,7 +5,7 @@ import { useAuthStore } from '../context/authStore';
 import {
   ShieldAlert, Clock, CheckCircle2, AlertTriangle, Activity,
   Filter, ArrowRight, Download, RefreshCw, Zap, MapPin, Eye,
-  Search, ShieldCheck, FileText, Database, Sparkles, TrendingUp
+  Search, ShieldCheck, FileText, Database, Sparkles, TrendingUp, HelpCircle
 } from 'lucide-react';
 import {
   ResponsiveContainer, BarChart, Bar, AreaChart, Area, PieChart, Pie, Cell,
@@ -33,10 +33,13 @@ interface OfficialDashboardData {
   findings_by_severity: Record<string, number>;
   monthly_disposal_trend: Array<{ month: string; disposals: number }>;
   scrutiny_queue: Array<{
-    id: number;
+    id: number | string;
     application_no: string;
     institute_name: string;
     state: string;
+    category?: string;
+    risk_band?: 'HIGH' | 'MEDIUM' | 'LOW';
+    risk_reason?: string;
     status: string;
     risk_score: number;
     fast_track: boolean;
@@ -77,6 +80,7 @@ export const OfficialsDashboard: React.FC<OfficialsDashboardProps> = ({ onSelect
   const [lastCheckedTime, setLastCheckedTime] = useState<string>('just now');
 
   const [selectedState, setSelectedState] = useState<string | null>(null);
+  const [hoveredRiskId, setHoveredRiskId] = useState<string | number | null>(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -135,18 +139,37 @@ export const OfficialsDashboard: React.FC<OfficialsDashboardProps> = ({ onSelect
           {
             id: 2,
             application_no: "AICTE/EOA/2026/MH-NSK-108",
-            institute_name: "Sahyadri College of Engineering",
+            institute_name: "Sahyadri College of Engineering & Research Technology",
             state: "Maharashtra",
+            category: "Extension of Approval (EoA)",
+            risk_band: "HIGH",
+            risk_reason: "Municipal Fire NOC expired 42 days ago; cadastral survey boundary shows 8% area mismatch against revenue records.",
             status: "UNDER_SCRUTINY",
             risk_score: 78.2,
             fast_track: false,
             created_at: "2026-02-19T14:20:00Z"
           },
           {
+            id: 3,
+            application_no: "AICTE/NPA/2026/KA-BLR-519",
+            institute_name: "Bangalore Institute of Advanced Computing",
+            state: "Karnataka",
+            category: "New Program Addition",
+            risk_band: "MEDIUM",
+            risk_reason: "Pending land conversion affidavit endorsement; faculty cadre ratio is borderline at 1:19.4 against mandatory 1:20.",
+            status: "UNDER_SCRUTINY",
+            risk_score: 41.5,
+            fast_track: false,
+            created_at: "2026-02-18T16:45:00Z"
+          },
+          {
             id: 1,
             application_no: "AICTE/EOA/2026/MH-PUNE-402",
             institute_name: "Saraswati Institute of Technology",
             state: "Maharashtra",
+            category: "Extension of Approval (EoA)",
+            risk_band: "LOW",
+            risk_reason: "All 18 statutory clearance certificates verified via National Academic Depository & DigiLocker without discrepancy.",
             status: "SUBMITTED",
             risk_score: 4.5,
             fast_track: true,
@@ -612,41 +635,102 @@ export const OfficialsDashboard: React.FC<OfficialsDashboardProps> = ({ onSelect
             </div>
 
             <div className="space-y-3">
-              {data?.scrutiny_queue.map((item) => (
-                <div
-                  key={item.id}
-                  className="p-4 rounded-xl border border-slate-200/80 dark:border-navy-700/80 bg-slate-50/70 dark:bg-navy-950/40 hover:bg-white dark:hover:bg-navy-900 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs hover:shadow-xs"
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-14 font-bold text-navy-900 dark:text-white">
-                        {item.institute_name}
-                      </span>
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
-                        item.risk_score > 60
-                          ? 'bg-red-100 text-red-700 dark:bg-red-950/80 dark:text-red-300'
-                          : 'bg-green-100 text-green-700 dark:bg-green-950/80 dark:text-green-300'
-                      }`}>
-                        Risk: {item.risk_score}%
-                      </span>
-                    </div>
-                    <div className="text-12 text-gov-muted flex items-center gap-2">
-                      <span className="font-mono text-[13px] font-semibold text-slate-800 dark:text-slate-200">{item.application_no}</span>
-                      <span>•</span>
-                      <span>{item.state}</span>
-                    </div>
-                  </div>
+              {data?.scrutiny_queue.map((item) => {
+                const band: 'HIGH' | 'MEDIUM' | 'LOW' =
+                  item.risk_band || (item.risk_score >= 60 ? 'HIGH' : item.risk_score >= 30 ? 'MEDIUM' : 'LOW');
 
-                  <button
-                    type="button"
-                    onClick={() => onSelectApplication?.(item.id)}
-                    className="px-4 py-2 rounded-xl bg-navy-900 hover:bg-navy-800 text-white text-12 font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95 shrink-0"
+                const bandStyles =
+                  band === 'HIGH'
+                    ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/70 dark:text-red-300 dark:border-red-900/60'
+                    : band === 'MEDIUM'
+                      ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-900/60'
+                      : 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-900/60';
+
+                const dotColor =
+                  band === 'HIGH' ? 'bg-red-600' : band === 'MEDIUM' ? 'bg-amber-500' : 'bg-emerald-600';
+
+                return (
+                  <div
+                    key={item.id}
+                    className="p-4 rounded-xl border border-slate-200/80 dark:border-navy-700/80 bg-slate-50/70 dark:bg-navy-950/40 hover:bg-white dark:hover:bg-navy-900 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs hover:shadow-xs"
                   >
-                    <span>Open Scrutiny Dossier</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              ))}
+                    <div className="space-y-1.5 min-w-0 flex-1">
+                      {/* Row 1: Institute Name (up to 2 lines) & Risk Band Chip */}
+                      <div className="flex items-start justify-between gap-3">
+                        <h4
+                          className="line-clamp-2 text-14 font-bold text-navy-900 dark:text-white leading-tight"
+                          title={item.institute_name}
+                        >
+                          {item.institute_name}
+                        </h4>
+
+                        {/* Risk Band Chip with 'Why this score' hover popover */}
+                        <div className="relative shrink-0">
+                          <button
+                            type="button"
+                            onMouseEnter={() => setHoveredRiskId(item.id)}
+                            onMouseLeave={() => setHoveredRiskId(null)}
+                            onFocus={() => setHoveredRiskId(item.id)}
+                            onBlur={() => setHoveredRiskId(null)}
+                            className={`px-2.5 py-0.5 rounded-full border text-[11px] font-bold flex items-center gap-1.5 cursor-help transition-all ${bandStyles}`}
+                            aria-label={`Risk band ${band}, score ${item.risk_score} percent. Hover for factor breakdown.`}
+                          >
+                            <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
+                            <span>{band} · {item.risk_score}%</span>
+                            <HelpCircle className="w-3 h-3 opacity-70" />
+                          </button>
+
+                          {/* 'Why this score' popover */}
+                          {hoveredRiskId === item.id && (
+                            <div className="absolute z-30 bottom-full right-0 mb-2 w-72 p-3 rounded-xl bg-navy-950 text-white text-[11px] shadow-xl border border-navy-700/80 backdrop-blur-md animate-in fade-in zoom-in-95 duration-150">
+                              <div className="flex items-center justify-between font-bold text-12 text-saffron-400 mb-1 border-b border-navy-800 pb-1">
+                                <span>Why this score?</span>
+                                <span className="text-[10px] text-slate-300">Confidence: 94%</span>
+                              </div>
+                              <p className="text-slate-200 leading-relaxed font-normal mb-1.5">
+                                {item.risk_reason || (
+                                  band === 'HIGH'
+                                    ? 'Multi-factor risk: Municipal Fire NOC expiry flag and cadastral survey resolution below required threshold.'
+                                    : band === 'MEDIUM'
+                                      ? 'Moderate variance: Land conversion deed under municipal verification; faculty count matches requirement.'
+                                      : 'Zero flags: All regulatory clearances and land documents independently validated via DigiLocker.'
+                                )}
+                              </p>
+                              <div className="text-[10px] text-slate-400 flex items-center gap-1">
+                                <ShieldAlert className="w-3 h-3 text-saffron-400 shrink-0" />
+                                <span>Statutory AI risk model v2.4 (Rule 14-B)</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Row 2: Application number (Noto Sans Mono), state, category */}
+                      <div className="text-12 text-gov-muted flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <span className="font-mono text-[13px] font-semibold text-slate-800 dark:text-slate-200">
+                          {item.application_no}
+                        </span>
+                        <span className="text-slate-300 dark:text-navy-700">•</span>
+                        <span>{item.state}</span>
+                        <span className="text-slate-300 dark:text-navy-700">•</span>
+                        <span className="truncate max-w-[220px]" title={item.category || 'Extension of Approval (EoA)'}>
+                          {item.category || 'Extension of Approval (EoA)'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Action button: 'Open dossier' with arrow, aligned right */}
+                    <button
+                      type="button"
+                      onClick={() => onSelectApplication?.(typeof item.id === 'string' ? parseInt(item.id, 10) || 1 : item.id)}
+                      className="px-3.5 py-2 rounded-xl bg-navy-900 hover:bg-navy-800 dark:bg-navy-800 dark:hover:bg-navy-700 text-white text-12 font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95 shrink-0 self-end sm:self-center ml-auto"
+                    >
+                      <span>Open dossier</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           </div>
 

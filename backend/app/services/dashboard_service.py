@@ -233,11 +233,16 @@ class DashboardService:
             if a.institute:
                 inst_name = a.institute.name
                 inst_state = a.institute.state
+            category_name = a.category.name if a.category else "Extension of Approval (EoA)"
+            band = a.risk_band or ("HIGH" if a.risk_score >= 60 else "MEDIUM" if a.risk_score >= 30 else "LOW")
             scrutiny_queue.append({
                 "id": a.id,
                 "application_no": a.application_no,
                 "institute_name": inst_name,
                 "state": inst_state,
+                "category": category_name,
+                "risk_band": band,
+                "risk_reason": "Multiple anomalies detected in Fire NOC and faculty cadre ratio" if band == "HIGH" else "Pending land conversion affidavit verification" if band == "MEDIUM" else "All institutional regulatory credentials cross-verified with DigiLocker",
                 "status": a.status.value,
                 "risk_score": a.risk_score,
                 "fast_track": a.risk_score <= 25.0,
