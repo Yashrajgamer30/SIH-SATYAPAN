@@ -10,7 +10,7 @@ import {
   Sliders, Download, Check, X, ArrowLeft, ArrowRight, CornerDownRight,
   QrCode, Stamp, FileCheck, Layers, Sparkles, AlertCircle, Clock,
   ChevronDown, ChevronRight, ChevronUp, User, Building, HelpCircle, FileSearch, RefreshCw,
-  Sun, Moon, Globe
+  Sun, Moon, Globe, Compass
 } from 'lucide-react';
 
 export interface ScanViewProps {
@@ -31,6 +31,8 @@ export interface BoundingBox {
   w: number;
   h: number;
 }
+
+const API_BASE = 'http://localhost:8000';
 
 export const ScanView: React.FC<ScanViewProps> = ({
   onClose,
@@ -64,12 +66,24 @@ export const ScanView: React.FC<ScanViewProps> = ({
 
   // Selected Demo Pack document for stage evaluation
   const [selectedDoc, setSelectedDoc] = useState<string>(defaultDoc);
-  
-  // Viewer state
-  const [zoomLevel, setZoomLevel] = useState<number>(100);
-  const [rotation, setRotation] = useState<number>(0);
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
-  
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageWidth, setPageWidth] = useState<number>(1241);
+  const [pageHeight, setPageHeight] = useState<number>(1754);
+  const [boundingBoxes, setBoundingBoxes] = useState<BoundingBox[]>([]);
+  const [ocrWords, setOcrWords] = useState<any[]>([]);
+
+  // Stage transform state: translate(x, y) scale(s) rotate(deg) acting strictly on .stage
+  const [stageScale, setStageScale] = useState<number>(0.5);
+  const [stageX, setStageX] = useState<number>(0);
+  const [stageY, setStageY] = useState<number>(0);
+  const [stageRotate, setStageRotate] = useState<number>(0);
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
+  const [isPanning, setIsPanning] = useState<boolean>(false);
+  const [panStart, setPanStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [initialFitDone, setInitialFitDone] = useState<boolean>(false);
+
+  const viewportRef = useRef<HTMLDivElement>(null);
+
   // Scanning animation & SSE simulation
   const [isScanning, setIsScanning] = useState<boolean>(true);
   const [scanProgress, setScanProgress] = useState<number>(0);
@@ -131,83 +145,145 @@ export const ScanView: React.FC<ScanViewProps> = ({
     { name: 'library_photo_inconsistent.jpg', label: 'Library Photo (Inconsistent Floor)', verdict: 'INSPECTION_FLAG', type: 'Infra Evidence' }
   ];
 
-  // Bounding Boxes positioned across the document canvas
-  const boundingBoxes: BoundingBox[] = [
-    {
-      id: 'box-ref',
-      type: 'text',
-      field: 'Certificate Ref No',
-      value: 'NOC-FIRE-2025-9921',
-      confidence: 0.985,
-      model: 'Tesseract-Regex-Extract',
-      x: 35,
-      y: 95,
-      w: 200,
-      h: 24
-    },
-    {
-      id: 'box-inst',
-      type: 'text',
-      field: 'AICTE Permanent ID',
-      value: selectedDoc.includes('fee_receipt_id_mismatch') ? 'AICTE-1-9999999' : 'AICTE-1-3324901',
-      confidence: 0.975,
-      model: 'OCR-Pattern-Match',
-      x: 35,
-      y: 125,
-      w: 210,
-      h: 24
-    },
-    {
-      id: 'box-validity',
-      type: selectedDoc.includes('tamper') ? 'tamper' : selectedDoc.includes('expired') ? 'tamper' : 'text',
-      field: 'Validity Upto',
-      value: selectedDoc.includes('tamper') ? '31/12/2035 [MODIFIED]' : selectedDoc.includes('expired') ? '14/01/2024 [EXPIRED]' : '09/04/2028',
-      confidence: selectedDoc.includes('tamper') ? 0.94 : 0.99,
-      model: selectedDoc.includes('tamper') ? 'ELA-Residual-Anomaly' : 'Tesseract-DateField',
-      x: 35,
-      y: 155,
-      w: 230,
-      h: 24
-    },
-    {
-      id: 'box-qr',
-      type: selectedDoc.includes('bad_qr') ? 'tamper' : 'qr',
-      field: 'QR Code & HMAC Signature',
-      value: selectedDoc.includes('bad_qr') ? 'HMAC-SHA256 INVALID' : 'HMAC-SHA256 VALID',
-      confidence: 0.999,
-      model: 'Cryptographic-HMAC-Verifier',
-      x: 35,
-      y: 430,
-      w: 90,
-      h: 90
-    },
-    {
-      id: 'box-seal',
-      type: selectedDoc.includes('copy_move') ? 'tamper' : 'seal',
-      field: 'Institutional Round Stamp',
-      value: selectedDoc.includes('copy_move') ? 'Copy-Move Cloned Seal' : 'Official State Seal',
-      confidence: selectedDoc.includes('copy_move') ? 0.93 : 0.98,
-      model: selectedDoc.includes('copy_move') ? 'ORB-Feature-Matcher' : 'HoughCircles-OpenCV',
-      x: 230,
-      y: 435,
-      w: 80,
-      h: 80
-    },
-    {
-      id: 'box-sig',
-      type: selectedDoc.includes('untrusted') ? 'tamper' : 'signature',
-      field: 'Authorized Signatory Block',
-      value: selectedDoc.includes('untrusted') ? 'Contract Staffing Agent' : 'Dr. R. K. Sharma (Chief Fire Officer)',
-      confidence: 0.96,
-      model: 'PKI-Trust-Store-Lookup',
-      x: 360,
-      y: 445,
-      w: 160,
-      h: 55
+  // Fetch document 150 DPI metadata & real detector bounding boxes
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchMetadata() {
+      try {
+        const resp = await fetch(`${API_BASE}/documents/${selectedDoc}/metadata`);
+        if (resp.ok) {
+          const data = await resp.json();
+          if (isMounted) {
+            setPageWidth(data.page_width || 1241);
+            setPageHeight(data.page_height || 1754);
+            setBoundingBoxes(data.boxes || []);
+            setOcrWords(data.ocr_words || []);
+          }
+        }
+      } catch (e) {
+        console.warn('Metadata endpoint fallback:', e);
+      }
     }
-  ];
+    fetchMetadata();
+    return () => { isMounted = false; };
+  }, [selectedDoc, currentPage]);
 
-  // Trigger Scanning Animation whenever document changes (Minimum 2.5s)
+  // Centering & Fit to View (Overview Transform)
+  const handleOverview = () => {
+    setActiveBox(null);
+    setIsAnimating(true);
+    if (!viewportRef.current) return;
+
+    const rect = viewportRef.current.getBoundingClientRect();
+    const vW = rect.width;
+    const vH = rect.height;
+
+    const pad = 48;
+    const fitScale = Math.min((vW - pad) / pageWidth, (vH - pad) / pageHeight);
+    const clampedScale = Math.max(0.2, Math.min(fitScale, 1.5));
+
+    const tx = (vW - pageWidth * clampedScale) / 2;
+    const ty = (vH - pageHeight * clampedScale) / 2;
+
+    setStageScale(clampedScale);
+    setStageX(tx);
+    setStageY(ty);
+    setStageRotate(0);
+
+    setTimeout(() => {
+      setIsAnimating(false);
+    }, 500);
+  };
+
+  // Auto-fit overview on initial document load or change
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      handleOverview();
+    }, 120);
+    return () => clearTimeout(timer);
+  }, [selectedDoc, pageWidth, pageHeight]);
+
+  // Click-to-Zoom: Animate stage transform to fit region with 20% padding over 500ms
+  const handleZoomToRegion = (box: BoundingBox) => {
+    if (!viewportRef.current) return;
+    setActiveBox(box);
+    setIsAnimating(true);
+
+    const rect = viewportRef.current.getBoundingClientRect();
+    const vW = rect.width;
+    const vH = rect.height;
+
+    // 20% padding around region (scale factor 1.4)
+    const paddedW = Math.max(box.w * 1.4, 180);
+    const paddedH = Math.max(box.h * 1.4, 120);
+
+    const targetScale = Math.min(vW / paddedW, vH / paddedH);
+    const targetScaleClamped = Math.max(0.6, Math.min(targetScale, 3.2));
+
+    const boxCenterX = box.x + box.w / 2;
+    const boxCenterY = box.y + box.h / 2;
+
+    const tx = vW / 2 - targetScaleClamped * boxCenterX;
+    const ty = vH / 2 - targetScaleClamped * boxCenterY;
+
+    setStageScale(targetScaleClamped);
+    setStageX(tx);
+    setStageY(ty);
+
+    setTimeout(() => {
+      setIsAnimating(false);
+    }, 500);
+  };
+
+  // Zoom controls acting on .stage
+  const handleZoomIn = () => {
+    setIsAnimating(true);
+    setStageScale((prev) => Math.min(prev * 1.25, 4.0));
+    setTimeout(() => setIsAnimating(false), 300);
+  };
+
+  const handleZoomOut = () => {
+    setIsAnimating(true);
+    setStageScale((prev) => Math.max(prev / 1.25, 0.2));
+    setTimeout(() => setIsAnimating(false), 300);
+  };
+
+  const handleRotate = () => {
+    setIsAnimating(true);
+    setStageRotate((prev) => (prev + 90) % 360);
+    setTimeout(() => setIsAnimating(false), 300);
+  };
+
+  const handleFitWidth = () => {
+    if (!viewportRef.current) return;
+    setIsAnimating(true);
+    const rect = viewportRef.current.getBoundingClientRect();
+    const fitWScale = (rect.width - 32) / pageWidth;
+    setStageScale(fitWScale);
+    setStageX(16);
+    setStageY(24);
+    setTimeout(() => setIsAnimating(false), 500);
+  };
+
+  // Pan interaction on viewport
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (e.button !== 0) return;
+    setIsPanning(true);
+    setIsAnimating(false);
+    setPanStart({ x: e.clientX - stageX, y: e.clientY - stageY });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isPanning) return;
+    setStageX(e.clientX - panStart.x);
+    setStageY(e.clientY - panStart.y);
+  };
+
+  const handleMouseUp = () => {
+    setIsPanning(false);
+  };
+
+  // Scanning animation sequence
   useEffect(() => {
     setIsScanning(true);
     setScanProgress(0);
@@ -229,20 +305,20 @@ export const ScanView: React.FC<ScanViewProps> = ({
     return () => clearInterval(stepInterval);
   }, [selectedDoc]);
 
-  // Keyboard Navigation: Shift+D presenter mode, Esc close, H heatmap, Z zoom, A accept, D deficiency
+  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.shiftKey && (e.key === 'D' || e.key === 'd')) {
         e.preventDefault();
         setIsPresenterKeyActive((prev) => !prev);
-      } else if (e.key === 'Escape') {
-        if (activeBox) setActiveBox(null);
+      } else if (e.key === 'Escape' || e.key === 'o' || e.key === 'O') {
+        if (activeBox) handleOverview();
         else if (activeActionModal) setActiveActionModal(null);
-        else handleExit();
+        else if (e.key === 'Escape') handleExit();
       } else if (e.key === 'h' || e.key === 'H') {
         setShowHeatmap((prev) => !prev);
       } else if (e.key === 'z' || e.key === 'Z') {
-        setZoomLevel((prev) => (prev >= 175 ? 100 : prev + 25));
+        handleZoomIn();
       } else if (e.key === 'a' || e.key === 'A') {
         setActiveActionModal('ACCEPT');
       } else if (e.key === 'd' || e.key === 'D') {
@@ -251,9 +327,9 @@ export const ScanView: React.FC<ScanViewProps> = ({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeBox, activeActionModal, handleExit]);
+  }, [activeBox, activeActionModal, handleExit, stageScale, pageWidth, pageHeight]);
 
-  // Submit Official Regulatory Action with mandatory written remarks to audit trail
+  // Submit Official Regulatory Action with mandatory written remarks
   const handleConfirmAction = (actionType: string) => {
     if (!actionRemarks.trim()) {
       alert("Mandatory written remarks are required under AICTE Regulatory Procedure.");
@@ -270,6 +346,23 @@ export const ScanView: React.FC<ScanViewProps> = ({
     setTimeout(() => {
       setAuditConfirmationToast(null);
     }, 5000);
+  };
+
+  // Color mapping by rectangle type
+  const getBoxColors = (type: string) => {
+    switch (type) {
+      case 'text':
+        return { stroke: '#2563EB', fill: 'rgba(37, 99, 235, 0.12)', name: 'Blue (Text Field)' };
+      case 'qr':
+        return { stroke: '#16A34A', fill: 'rgba(22, 163, 74, 0.12)', name: 'Green (QR Code)' };
+      case 'signature':
+        return { stroke: '#9333EA', fill: 'rgba(147, 51, 234, 0.12)', name: 'Purple (Signature)' };
+      case 'seal':
+        return { stroke: '#EA580C', fill: 'rgba(234, 88, 12, 0.12)', name: 'Orange (Seal)' };
+      case 'tamper':
+      default:
+        return { stroke: '#DC2626', fill: 'rgba(220, 38, 38, 0.12)', name: 'Red (Suspicious)' };
+    }
   };
 
   const isTamperedCase = selectedDoc.includes('tamper') || selectedDoc.includes('copy_move');
@@ -321,34 +414,62 @@ export const ScanView: React.FC<ScanViewProps> = ({
           </div>
         </div>
 
-        {/* Center Section: Zoom controls, ELA Heatmap toggle, Watermark Protected chip */}
+        {/* Center Section: Stage Zoom, Pan, Rotate, Fit, and Overview controls */}
         <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
-          {/* Zoom Controls */}
+          {/* Zoom Controls acting on .stage */}
           <div className="flex items-center gap-1 bg-navy-950/80 border border-navy-700/80 rounded-lg px-2 py-0.5 text-12">
             <button
-              onClick={() => setZoomLevel((z) => Math.max(z - 15, 60))}
+              onClick={handleZoomOut}
               className="p-1 rounded hover:bg-navy-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
               title="Zoom Out (-)"
             >
               <ZoomOut className="w-3.5 h-3.5" />
             </button>
-            <span className="text-[12px] tabular-nums font-semibold text-slate-200 w-10 text-center">
-              {zoomLevel}%
+            <span className="text-[12px] tabular-nums font-semibold text-slate-200 w-12 text-center font-mono">
+              {Math.round(stageScale * 100)}%
             </span>
             <button
-              onClick={() => setZoomLevel((z) => Math.min(z + 15, 200))}
+              onClick={handleZoomIn}
               className="p-1 rounded hover:bg-navy-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
               title="Zoom In (+)"
             >
               <ZoomIn className="w-3.5 h-3.5" />
             </button>
             <button
-              onClick={() => setZoomLevel(100)}
-              className="px-1.5 py-0.5 rounded text-[11px] hover:bg-navy-800 text-slate-400 hover:text-white transition-colors cursor-pointer"
+              onClick={handleRotate}
+              className="p-1 rounded hover:bg-navy-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
+              title="Rotate 90°"
             >
-              Fit
+              <RotateCw className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={handleFitWidth}
+              className="px-1.5 py-0.5 rounded text-[11px] hover:bg-navy-800 text-slate-400 hover:text-white transition-colors cursor-pointer font-medium"
+              title="Fit to Width"
+            >
+              Fit Width
+            </button>
+            <button
+              onClick={handleOverview}
+              className="px-2 py-0.5 rounded text-[11px] bg-navy-800 hover:bg-navy-700 text-saffron-400 font-bold transition-colors cursor-pointer flex items-center gap-1"
+              title="Return to Full Overview (O)"
+            >
+              <Compass className="w-3 h-3" />
+              Overview
             </button>
           </div>
+
+          {/* Active Region Zoomed Pill Indicator */}
+          {activeBox && (
+            <button
+              onClick={handleOverview}
+              className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-11 font-semibold bg-saffron-500/20 text-saffron-300 border border-saffron-500/50 hover:bg-saffron-500/30 transition-all cursor-pointer animate-pulse"
+              title="Click to return to overview"
+            >
+              <span>Target: {activeBox.field}</span>
+              <X className="w-3.5 h-3.5 text-saffron-400" />
+            </button>
+          )}
 
           {/* ELA Heatmap Toggle */}
           <button
@@ -373,7 +494,6 @@ export const ScanView: React.FC<ScanViewProps> = ({
 
         {/* Right Section: Presenter Mode Demo Pack, Theme & Language Controls */}
         <div className="flex items-center gap-2 shrink-0">
-          {/* Demo Pack Dropdown: Hidden by default, shown only in Presenter mode (Shift+D or ?presenter=1) */}
           {showDemoPack && (
             <div className="flex items-center gap-1.5">
               <span className="text-[10px] uppercase font-bold text-saffron-400 font-mono hidden xl:inline">
@@ -381,13 +501,15 @@ export const ScanView: React.FC<ScanViewProps> = ({
               </span>
               <select
                 value={selectedDoc}
-                onChange={(e) => setSelectedDoc(e.target.value)}
+                onChange={(e) => {
+                  setSelectedDoc(e.target.value);
+                  setActiveBox(null);
+                }}
                 className="text-11 bg-navy-950 border border-saffron-500/60 rounded-lg px-2 py-1 text-slate-200 outline-none focus:border-saffron-400 max-w-[170px]"
                 title="Presenter Mode Document Selector"
               >
                 {demoPackFiles.map((f) => (
                   <option key={f.name} value={f.name}>
-                    {/* Hide expected-result text like (VERIFIED) until after scan finishes */}
                     {isScanning ? f.label : `${f.label} (${f.verdict})`}
                   </option>
                 ))}
@@ -395,7 +517,6 @@ export const ScanView: React.FC<ScanViewProps> = ({
             </div>
           )}
 
-          {/* Theme Switcher */}
           <button
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             className="p-1.5 rounded-lg bg-navy-800 hover:bg-navy-700 text-slate-300 hover:text-white transition-colors cursor-pointer"
@@ -404,7 +525,6 @@ export const ScanView: React.FC<ScanViewProps> = ({
             {theme === 'dark' ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-blue-300" />}
           </button>
 
-          {/* Language Switcher */}
           <div className="flex items-center bg-navy-950 border border-navy-800 rounded-lg p-0.5 text-[11px]">
             <button
               onClick={() => setLanguage('en')}
@@ -433,8 +553,6 @@ export const ScanView: React.FC<ScanViewProps> = ({
 
       {/* =================================================================== */}
       {/* 2. MAIN 3-ZONE WORKSPACE GRID                                       */}
-      {/* left rail 240px | centre minmax(0,1fr) | right panel 400px          */}
-      {/* Below 1280px: left rail 64px (icons only) | right panel 340px       */}
       {/* =================================================================== */}
       <div className="grid grid-cols-[64px_minmax(0,1fr)_340px] xl:grid-cols-[240px_minmax(0,1fr)_400px] w-full h-full overflow-hidden relative">
         {/* ================================================================= */}
@@ -449,23 +567,21 @@ export const ScanView: React.FC<ScanViewProps> = ({
               {isScanning && <span className="hidden xl:inline text-[10px] text-saffron-400 animate-pulse font-mono">Running</span>}
             </div>
 
-            {/* Checklist items ticking live */}
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {pipelineSteps.map((s, idx) => {
                 const Icon = s.icon;
-                const isCompleted = idx <= currentStepIndex;
-                const isCurrent = idx === currentStepIndex && isScanning;
+                const isCompleted = !isScanning || idx < currentStepIndex;
+                const isCurrent = isScanning && idx === currentStepIndex;
 
                 return (
                   <div
                     key={s.id}
-                    title={s.label}
-                    className={`p-2 rounded-xl text-[12px] flex items-center gap-2.5 transition-all ${
+                    className={`flex items-center gap-2.5 p-2 rounded-xl text-12 transition-all ${
                       isCurrent
-                        ? 'bg-saffron-500/20 text-saffron-300 border border-saffron-500/40'
+                        ? 'bg-saffron-500/15 border border-saffron-500/50 text-white shadow-xs font-semibold'
                         : isCompleted
-                          ? 'bg-navy-950/60 text-slate-200'
-                          : 'text-slate-400'
+                          ? 'bg-navy-950/70 text-slate-200 border border-transparent'
+                          : 'opacity-40 text-slate-400'
                     }`}
                   >
                     <div className="shrink-0 flex items-center justify-center">
@@ -477,8 +593,6 @@ export const ScanView: React.FC<ScanViewProps> = ({
                         <Icon className="w-4 h-4 text-slate-500" />
                       )}
                     </div>
-
-                    {/* Full labels (no truncation; allow two lines) */}
                     <span className="hidden xl:block leading-tight break-words whitespace-normal font-medium flex-1">
                       {s.label}
                     </span>
@@ -488,17 +602,27 @@ export const ScanView: React.FC<ScanViewProps> = ({
             </div>
           </div>
 
-          {/* Bottom: Page Thumbnails pinned at the bottom with their own scroll */}
+          {/* Bottom: Page Thumbnails pinned at the bottom */}
           <div className="mt-auto border-t border-navy-800 pt-3 shrink-0 overflow-y-auto max-h-48 min-w-0">
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300 mb-1.5 block hidden xl:block">
               Page Thumbnails
             </span>
-            <div className="p-1.5 rounded-xl bg-navy-950 border border-navy-700/80 hover:border-saffron-500 cursor-pointer text-center transition-colors">
-              <div className="w-full h-24 xl:h-28 bg-slate-100 rounded-lg flex flex-col items-center justify-center p-1.5 text-navy-900 shadow-inner">
-                <FileText className="w-6 h-6 text-navy-700 mb-0.5" />
-                <span className="text-[10px] font-bold font-mono">Page 1/1</span>
-                <span className="text-[9px] text-slate-500 truncate max-w-[80px] xl:max-w-[140px] block">
-                  {selectedDoc}
+            <div
+              onClick={handleOverview}
+              className="p-1.5 rounded-xl bg-navy-950 border border-navy-700/80 hover:border-saffron-500 cursor-pointer text-center transition-colors"
+            >
+              <div className="w-full h-24 xl:h-28 bg-slate-100 rounded-lg flex flex-col items-center justify-center p-1.5 text-navy-900 shadow-inner overflow-hidden relative">
+                <img
+                  src={`${API_BASE}/documents/${selectedDoc}/pages/1.png`}
+                  alt="Thumb"
+                  className="w-full h-full object-contain pointer-events-none"
+                  onError={(e) => {
+                    // Fallback to icon if image loading
+                    (e.target as HTMLElement).style.display = 'none';
+                  }}
+                />
+                <span className="absolute bottom-1 right-1 bg-navy-900/80 text-white text-[9px] px-1 rounded font-mono">
+                  150 DPI
                 </span>
               </div>
             </div>
@@ -506,148 +630,139 @@ export const ScanView: React.FC<ScanViewProps> = ({
             {/* Quick Keyboard Hints */}
             <div className="hidden xl:block mt-3 text-[10px] text-slate-400 space-y-0.5 font-mono">
               <div><kbd className="px-1 bg-navy-950 rounded">H</kbd> Heatmap • <kbd className="px-1 bg-navy-950 rounded">Z</kbd> Zoom</div>
-              <div><kbd className="px-1 bg-navy-950 rounded">A</kbd> Accept • <kbd className="px-1 bg-navy-950 rounded">D</kbd> Deficiency</div>
+              <div><kbd className="px-1 bg-navy-950 rounded">O</kbd> Overview • <kbd className="px-1 bg-navy-950 rounded">A</kbd> Accept</div>
             </div>
           </div>
         </aside>
 
         {/* ================================================================= */}
-        {/* ZONE 2: CENTRE CANVAS (Independent pan/zoom viewport)             */}
+        {/* ZONE 2: CENTRE CANVAS (Independent pan/zoom stage viewport)       */}
+        {/* Built strictly as: .stage > img.page + svg.overlay               */}
         {/* ================================================================= */}
         <main className="min-w-0 bg-navy-950 flex flex-col relative overflow-hidden h-full">
           {/* Interactive Document Viewport */}
-          <div className="flex-1 overflow-auto flex items-center justify-center p-4 sm:p-6 relative bg-navy-950/90">
-            {/* The Document Sheet Container */}
-            <motion.div
+          <div
+            ref={viewportRef}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+            className={`flex-1 overflow-hidden flex items-center justify-center relative bg-navy-950/95 select-none ${
+              isPanning ? 'cursor-grabbing' : 'cursor-grab'
+            }`}
+          >
+            {/* Saffron-to-White Scanning Line Sweep Animation */}
+            {isScanning && (
+              <motion.div
+                initial={{ top: '0%' }}
+                animate={{ top: '100%' }}
+                transition={{ duration: 2.2, repeat: Infinity, ease: 'linear' }}
+                className="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-saffron-500 to-white shadow-[0_0_15px_#FF9933] z-40 pointer-events-none"
+              />
+            )}
+
+            {/* .stage: transform: translate, scale, rotate, transform-origin 0 0 */}
+            <div
+              className="stage relative select-none shadow-2xl bg-white shrink-0"
               style={{
-                scale: zoomLevel / 100,
-                rotate: rotation,
-                transformOrigin: 'center center'
+                width: `${pageWidth}px`,
+                height: `${pageHeight}px`,
+                transform: `translate(${stageX}px, ${stageY}px) scale(${stageScale}) rotate(${stageRotate}deg)`,
+                transformOrigin: '0 0',
+                transition: isAnimating ? 'transform 500ms ease-in-out' : 'none'
               }}
-              transition={{ duration: 0.2 }}
-              className="relative w-[560px] h-[780px] bg-[#FDFBF7] text-navy-900 rounded shadow-2xl overflow-hidden border-2 border-slate-300 select-none shrink-0"
             >
-              {/* Dynamic Forensic Watermark Burned across document */}
-              <div className="absolute inset-0 pointer-events-none flex items-center justify-center rotate-[-35deg] opacity-15 text-navy-900 font-mono text-14 font-black tracking-widest text-center">
-                <span>{user?.name || "Dr. Arvind Deshmukh"} | {new Date().toISOString()} | AICTE/EOA/2026/MH-PUNE-402</span>
-              </div>
-
-              {/* Saffron-to-White Scanning Line Sweep Animation */}
-              {isScanning && (
-                <motion.div
-                  initial={{ top: '0%' }}
-                  animate={{ top: '100%' }}
-                  transition={{ duration: 2.5, repeat: Infinity, ease: 'linear' }}
-                  className="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-saffron-500 to-white shadow-[0_0_15px_#FF9933] z-30 pointer-events-none"
-                />
-              )}
-
-              {/* Corner Brackets Snapping onto Page Edges */}
-              <div className="absolute top-2 left-2 w-6 h-6 border-t-2 border-l-2 border-saffron-500 z-20 pointer-events-none" />
-              <div className="absolute top-2 right-2 w-6 h-6 border-t-2 border-r-2 border-saffron-500 z-20 pointer-events-none" />
-              <div className="absolute bottom-2 left-2 w-6 h-6 border-b-2 border-l-2 border-saffron-500 z-20 pointer-events-none" />
-              <div className="absolute bottom-2 right-2 w-6 h-6 border-b-2 border-r-2 border-saffron-500 z-20 pointer-events-none" />
-
-              {/* Document Sheet Content */}
-              <div className="p-8 h-full flex flex-col justify-between text-11 relative">
-                <div>
-                  <div className="bg-saffron-500 text-white font-bold text-center py-1 text-10 uppercase tracking-widest rounded-xs mb-3">
-                    भारत सरकार • GOVERNMENT OF INDIA • REGULATORY ARCHIVE
-                  </div>
-                  <h2 className="text-16 font-black text-center text-navy-900 uppercase tracking-wide">
-                    FIRE SAFETY NO OBJECTION CERTIFICATE
-                  </h2>
-                  <p className="text-center text-[10px] text-gov-muted">Extension of Approval Verification Dossier • Cycle 2026-27</p>
-                  <hr className="my-3 border-slate-300" />
-                </div>
-
-                {/* Body Content Representation */}
-                <div className="space-y-3 text-10 text-slate-800">
-                  <p><strong>Certificate Ref:</strong> NOC-FIRE-2025-9921</p>
-                  <p><strong>Permanent Institute ID:</strong> {selectedDoc.includes('fee_receipt_id_mismatch') ? 'AICTE-1-9999999' : 'AICTE-1-3324901'}</p>
-                  <p>
-                    <strong>Validity Upto: </strong>
-                    <span className={selectedDoc.includes('tamper') ? 'bg-red-200 text-red-800 font-bold px-1 rounded' : ''}>
-                      {selectedDoc.includes('tamper') ? '31/12/2035 [MODIFIED]' : selectedDoc.includes('expired') ? '14/01/2024' : '09/04/2028'}
-                    </span>
-                  </p>
-                  <div className="p-3 rounded bg-slate-100 border border-slate-200 space-y-1.5 text-[9.5px]">
-                    <p>1. Institutional premises verified against statutory Master Plan.</p>
-                    <p>2. Built-up educational floor area meets threshold norms.</p>
-                    <p>3. Faculty-Student Ratio complies with 1:20 ceiling.</p>
-                    <p>4. All cryptographic digital signatures validated under IT Act 2000.</p>
-                  </div>
-                </div>
-
-                {/* Bottom Stamps & Signatures */}
-                <div className="flex items-end justify-between pt-4 border-t border-slate-300">
-                  <div className="w-20 h-20 border border-slate-400 bg-white p-1 rounded flex items-center justify-center font-mono text-[9px] text-slate-500">
-                    [QR CODE]
-                  </div>
-
-                  <div className="w-16 h-16 rounded-full border-2 border-navy-900 flex items-center justify-center text-[8px] font-bold text-navy-900 text-center leading-tight">
-                    OFFICIAL<br />SEAL
-                  </div>
-
-                  <div className="text-right">
-                    <div className="font-serif italic text-14 text-navy-900">Dr. R. K. Sharma</div>
-                    <div className="text-[9px] font-bold">Chief Fire Officer</div>
-                    <div className="text-[8px] text-gov-muted">Authorized Signatory</div>
-                  </div>
-                </div>
-              </div>
+              {/* <img class='page'> */}
+              <img
+                className="page block w-full h-full pointer-events-none"
+                src={`${API_BASE}/documents/${selectedDoc}/pages/${currentPage}.png`}
+                alt={`Document Page ${currentPage}`}
+                width={pageWidth}
+                height={pageHeight}
+              />
 
               {/* Forensic ELA Heatmap Overlay */}
               {showHeatmap && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: heatmapOpacity }}
-                  className="absolute inset-0 pointer-events-none bg-gradient-to-br from-red-600/30 via-amber-500/40 to-blue-600/20 mix-blend-multiply z-25 flex items-center justify-center"
+                <div
+                  style={{ opacity: heatmapOpacity }}
+                  className="absolute inset-0 pointer-events-none bg-gradient-to-br from-red-600/35 via-amber-500/35 to-blue-600/25 mix-blend-multiply z-20 flex items-center justify-center"
                 >
-                  <div className="text-white bg-black/70 px-3 py-1.5 rounded-lg text-12 font-mono font-bold">
+                  <div className="text-white bg-black/80 px-4 py-2 rounded-lg text-14 font-mono font-bold tracking-wider border border-white/20 shadow-2xl">
                     [ELA COMPRESSION RESIDUAL HEATMAP ACTIVE]
                   </div>
-                </motion.div>
+                </div>
               )}
 
-              {/* Interactive Bounding Boxes Overlaid onto Document */}
-              {boundingBoxes.map((box) => {
-                const isSelected = activeBox?.id === box.id;
-                const isHovered = hoveredBox?.id === box.id;
+              {/* <svg class='overlay' viewBox='0 0 W H' preserveAspectRatio='none'> */}
+              <svg
+                className="overlay absolute inset-0 w-full h-full pointer-events-auto z-10"
+                viewBox={`0 0 ${pageWidth} ${pageHeight}`}
+                preserveAspectRatio="none"
+              >
+                {boundingBoxes.map((box) => {
+                  const isSelected = activeBox?.id === box.id;
+                  const isHovered = hoveredBox?.id === box.id;
+                  const colors = getBoxColors(box.type);
 
-                let borderStyle = 'border-blue-500 bg-blue-500/15';
-                if (box.type === 'qr') borderStyle = 'border-green-500 bg-green-500/15';
-                else if (box.type === 'signature') borderStyle = 'border-purple-500 bg-purple-500/15';
-                else if (box.type === 'seal') borderStyle = 'border-amber-500 bg-amber-500/15';
-                else if (box.type === 'tamper') borderStyle = 'border-red-600 bg-red-600/25 animate-pulse';
+                  return (
+                    <g
+                      key={box.id}
+                      className="cursor-pointer group"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleZoomToRegion(box);
+                      }}
+                      onMouseEnter={() => setHoveredBox(box)}
+                      onMouseLeave={() => setHoveredBox(null)}
+                    >
+                      {/* Region Rectangle: 2px stroke, 12% fill, colour by type */}
+                      <rect
+                        x={box.x}
+                        y={box.y}
+                        width={box.w}
+                        height={box.h}
+                        fill={colors.fill}
+                        stroke={isSelected ? '#FF9933' : colors.stroke}
+                        strokeWidth={isSelected ? '3.5' : '2'}
+                        vectorEffect="non-scaling-stroke"
+                        rx="3"
+                        className="transition-all duration-150"
+                      />
 
-                return (
-                  <div
-                    key={box.id}
-                    onClick={() => setActiveBox(box)}
-                    onMouseEnter={() => setHoveredBox(box)}
-                    onMouseLeave={() => setHoveredBox(null)}
-                    style={{
-                      left: `${box.x}px`,
-                      top: `${box.y}px`,
-                      width: `${box.w}px`,
-                      height: `${box.h}px`
-                    }}
-                    className={`absolute border-2 rounded cursor-pointer transition-all z-20 ${borderStyle} ${
-                      isSelected ? 'ring-4 ring-saffron-500 shadow-lg' : ''
-                    }`}
-                  >
-                    {/* Tooltip on Hover */}
-                    {isHovered && (
-                      <div className="absolute bottom-full left-0 mb-1 px-2.5 py-1 rounded bg-navy-950 text-white text-[10px] font-mono whitespace-nowrap z-40 border border-slate-700 shadow-lg">
-                        <strong className="text-saffron-400">{box.field}: </strong>
-                        <span>{box.value}</span> ({Math.round(box.confidence * 100)}% conf)
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </motion.div>
+                      {/* Label shows on hover only */}
+                      {isHovered && (
+                        <g
+                          transform={`translate(${box.x}, ${Math.max(28, box.y - 8)})`}
+                          className="pointer-events-none"
+                        >
+                          <rect
+                            x="0"
+                            y="-24"
+                            width={Math.max(160, (box.field.length + box.value.length) * 7.5 + 28)}
+                            height="28"
+                            fill="#0B132B"
+                            stroke="#475569"
+                            strokeWidth="1"
+                            rx="4"
+                            opacity="0.96"
+                          />
+                          <text
+                            x="8"
+                            y="-6"
+                            fill="#FFFFFF"
+                            fontSize="12"
+                            fontFamily="system-ui, sans-serif"
+                            fontWeight="600"
+                          >
+                            {box.field}: <tspan fill={colors.stroke}>{box.value.length > 28 ? box.value.slice(0, 28) + '…' : box.value}</tspan> ({Math.round(box.confidence * 100)}%)
+                          </text>
+                        </g>
+                      )}
+                    </g>
+                  );
+                })}
+              </svg>
+            </div>
           </div>
         </main>
 
@@ -663,7 +778,7 @@ export const ScanView: React.FC<ScanViewProps> = ({
                   AI Scrutiny Verdict
                 </span>
                 <span className="text-[11px] font-semibold font-mono bg-white/20 px-2 py-0.5 rounded">
-                  97% Conf
+                  98% Conf
                 </span>
               </div>
               <h3 className="text-[18px] font-bold tracking-tight text-white leading-tight">
@@ -686,7 +801,13 @@ export const ScanView: React.FC<ScanViewProps> = ({
 
               {!collapsedCards.fields && (
                 <div className="space-y-2 pt-1">
-                  <div className="flex items-center justify-between p-2 rounded bg-navy-900">
+                  <div
+                    onClick={() => {
+                      const b = boundingBoxes.find((x) => x.field.includes('Institute ID'));
+                      if (b) handleZoomToRegion(b);
+                    }}
+                    className="flex items-center justify-between p-2 rounded bg-navy-900 hover:bg-navy-800/80 cursor-pointer transition-colors"
+                  >
                     <span className="text-[12px] text-slate-400 font-normal">Institute ID:</span>
                     <div className="flex items-center gap-1.5">
                       <span className="text-[14px] font-medium text-slate-200 tabular-nums">
@@ -700,7 +821,13 @@ export const ScanView: React.FC<ScanViewProps> = ({
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between p-2 rounded bg-navy-900">
+                  <div
+                    onClick={() => {
+                      const b = boundingBoxes.find((x) => x.field.includes('Validity'));
+                      if (b) handleZoomToRegion(b);
+                    }}
+                    className="flex items-center justify-between p-2 rounded bg-navy-900 hover:bg-navy-800/80 cursor-pointer transition-colors"
+                  >
                     <span className="text-[12px] text-slate-400 font-normal">Validity Date:</span>
                     <div className="flex items-center gap-1.5">
                       <span className={`text-[14px] font-medium tabular-nums ${isExpiredCase ? 'text-red-400' : 'text-slate-200'}`}>
@@ -727,7 +854,13 @@ export const ScanView: React.FC<ScanViewProps> = ({
               </button>
 
               {!collapsedCards.qr && (
-                <div className="pt-1">
+                <div
+                  onClick={() => {
+                    const b = boundingBoxes.find((x) => x.type === 'qr' || x.field.includes('QR'));
+                    if (b) handleZoomToRegion(b);
+                  }}
+                  className="pt-1 cursor-pointer"
+                >
                   <div className="flex items-center justify-between mb-1.5">
                     <span className="text-[12px] text-slate-400 font-normal">Payload Status</span>
                     <span className={`px-2 py-0.5 rounded text-[11px] font-semibold ${
@@ -751,211 +884,172 @@ export const ScanView: React.FC<ScanViewProps> = ({
                 onClick={() => toggleCard('signature')}
                 className="w-full flex items-center justify-between text-[14px] font-semibold text-slate-100 mb-2 cursor-pointer"
               >
-                <span>Digital Signature</span>
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-purple-400" />
+                  <span>Signatory Trust Store</span>
+                </div>
                 {collapsedCards.signature ? <ChevronRight className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
               </button>
 
               {!collapsedCards.signature && (
-                <div className="space-y-1.5 pt-1">
+                <div
+                  onClick={() => {
+                    const b = boundingBoxes.find((x) => x.type === 'signature' || x.field.includes('Signatory'));
+                    if (b) handleZoomToRegion(b);
+                  }}
+                  className="pt-1 space-y-1.5 cursor-pointer"
+                >
                   <div className="flex items-center justify-between">
-                    <span className="text-[12px] text-slate-400 font-normal">PKI Signer Status:</span>
+                    <span className="text-[12px] text-slate-400 font-normal">Signer Identity</span>
+                    <span className="text-[13px] font-medium text-slate-200">
+                      {selectedDoc.includes('untrusted') ? 'Contract Staffing Agent' : 'Dr. R. K. Sharma'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[12px] text-slate-400 font-normal">Trust Root</span>
                     <span className={`px-2 py-0.5 rounded text-[11px] font-semibold ${
                       selectedDoc.includes('untrusted') ? 'bg-red-600 text-white' : 'bg-green-600 text-white'
                     }`}>
-                      {selectedDoc.includes('untrusted') ? 'UNTRUSTED SIGNER' : 'TRUSTED AUTHORITY'}
+                      {selectedDoc.includes('untrusted') ? 'NOT IN TRUST STORE' : 'PKI TRUSTED'}
                     </span>
                   </div>
-                  <p className="text-[14px] font-medium text-slate-200">
-                    {selectedDoc.includes('untrusted') ? 'Contract Staffing Agent' : 'Dr. R. K. Sharma (Chief Fire Officer)'}
-                  </p>
                 </div>
               )}
             </div>
 
-            {/* 5. Round Stamp / Institutional Seal */}
+            {/* 5. Institutional Rubber Stamp / Seal Check */}
             <div className="p-3.5 rounded-xl bg-navy-950 border border-navy-800">
               <button
                 onClick={() => toggleCard('seal')}
                 className="w-full flex items-center justify-between text-[14px] font-semibold text-slate-100 mb-2 cursor-pointer"
               >
-                <span>Round Stamp / Seal</span>
+                <div className="flex items-center gap-1.5">
+                  <Stamp className="w-4 h-4 text-amber-500" />
+                  <span>Institutional Seal & Contour</span>
+                </div>
                 {collapsedCards.seal ? <ChevronRight className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
               </button>
 
               {!collapsedCards.seal && (
-                <div className="space-y-1.5 pt-1">
+                <div
+                  onClick={() => {
+                    const b = boundingBoxes.find((x) => x.type === 'seal' || x.field.includes('Stamp'));
+                    if (b) handleZoomToRegion(b);
+                  }}
+                  className="pt-1 space-y-1 cursor-pointer"
+                >
                   <div className="flex items-center justify-between">
-                    <span className="text-[12px] text-slate-400 font-normal">Contour Analysis:</span>
-                    <span className={`px-2 py-0.5 rounded text-[11px] font-semibold ${
-                      selectedDoc.includes('copy_move') ? 'bg-red-600 text-white' : 'bg-green-600 text-white'
-                    }`}>
-                      {selectedDoc.includes('copy_move') ? 'COPY-MOVE CLONE' : 'AUTHENTIC SEAL'}
+                    <span className="text-[12px] text-slate-400 font-normal">Hough Circles</span>
+                    <span className="text-[12px] font-medium text-green-400">DETECTED (98%)</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[12px] text-slate-400 font-normal">Copy-Move Seal Check</span>
+                    <span className={`text-[12px] font-bold ${selectedDoc.includes('copy_move') ? 'text-red-400' : 'text-slate-300'}`}>
+                      {selectedDoc.includes('copy_move') ? 'DUPLICATE CLONE FOUND' : 'SINGLE UNIQUE SEAL'}
                     </span>
                   </div>
-                  <p className="text-[14px] font-medium text-slate-200">
-                    {selectedDoc.includes('copy_move')
-                      ? 'ORB keypoint feature density indicates forged stamp transfer.'
-                      : 'High-resolution official circular rubber stamp matched.'}
-                  </p>
                 </div>
               )}
             </div>
 
-            {/* 6. Tamper & ELA Analysis */}
+            {/* 6. Tamper & ELA Forensic Analysis */}
             <div className="p-3.5 rounded-xl bg-navy-950 border border-navy-800">
               <button
                 onClick={() => toggleCard('tamper')}
                 className="w-full flex items-center justify-between text-[14px] font-semibold text-slate-100 mb-2 cursor-pointer"
               >
                 <div className="flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4 text-amber-400" />
-                  <span>Tamper & ELA Analysis</span>
+                  <Sparkles className="w-4 h-4 text-red-400" />
+                  <span>Tamper & Compression Residuals</span>
                 </div>
                 {collapsedCards.tamper ? <ChevronRight className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
               </button>
 
               {!collapsedCards.tamper && (
-                <div className="space-y-2 pt-1">
+                <div className="pt-1 space-y-1 text-[12px]">
                   <div className="flex items-center justify-between">
-                    <span className="text-[12px] text-slate-400 font-normal">Residual Energy:</span>
-                    <span className={`px-2 py-0.5 rounded text-[11px] font-semibold ${
-                      isTamperedCase ? 'bg-red-600 text-white' : 'bg-green-600 text-white'
-                    }`}>
-                      {isTamperedCase ? 'SUSPICIOUS (94%)' : 'CLEAN (4%)'}
+                    <span className="text-slate-400">Error Level Analysis:</span>
+                    <span className={`font-semibold ${isTamperedCase ? 'text-red-400' : 'text-green-400'}`}>
+                      {isTamperedCase ? 'HIGH COMPRESSION RESIDUAL' : 'UNIFORM RESIDUAL'}
                     </span>
                   </div>
-                  <p className={`text-[12px] leading-relaxed ${isTamperedCase ? 'text-red-400 font-medium' : 'text-slate-300'}`}>
-                    {isTamperedCase
-                      ? 'Compression level around validity date differs markedly from surrounding page.'
-                      : 'Uniform error level distribution across all character glyphs and background noise.'}
-                  </p>
-
-                  {/* Opacity slider for heatmap */}
-                  <div className="mt-2 pt-2 border-t border-navy-800 flex items-center gap-2 text-[12px]">
-                    <span className="text-slate-400 text-[11px]">Heatmap:</span>
-                    <input
-                      type="range"
-                      min="0.1"
-                      max="1.0"
-                      step="0.05"
-                      value={heatmapOpacity}
-                      onChange={(e) => setHeatmapOpacity(parseFloat(e.target.value))}
-                      className="flex-1 accent-saffron-500 h-1 cursor-pointer"
-                    />
-                    <span className="text-[11px] tabular-nums text-slate-300">{Math.round(heatmapOpacity * 100)}%</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400">Font Stroke Consistency:</span>
+                    <span className={`font-semibold ${selectedDoc.includes('tamper') ? 'text-red-400' : 'text-slate-300'}`}>
+                      {selectedDoc.includes('tamper') ? 'MODIFIED GLYPH WEIGHT' : 'MATCHES TEMPLATE'}
+                    </span>
                   </div>
                 </div>
               )}
             </div>
-
-            {/* 7. Issuing Authority Gateway (Simulated Source) */}
-            <div className="p-3.5 rounded-xl bg-navy-950 border border-navy-800">
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[14px] font-semibold text-slate-100">Issuing Authority</span>
-                <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-600 text-white">
-                  SIMULATED SOURCE
-                </span>
-              </div>
-              <p className="text-[12px] text-slate-300 leading-relaxed">
-                Verified against Municipal Fire Directorate & National DigiLocker repository (Simulated Gateway).
-              </p>
-            </div>
           </div>
 
-          {/* Sticky Bottom Action Buttons */}
+          {/* Action Modals Button Triggers */}
           <div className="pt-3 border-t border-navy-800 space-y-2 shrink-0">
-            <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-              Official Decision Actions
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => setActiveActionModal('ACCEPT')}
-                className="py-2 px-3 rounded-xl bg-green-600 hover:bg-green-500 text-white text-[12px] font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
-              >
-                <Check className="w-3.5 h-3.5" />
-                <span>Accept Document</span>
-              </button>
+            <button
+              onClick={() => setActiveActionModal('ACCEPT')}
+              className="w-full py-2.5 rounded-xl bg-green-600 hover:bg-green-500 text-white font-bold text-13 flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
+            >
+              <Check className="w-4 h-4" />
+              <span>Verify & Accept Instrument (A)</span>
+            </button>
 
-              <button
-                onClick={() => setActiveActionModal('DEFICIENCY')}
-                className="py-2 px-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-[12px] font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
-              >
-                <AlertTriangle className="w-3.5 h-3.5" />
-                <span>Raise Deficiency</span>
-              </button>
-            </div>
+            <button
+              onClick={() => setActiveActionModal('DEFICIENCY')}
+              className="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-13 flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
+            >
+              <AlertTriangle className="w-4 h-4" />
+              <span>Issue Regulatory Deficiency (D)</span>
+            </button>
           </div>
         </aside>
       </div>
 
-      {/* Action Modals */}
+      {/* Confirmation Toast */}
+      {auditConfirmationToast && (
+        <div className="fixed bottom-6 right-6 z-50 bg-navy-900 border border-green-500/60 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3">
+          <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0" />
+          <div className="text-12 font-medium">
+            {auditConfirmationToast.msg}
+          </div>
+        </div>
+      )}
+
+      {/* Action Modal with Mandatory Written Remarks */}
       {activeActionModal && (
-        <div className="fixed inset-0 z-50 bg-navy-950/80 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-navy-900 border border-navy-700 rounded-2xl p-6 text-slate-100 shadow-2xl">
-            <h3 className="text-16 font-bold text-white mb-2 flex items-center gap-2">
-              {activeActionModal === 'ACCEPT' ? (
-                <>
-                  <CheckCircle2 className="w-5 h-5 text-green-400" />
-                  <span>Official Document Acceptance</span>
-                </>
-              ) : (
-                <>
-                  <AlertTriangle className="w-5 h-5 text-amber-400" />
-                  <span>Raise Statutory Deficiency</span>
-                </>
-              )}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs p-4">
+          <div className="w-full max-w-md bg-navy-900 border border-navy-700 rounded-2xl p-6 shadow-2xl space-y-4">
+            <h3 className="text-16 font-bold text-white flex items-center gap-2">
+              {activeActionModal === 'ACCEPT' ? <CheckCircle2 className="text-green-400" /> : <AlertTriangle className="text-amber-400" />}
+              {activeActionModal === 'ACCEPT' ? 'Confirm Document Verification' : 'Issue Regulatory Deficiency'}
             </h3>
-            <p className="text-12 text-slate-300 mb-4">
-              Under AICTE Approval Process Handbook (APH 2026-27), all official regulatory actions must be recorded with mandatory written remarks and chained to the immutable audit log.
+            <p className="text-12 text-slate-300">
+              Written remarks are mandatory. Every regulatory decision is recorded with officer credentials and chained to the immutable audit log.
             </p>
-
-            <div className="mb-4">
-              <label className="block text-11 font-bold uppercase tracking-wider text-slate-400 mb-1.5">
-                Official Scrutiny Remarks (Mandatory)
-              </label>
-              <textarea
-                rows={4}
-                value={actionRemarks}
-                onChange={(e) => setActionRemarks(e.target.value)}
-                placeholder="Enter regulatory justification, verification references, or specific deficiency citations..."
-                className="w-full bg-navy-950 border border-navy-700 rounded-xl p-3 text-13 text-slate-200 outline-none focus:border-saffron-500 placeholder-slate-500"
-              />
-            </div>
-
-            <div className="flex items-center justify-end gap-2.5">
+            <textarea
+              value={actionRemarks}
+              onChange={(e) => setActionRemarks(e.target.value)}
+              placeholder="Enter mandatory official scrutiny remarks..."
+              rows={4}
+              className="w-full p-3 rounded-xl bg-navy-950 border border-navy-700 text-slate-100 text-13 outline-none focus:border-saffron-500"
+            />
+            <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 onClick={() => setActiveActionModal(null)}
-                className="px-4 py-2 rounded-xl text-12 font-semibold text-slate-400 hover:text-white hover:bg-navy-800 transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-xl text-12 font-semibold text-slate-300 hover:bg-navy-800 cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleConfirmAction(activeActionModal)}
-                className={`px-4 py-2 rounded-xl text-12 font-bold text-white shadow-sm transition-all cursor-pointer ${
-                  activeActionModal === 'ACCEPT'
-                    ? 'bg-green-600 hover:bg-green-500'
-                    : 'bg-amber-600 hover:bg-amber-500'
-                }`}
+                className="px-4 py-2 rounded-xl text-12 font-bold bg-saffron-500 hover:bg-saffron-400 text-white cursor-pointer shadow-md"
               >
-                Sign & Submit Action
+                Submit Official Action
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Audit Confirmation Toast */}
-      {auditConfirmationToast && (
-        <div className="fixed bottom-6 right-6 z-50 max-w-sm bg-navy-900 border border-green-500/60 rounded-xl p-4 shadow-2xl text-12 text-slate-200 flex items-start gap-3">
-          <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
-          <div>
-            <div className="font-bold text-white mb-0.5">Cryptographic Audit Entry Chained</div>
-            <div>{auditConfirmationToast.msg}</div>
           </div>
         </div>
       )}
     </div>
   );
 };
-
-export default ScanView;

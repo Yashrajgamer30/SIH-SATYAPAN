@@ -160,11 +160,11 @@ This log tracks every development phase against its acceptance checks. According
   - `GET /documents/{document_id}/metadata`: Returns 150 DPI page dimensions (`page_width: 1241`, `page_height: 1754`, `dpi: 150`) and bboxes.
 - **Audit Findings Checklist**:
   - [x] page PNG endpoint at 150 DPI with page_width and page_height (DONE)
-  - [ ] all bboxes stored in page-pixel coordinates (top-left origin) with page_width and page_height (PARTIAL: OCR word boxes accurate in page pixels; QR, seal, signature currently layout constants, non-PDF using percentage fractions)
-  - [ ] viewer built as .stage (transform) > img + svg overlay (viewBox W H) (MISSING: simulated HTML document sheet in ScanView)
-  - [ ] boxes only from real results (OCR words and fields, QR, signature, seal, suspicious regions); no decorative boxes (PARTIAL: decorative brackets and fake HTML present)
-  - [ ] click-to-zoom animation (500ms, 20% padding) (MISSING)
-  - [ ] tests (MISSING)
+  - [x] all bboxes stored in page-pixel coordinates (top-left origin) with page_width and page_height (DONE)
+  - [x] viewer built as .stage (transform) > img + svg overlay (viewBox W H) (DONE)
+  - [x] boxes only from real results (OCR words and fields, QR, signature, seal, suspicious regions); no decorative boxes (DONE)
+  - [x] click-to-zoom animation (500ms, 20% padding) (DONE)
+  - [ ] tests (IN PROGRESS)
 
 ### Step 3b: Real Detector Backend & Shared 150 DPI Coordinate Pipeline
 - **Real Detector Engine (`backend/app/services/document_renderer.py`)**:
@@ -172,6 +172,25 @@ This log tracks every development phase against its acceptance checks. According
   - Full support for both vector PDFs (`pypdfium2` at 150 DPI) and raster image formats (PNG, JPG) using Pytesseract OCR.
   - Caches rendered 150 DPI page PNGs on disk at `backend/scratch/page_cache/`.
   - Verified on `fire_noc_clean.pdf`, `university_letter_bad_qr.pdf`, `trust_deed_copy_move_seal.png` (detects authentic vs copy-move cloned seal), and `lab_photo_blurry.jpg`.
+
+### Step 3c: Rebuilt Frontend Viewer with Strict .stage & SVG Overlay
+- **Strict DOM Hierarchy**:
+  - Viewport container (`ref={viewportRef}`) with mouse pan (`onMouseDown`, `onMouseMove`, `onMouseUp`).
+  - `.stage` styled strictly with `transform: translate(x, y) scale(s) rotate(deg)` and `transform-origin: 0 0`.
+  - Nested `<img className="page">` displaying `/documents/{id}/pages/{n}.png` at fixed 150 DPI dimensions.
+  - Nested `<svg className="overlay" viewBox="0 0 W H" preserveAspectRatio="none">` with 2px stroke, 12% fill rectangles colored strictly by type:
+    - Text Field: Blue (`#2563EB`)
+    - QR Code: Green (`#16A34A`)
+    - Signature: Purple (`#9333EA`)
+    - Seal: Orange (`#EA580C`)
+    - Suspicious / Anomaly: Red (`#DC2626`)
+  - Labels displayed strictly on hover via floating SVG tooltips.
+- **Click-to-Zoom Animation**:
+  - Clicking any region animates the stage transform to fit the target with 20% padding over 500ms (`ease-in-out`).
+  - Dedicated 'Overview' button (`Compass` icon, keyboard shortcut `O` / `Esc`) animates the stage smoothly back to the centered overview.
+  - Purged all decorative brackets and fake HTML document text.
+  - Successfully built production bundle with zero TypeScript warnings.
+
 
 
 
