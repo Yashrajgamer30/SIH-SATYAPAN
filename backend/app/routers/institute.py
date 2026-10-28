@@ -102,6 +102,45 @@ class SahayakQueryRequest(BaseModel):
 
 
 # ==============================================================================
+# 0. INSTITUTE DASHBOARD & APPLICATION DETAIL (IDOR Protected)
+# ==============================================================================
+
+@router.get("/dashboard")
+def get_institute_dashboard_view(
+    current_user: User = Depends(require_roles(UserRole.INSTITUTE_ADMIN, UserRole.INSTITUTE_FACULTY, UserRole.SYSTEM_ADMIN)),
+    db: Session = Depends(get_db)
+):
+    service = DashboardService(db)
+    try:
+        return service.get_institute_dashboard(current_user)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/applications/{application_id}")
+def get_institute_application(
+    application_id: str,
+    current_user: User = Depends(require_roles(UserRole.INSTITUTE_ADMIN, UserRole.INSTITUTE_FACULTY, UserRole.SYSTEM_ADMIN)),
+    db: Session = Depends(get_db)
+):
+    app_record = db.execute(select(Application).where(Application.id == application_id)).scalar_one_or_none()
+    if not app_record:
+        raise HTTPException(status_code=404, detail="Application not found.")
+
+    verify_institute_access(current_user, app_record.institute_id)
+    return {
+        "id": app_record.id,
+        "application_no": app_record.application_no,
+        "academic_year": app_record.academic_year,
+        "status": app_record.status.value,
+        "readiness_score": app_record.readiness_score,
+        "risk_score": app_record.risk_score,
+        "risk_band": app_record.risk_band,
+        "submitted_at": app_record.submitted_at.isoformat() if app_record.submitted_at else None
+    }
+
+
+# ==============================================================================
 # 1. INSTITUTE PROFILE (Details, Approved Intake, Previous EoA, Deficiency)
 # ==============================================================================
 
@@ -1435,7 +1474,7 @@ def compare_with_previous_year(
 _SAHAYAK_KNOWLEDGE_BASE = [
     {
         "id": "faq-01",
-        "keywords": ["fire", "noc", "fire safety", "आग", "अग्निशमन"],
+        "keywords": ["fire", "noc", "fire safety", "आग", "अग्निशमन", "फायर", "एनओसी"],
         "en": {
             "question": "What are the Fire Safety NOC requirements for EoA?",
             "answer": "Under AICTE Approval Process Handbook (Rule 14.2), technical institutions must possess a valid Fire NOC issued by the State Fire Services. If your NOC is due for expiry, an official renewal receipt or temporary extension letter from the competent authority is required."
@@ -1451,7 +1490,7 @@ _SAHAYAK_KNOWLEDGE_BASE = [
     },
     {
         "id": "faq-02",
-        "keywords": ["fsr", "ratio", "faculty", "प्राध्यापक", "गुणोत्तर"],
+        "keywords": ["fsr", "ratio", "faculty", "प्राध्यापक", "गुणोत्तर", "संकाय", "अनुपात", "प्रमाण"],
         "en": {
             "question": "What is the mandatory Faculty-Student Ratio (FSR)?",
             "answer": "For Undergraduate Engineering & Technology, AICTE mandates a 1:20 ratio with cadre proportion of 1:2:6 (Professor : Associate Professor : Assistant Professor). For PG programs, the required ratio is 1:15."
@@ -1467,7 +1506,7 @@ _SAHAYAK_KNOWLEDGE_BASE = [
     },
     {
         "id": "faq-03",
-        "keywords": ["land", "title", "7/12", "conveyance", "जमीन"],
+        "keywords": ["land", "title", "7/12", "conveyance", "जमीन", "भूमि"],
         "en": {
             "question": "What land documents are required for campus approval?",
             "answer": "Institutions must submit the registered Sale/Gift/Lease Deed (minimum 30 years), 7/12 Revenue Extract or Khasra/Khatauni, and a District Collector Non-Agricultural (NA) Land Conversion Certificate."
@@ -1483,7 +1522,7 @@ _SAHAYAK_KNOWLEDGE_BASE = [
     },
     {
         "id": "faq-04",
-        "keywords": ["deficiency", "reply", "truti", "दोष", "तक्रार"],
+        "keywords": ["deficiency", "reply", "truti", "दोष", "तक्रार", "कमी", "कमियां", "त्रुटी"],
         "en": {
             "question": "How do I respond to a communicated regulatory deficiency?",
             "answer": "Navigate to 'Track Applications' -> 'Open Deficiencies', click 'Fix-It Wizard' to enter your compliance explanation, upload the rectified document, and submit before the 15-day SLA deadline."

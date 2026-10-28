@@ -15,6 +15,18 @@ import { OfficialsPortalShell } from './components/layout/OfficialsPortalShell';
 import { SessionTimeoutModal } from './components/login/SessionTimeoutModal';
 import { SignInTransition } from './components/login/SignInTransition';
 
+// Institute Pages
+import { InstituteProfileView } from './pages/institute/InstituteProfileView';
+import { FacultyView } from './pages/institute/FacultyView';
+import { StudentsView } from './pages/institute/StudentsView';
+import { NewApplicationWizard } from './pages/institute/NewApplicationWizard';
+import { TrackApplicationsView } from './pages/institute/TrackApplicationsView';
+import { DocumentsVaultView } from './pages/institute/DocumentsVaultView';
+import { ReportsAndDownloadsView } from './pages/institute/ReportsAndDownloadsView';
+import { SahayakHelpView } from './pages/institute/SahayakHelpView';
+import { NotificationsView } from './pages/institute/NotificationsView';
+
+
 // Route guard for authenticated regulatory access
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuthStore();
@@ -131,7 +143,16 @@ function AppShell() {
           }}
           onLogout={handleLogout}
         >
-          <InstituteDashboard />
+          {instituteNav === 'dashboard' && <InstituteDashboard />}
+          {instituteNav === 'profile' && <InstituteProfileView />}
+          {instituteNav === 'faculty' && <FacultyView />}
+          {instituteNav === 'students' && <StudentsView />}
+          {instituteNav === 'new-app' && <NewApplicationWizard />}
+          {(instituteNav === 'track' || instituteNav === 'track-app') && <TrackApplicationsView />}
+          {(instituteNav === 'vault' || instituteNav === 'documents') && <DocumentsVaultView />}
+          {instituteNav === 'reports' && <ReportsAndDownloadsView />}
+          {instituteNav === 'help' && <SahayakHelpView />}
+          {instituteNav === 'notifications' && <NotificationsView />}
         </InstitutePortalShell>
       ) : (
         /* Officials Portal Shell Layout (Scrutiny Workbench) */
