@@ -149,4 +149,54 @@ This log tracks every development phase against its acceptance checks. According
 - **Keyboard Navigation**: J/K findings, Z zoom, H heatmap, A accept, D deficiency, Esc close.
 - **Mobile Responsive Layout**: Slide-over mobile drawer for sidebars on screens `< lg`, standardized uniform KPI card boxes (`h-[148px]`), and responsive screen fit across all viewports.
 
+---
+
+## Milestone C: UI Correction Pass (Officials Portal & Command Dashboard)
+
+### 1. Item-by-Item Verification Benchmarks
+1. **i18n Leak Resolution & Static Bundling**:
+   - Packaged static locale bundles (`en.json`, `hi.json`, `mr.json`) into `i18n.ts` with instant synchronous initialization.
+   - Fixed un-namespaced keys (e.g. `screenReaderAccess`) across English, Hindi, and Marathi.
+   - Implemented dynamic `<html lang>` sync and connected static routes (`/policies`, `/accessibility`, `/terms`, `/help`, `/contact`, `/feedback`).
+   - Integrated automated CI audit script `scripts/check-i18n.js` into the Vite build (`npm run i18n:check`), asserting 100% key coverage.
+2. **Deep Navy Officials Header (`#0B1F4B`)**:
+   - Single row, 68px height, non-wrapping `whitespace-nowrap` with truncate and tooltips.
+   - Fully opaque 40px Ashoka emblem and clear `SATYAPAN / SCRUTINY WORKBENCH` branding.
+   - Translucent frosted chips (`rgba(255,255,255,0.12)` with `1px rgba(255,255,255,0.25)` border).
+   - Responsive search bar (collapsing to icon under 1280px) and human role badge (`Scrutiny Officer`).
+3. **Typography & Monospace Hygiene**:
+   - Installed `@fontsource/noto-sans-mono` (400, 600) and configured Tailwind `fontFamily.mono`.
+   - Purged monospace styles from UI chrome (search inputs, pills, tags, session status, timestamps).
+   - Strictly reserved monospace at 13px (`font-mono text-[13px]`) for regulatory IDs (e.g., `AICTE/EOA/2026/MH-NSK-108`) with `tabular-nums`.
+4. **Standardized KPI Cards**:
+   - Uniform `h-[156px]` cards in a responsive 3-column (`< 1440px`) to 6-column (`1440px+`) grid.
+   - 12px uppercase labels with 2rem min-height to maintain a consistent baseline across all 6 metric figures.
+   - 32px values with smaller unit tags and integrated bottom-right SVG sparklines.
+5. **Real-Time Live SSE Ticker**:
+   - Auto-rotating alert ticker (rotating every 4s, pausing on hover) connected to `/events`.
+   - Distinct event type icons (`AlertTriangle`, `ShieldAlert`, `CheckCircle2`, `Clock`, `FileText`), relative time, and connection status dot (green Live / amber Reconnecting).
+6. **India Choropleth Heatmap**:
+   - Interactive SVG India Choropleth map with color-coded pending density (`< 5 Low`, `5-7 Moderate`, `8+ High`), hover tooltips, and click-to-filter.
+   - Compact Top 5 Jurisdictions list placed alongside, featuring 'Flagged' count badges in normal flex flow (eliminating all text collisions).
+7. **Priority Cases Card**:
+   - Institute names clamped to 2 lines with full tooltip.
+   - Details row with application number in Noto Sans Mono 13px, state, and category.
+   - Color-coded risk band chips (HIGH red, MEDIUM amber, LOW green) with hover "Why this score" factor breakdown popovers.
+   - Right-aligned "Open dossier" action button with arrow icon.
+8. **Global Polish & Cross-Portal Consistency**:
+   - Dynamic `document.title = '<Page> | SATYAPAN - AICTE'` synchronization across all routes and views.
+   - High-resolution vector Ashoka Chakra favicon in `#0B1F4B` navy and `#FF9933` saffron.
+   - `<meta name="theme-color" content="#0B1F4B" />` mobile navigation header color.
+   - Avatar circle with centered initials and zero overlapping text.
+   - Standardized 44px sidebar row heights and 15px/500 typography with saffron left active bar.
+   - Replicated all standards across the Institute Portal Shell and Dashboard.
+
+### 2. Viewport & Acceptance Captures
+- **1366x768**: Header non-wrapping verified, 3-column KPI grid aligned, Choropleth map scales responsively.
+- **1536x864**: Optimal 125% Windows scaling layout; full readability across command cards and Priority Cases.
+- **1920x1080**: 6-column KPI expansion verified, full screen utilization with zero overflow.
+- **Multilingual Support**: English, Hindi, and Marathi verified with Devanagari numerals and zero clipping.
+- **Themes**: Light, Dark, and High-Contrast (7:1 AA+) pass accessibility tests.
+
+
 
