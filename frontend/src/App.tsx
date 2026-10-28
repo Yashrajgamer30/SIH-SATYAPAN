@@ -46,6 +46,45 @@ function AppShell() {
     }
   }, [user?.role]);
 
+  const isInstitute = currentRole.startsWith('INSTITUTE');
+
+  // Dynamic document title updater based on current active workspace view
+  useEffect(() => {
+    if (activeScanDoc) {
+      document.title = 'Forensic Document Scanner | SATYAPAN - AICTE';
+      return;
+    }
+    if (isInstitute) {
+      const titles: Record<string, string> = {
+        'dashboard': 'Institute Dashboard',
+        'profile': 'Institute Profile',
+        'faculty': 'Faculty Register',
+        'students': 'Student Records',
+        'new-app': 'New Application',
+        'track-app': 'Track Applications',
+        'documents': 'Document Vault',
+        'reports': 'Reports & Downloads',
+        'notifications': 'Notifications',
+        'help': 'Sahayak AI Help'
+      };
+      const label = titles[instituteNav] || 'Institute Portal';
+      document.title = `${label} | SATYAPAN - AICTE`;
+    } else {
+      const titles: Record<string, string> = {
+        'command': 'Command Dashboard',
+        'smart-queue': 'Smart Scrutiny Queue',
+        'cross-verifications': 'Cross-Verification Centre',
+        'fraud-watch': 'Fraud & Risk Watch',
+        'deficiencies': 'Deficiency Manager',
+        'hearings': 'Virtual Hearing Board',
+        'reports': 'Regional Reports',
+        'settings': 'System Settings'
+      };
+      const label = titles[officialsNav] || 'Officials Workbench';
+      document.title = `${label} | SATYAPAN - AICTE`;
+    }
+  }, [isInstitute, instituteNav, officialsNav, activeScanDoc]);
+
   // Session timeout watchdog (checks every 5 seconds)
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -68,8 +107,6 @@ function AppShell() {
   const handleLogoutComplete = () => {
     setIsLogoutTransition(false);
   };
-
-  const isInstitute = currentRole.startsWith('INSTITUTE');
 
   const handleSelectApp = (id: number) => {
     // Open the full-screen forensic Scan View directly
@@ -145,10 +182,41 @@ function AppShell() {
   );
 }
 
+// Dynamic document title sync for top-level pages
+const RouteTitleHandler: React.FC = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    const p = location.pathname;
+    if (p === '/login') {
+      document.title = 'Sign In | SATYAPAN - AICTE';
+    } else if (p === '/policies') {
+      document.title = 'Website Policies | SATYAPAN - AICTE';
+    } else if (p === '/accessibility') {
+      document.title = 'Accessibility Statement | SATYAPAN - AICTE';
+    } else if (p === '/terms') {
+      document.title = 'Terms and Conditions | SATYAPAN - AICTE';
+    } else if (p === '/help') {
+      document.title = 'Help & Support | SATYAPAN - AICTE';
+    } else if (p === '/contact') {
+      document.title = 'Contact Us | SATYAPAN - AICTE';
+    } else if (p === '/feedback') {
+      document.title = 'Feedback | SATYAPAN - AICTE';
+    } else if (p === '/rules') {
+      document.title = 'Admin Rule Builder | SATYAPAN - AICTE';
+    } else if (p === '/styleguide') {
+      document.title = 'Design System Styleguide | SATYAPAN - AICTE';
+    }
+  }, [location.pathname]);
+
+  return null;
+};
+
 export function App() {
   return (
     <ThemeProvider>
       <BrowserRouter>
+        <RouteTitleHandler />
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/policies" element={<StaticInfoPage />} />

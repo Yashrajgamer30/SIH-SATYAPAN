@@ -17,6 +17,15 @@ interface OfficialsPortalShellProps {
   onOpenCommandPalette?: () => void;
 }
 
+function getInitials(name: string): string {
+  const clean = name.replace(/^(Dr\.|Prof\.|Mr\.|Ms\.|Mrs\.)\s+/i, '').trim();
+  const parts = clean.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return clean.slice(0, 2).toUpperCase() || 'AD';
+}
+
 export const OfficialsPortalShell: React.FC<OfficialsPortalShellProps> = ({
   children,
   activeNav = 'command',
@@ -157,8 +166,8 @@ export const OfficialsPortalShell: React.FC<OfficialsPortalShellProps> = ({
                 className="flex items-center gap-2 p-1.5 rounded-xl bg-white/[0.12] border border-white/25 hover:border-white/50 transition-all text-left max-w-[190px]"
                 title={`${user?.name || "Dr. Arvind Deshmukh"} • Official Signer`}
               >
-                <div className="w-8 h-8 rounded-full bg-white/20 text-white font-bold flex items-center justify-center text-12 shrink-0">
-                  {user?.name ? user.name.split(' ').filter(Boolean).map(n => n[0]).join('').slice(0, 2) : "AD"}
+                <div className="w-8 h-8 rounded-full bg-white/20 text-white font-bold flex items-center justify-center text-12 aspect-square shrink-0 select-none">
+                  {getInitials(user?.name || "Dr. Arvind Deshmukh")}
                 </div>
                 <div className="hidden md:block min-w-0 pr-1">
                   <div className="text-12 font-bold text-white leading-tight truncate">
@@ -250,18 +259,18 @@ export const OfficialsPortalShell: React.FC<OfficialsPortalShellProps> = ({
                         if (window.innerWidth < 1024) setIsSidebarCollapsed(true);
                       }}
                       title={isSidebarCollapsed ? item.label : undefined}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-13 font-semibold transition-all ${
+                      className={`w-full h-[44px] flex items-center gap-3 px-3 transition-all ${
                         isActive
-                          ? 'bg-navy-900 dark:bg-navy-800 text-white border-l-4 border-saffron-500 shadow-sm'
-                          : 'text-gov-muted hover:text-navy-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-navy-800'
+                          ? 'bg-navy-900/90 dark:bg-navy-800 text-white border-l-4 border-saffron-500 rounded-r-xl rounded-l-none font-medium shadow-xs'
+                          : 'text-gov-muted hover:text-navy-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-navy-800/60 rounded-xl font-medium'
                       }`}
                     >
                       <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-saffron-500' : ''}`} />
                       {(!isSidebarCollapsed || window.innerWidth < 1024) && (
-                        <span className="truncate flex-1 text-left">{item.label}</span>
+                        <span className="truncate flex-1 text-left text-[15px]">{item.label}</span>
                       )}
                       {(!isSidebarCollapsed || window.innerWidth < 1024) && item.badge && (
-                        <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-red-600 text-white">
+                        <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-red-600 text-white">
                           {item.badge}
                         </span>
                       )}

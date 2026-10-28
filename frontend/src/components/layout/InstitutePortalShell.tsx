@@ -16,6 +16,15 @@ interface InstitutePortalShellProps {
   onLogout: () => void;
 }
 
+function getInitials(name: string): string {
+  const clean = name.replace(/^(Dr\.|Prof\.|Mr\.|Ms\.|Mrs\.)\s+/i, '').trim();
+  const parts = clean.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return clean.slice(0, 2).toUpperCase() || 'MK';
+}
+
 export const InstitutePortalShell: React.FC<InstitutePortalShellProps> = ({
   children,
   activeNav = 'dashboard',
@@ -72,8 +81,8 @@ export const InstitutePortalShell: React.FC<InstitutePortalShellProps> = ({
       <UtilityBar />
 
       {/* 2. Top Bar for Institute Portal */}
-      <header className="bg-white dark:bg-navy-900 border-b border-slate-200 dark:border-navy-800 sticky top-0 z-40 shadow-2xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+      <header className="h-[68px] bg-white dark:bg-navy-900 border-b border-slate-200 dark:border-navy-800 sticky top-0 z-40 shadow-2xs">
+        <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 flex items-center justify-between gap-4 whitespace-nowrap">
           {/* Left: Branding & Greeting */}
           <div className="flex items-center gap-3">
             <button
@@ -112,9 +121,9 @@ export const InstitutePortalShell: React.FC<InstitutePortalShellProps> = ({
           <div className="flex items-center gap-3 sm:gap-4">
             {/* Institute name and AICTE ID chip */}
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-navy-800 border border-slate-200 dark:border-navy-700 text-12 font-medium text-navy-900 dark:text-slate-200">
-              <Building className="w-3.5 h-3.5 text-saffron-500" />
-              <span className="font-bold">Saraswati Institute of Technology</span>
-              <span className="text-[11px] font-mono text-gov-muted">• AICTE-1-3324901</span>
+              <Building className="w-3.5 h-3.5 text-saffron-500 shrink-0" />
+              <span className="font-bold truncate max-w-[220px]" title="Saraswati Institute of Technology">Saraswati Institute of Technology</span>
+              <span className="text-[13px] font-mono font-semibold text-slate-700 dark:text-slate-300">• AICTE-1-3324901</span>
             </div>
 
             {/* Notification Bell with count */}
@@ -138,8 +147,8 @@ export const InstitutePortalShell: React.FC<InstitutePortalShellProps> = ({
                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                 className="flex items-center gap-2 p-1.5 rounded-xl border border-slate-200 dark:border-navy-700 hover:border-saffron-500 transition-all text-left"
               >
-                <div className="w-8 h-8 rounded-lg bg-saffron-500 text-white font-bold flex items-center justify-center text-12">
-                  {(user?.name || "Dr. Meera")[0]}
+                <div className="w-8 h-8 rounded-full bg-saffron-500 text-white font-bold flex items-center justify-center text-12 aspect-square shrink-0 select-none">
+                  {getInitials(user?.name || "Dr. Meera Kulkarni")}
                 </div>
                 <div className="hidden lg:block pr-2">
                   <div className="text-12 font-bold text-navy-900 dark:text-white leading-tight">
@@ -231,19 +240,19 @@ export const InstitutePortalShell: React.FC<InstitutePortalShellProps> = ({
                         if (window.innerWidth < 1024) setIsSidebarCollapsed(true);
                       }}
                       title={isSidebarCollapsed ? item.label : undefined}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-13 font-semibold transition-all ${
+                      className={`w-full h-[44px] flex items-center gap-3 px-3 transition-all ${
                         isActive
-                          ? 'bg-saffron-500 text-white shadow-sm shadow-saffron-500/20'
-                          : 'text-gov-muted hover:text-navy-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-navy-800'
+                          ? 'bg-saffron-50 dark:bg-navy-800 text-navy-950 dark:text-white border-l-4 border-saffron-500 rounded-r-xl rounded-l-none font-medium shadow-xs'
+                          : 'text-gov-muted hover:text-navy-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-navy-800/60 rounded-xl font-medium'
                       }`}
                     >
-                      <Icon className="w-4 h-4 shrink-0" />
+                      <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-saffron-500' : ''}`} />
                       {(!isSidebarCollapsed || window.innerWidth < 1024) && (
-                        <span className="truncate flex-1 text-left">{item.label}</span>
+                        <span className="truncate flex-1 text-left text-[15px]">{item.label}</span>
                       )}
                       {(!isSidebarCollapsed || window.innerWidth < 1024) && item.badge && (
-                        <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-                          isActive ? 'bg-white text-saffron-600' : 'bg-red-600 text-white'
+                        <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                          isActive ? 'bg-saffron-500 text-white' : 'bg-red-600 text-white'
                         }`}>
                           {item.badge}
                         </span>
