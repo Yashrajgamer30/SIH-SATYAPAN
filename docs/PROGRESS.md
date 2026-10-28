@@ -151,7 +151,21 @@ This log tracks every development phase against its acceptance checks. According
 
 ---
 
-## Milestone C: UI Correction Pass (Officials Portal & Command Dashboard)
+## Fix Pass - Step 3: High-Fidelity Document Overlay Alignment & Real Detector Pipeline
+
+### Step 3a: Initial Audit & Baseline Verification
+- **pypdfium2 Integration**: Verified pypdfium2 in Python environment and appended `pypdfium2>=4.30.0` to `backend/requirements.txt`.
+- **Endpoints Verified**:
+  - `GET /documents/{document_id}/pages/{page_num}.png`: Returns 150 DPI rendered PNG (221,546 bytes for `fire_noc_clean.pdf`).
+  - `GET /documents/{document_id}/metadata`: Returns 150 DPI page dimensions (`page_width: 1241`, `page_height: 1754`, `dpi: 150`) and bboxes.
+- **Audit Findings Checklist**:
+  - [x] page PNG endpoint at 150 DPI with page_width and page_height (DONE)
+  - [ ] all bboxes stored in page-pixel coordinates (top-left origin) with page_width and page_height (PARTIAL: OCR word boxes accurate in page pixels; QR, seal, signature currently layout constants, non-PDF using percentage fractions)
+  - [ ] viewer built as .stage (transform) > img + svg overlay (viewBox W H) (MISSING: simulated HTML document sheet in ScanView)
+  - [ ] boxes only from real results (OCR words and fields, QR, signature, seal, suspicious regions); no decorative boxes (PARTIAL: decorative brackets and fake HTML present)
+  - [ ] click-to-zoom animation (500ms, 20% padding) (MISSING)
+  - [ ] tests (MISSING)
+
 
 ### 1. Item-by-Item Verification Benchmarks
 1. **i18n Leak Resolution & Static Bundling**:
