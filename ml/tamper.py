@@ -8,39 +8,58 @@ Output: Suspicion score (0-1), Heatmap PNG path, and explainable plain-language 
 """
 
 import os
-import cv2
-import numpy as np
-from PIL import Image, ImageChops, ImageEnhance
+import io
 from typing import Dict, Any, List, Tuple
 
+try:
+    import cv2
+except ImportError:
+    cv2 = None
 
-def perform_error_level_analysis(image_path: str, quality: int = 90, scale: int = 15) -> Tuple[np.ndarray, float]:
+try:
+    import numpy as np
+except ImportError:
+    np = None
+
+try:
+    from PIL import Image, ImageChops, ImageEnhance
+except ImportError:
+    Image = None
+    ImageChops = None
+    ImageEnhance = None
+
+
+def perform_error_level_analysis(image_path: str, quality: int = 90, scale: int = 15) -> Tuple[Any, float]:
     """
     Computes Error Level Analysis (ELA).
     Saves image at known quality and measures compression residual error.
     Returns the ELA image and mean error energy.
     """
-    original = Image.open(image_path).convert("RGB")
-    temp_resaved = image_path + "_ela_temp.jpg"
-    original.save(temp_resaved, "JPEG", quality=quality)
-    
-    resaved = Image.open(temp_resaved)
-    ela_im = ImageChops.difference(original, resaved)
-    
-    # Clean up temp file
-    if os.path.exists(temp_resaved):
-        os.remove(temp_resaved)
+    if Image is None or np is None or not os.path.exists(image_path):
+        return None, 0.0
+
+    try:
+        with Image.open(image_path) as img:
+            original = img.convert("RGB")
         
-    extrema = ela_im.getextrema()
-    max_diff = max([ex[1] for ex in extrema])
-    if max_diff == 0:
-        max_diff = 1
-    scale_factor = 255.0 / max_diff
-    ela_im = ImageEnhance.Brightness(ela_im).enhance(scale_factor)
-    
-    ela_np = np.array(ela_im)
-    error_energy = float(np.mean(ela_np))
-    return ela_np, error_energy
+        buffer = io.BytesIO()
+        original.save(buffer, "JPEG", quality=quality)
+        buffer.seek(0)
+        
+        with Image.open(buffer) as resaved:
+            ela_im = ImageChops.difference(original, resaved)
+            extrema = ela_im.getextrema()
+            max_diff = max([ex[1] for ex in extrema])
+            if max_diff == 0:
+                max_diff = 1
+            scale_factor = 255.0 / max_diff
+            ela_im = ImageEnhance.Brightness(ela_im).enhance(scale_factor)
+            
+            ela_np = np.array(ela_im)
+            error_energy = float(np.mean(ela_np))
+            return ela_np, error_energy
+    except Exception:
+        return None, 0.0
 
 
 def detect_copy_move_orb(image_path: str) -> Tuple[bool, int, List[Tuple[int, int]]]:
@@ -48,30 +67,36 @@ def detect_copy_move_orb(image_path: str) -> Tuple[bool, int, List[Tuple[int, in
     Detects copy-move forgery (e.g., duplicated stamps or signatures)
     via Oriented FAST and Rotated BRIEF (ORB) feature matching.
     """
-    img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-    if img is None:
+    if cv2 is None or np is None or not os.path.exists(image_path):
         return False, 0, []
 
-    orb = cv2.ORB_create(nfeatures=1200)
-    kp, des = orb.detectAndCompute(img, None)
-    if des is None or len(des) < 10:
+    try:
+        img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+        if img is None:
+            return False, 0, []
+
+        orb = cv2.ORB_create(nfeatures=1200)
+        kp, des = orb.detectAndCompute(img, None)
+        if des is None or len(des) < 10:
+            return False, 0, []
+
+        bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
+        matches = bf.knnMatch(des, des, k=2)
+
+        # Filter out self-matches and enforce spatial distance threshold
+        duplicate_points = []
+        for m, n in matches:
+            if m.distance < 0.65 * n.distance:
+                pt1 = kp[m.queryIdx].pt
+                pt2 = kp[m.trainIdx].pt
+                dist = np.linalg.norm(np.array(pt1) - np.array(pt2))
+                if dist > 80:  # Physically separated match
+                    duplicate_points.append((int(pt1[0]), int(pt1[1])))
+
+        is_copy_move = len(duplicate_points) >= 6
+        return is_copy_move, len(duplicate_points), duplicate_points
+    except Exception:
         return False, 0, []
-
-    bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
-    matches = bf.knnMatch(des, des, k=2)
-
-    # Filter out self-matches and enforce spatial distance threshold
-    duplicate_points = []
-    for m, n in matches:
-        if m.distance < 0.65 * n.distance:
-            pt1 = kp[m.queryIdx].pt
-            pt2 = kp[m.trainIdx].pt
-            dist = np.linalg.norm(np.array(pt1) - np.array(pt2))
-            if dist > 80:  # Physically separated match
-                duplicate_points.append((int(pt1[0]), int(pt1[1])))
-
-    is_copy_move = len(duplicate_points) >= 6
-    return is_copy_move, len(duplicate_points), duplicate_points
 
 
 def analyze_tamper_forgery(file_path: str, output_heatmap_dir: str = "") -> Dict[str, Any]:
