@@ -52,3 +52,4 @@ def test_regulatory_rules_lifecycle():
 
     finally:
         db.close()
+
