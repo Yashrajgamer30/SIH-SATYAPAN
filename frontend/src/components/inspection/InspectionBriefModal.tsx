@@ -208,3 +208,4 @@ export const InspectionBriefModal: React.FC<InspectionBriefModalProps> = ({
     </div>
   );
 };
+

@@ -1,5 +1,7 @@
 # AICTE SATYAPAN - Complete System Architecture
 
+'# AICTE SATYAPAN - Project Architecture & Technical Specification
+
 ## 1. System Overview & Statutory Tenets
 **AICTE SATYAPAN** is an enterprise-grade AI decision-support and document scrutiny platform designed for the All India Council for Technical Education (AICTE) Extension of Approval (EoA) scrutiny cycle.
 

@@ -508,3 +508,4 @@ export const AuditSecurityCentreView: React.FC = () => {
     </div>
   );
 };
+

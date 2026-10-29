@@ -33,3 +33,4 @@
 ## 3. Synthetic Benchmark Scope & Production Readiness
 - **Evaluation Split**: Benchmarked on a curated held-out test split of 92 multi-page dossiers across 12 distinct deficiency scenarios.
 - **Simulated Gateways**: External authority gateways (DigiLocker, State Fire Services, Land Revenue) are simulated via local mock microservices. Real-world integration will require national NIC/API Setu credentials.
+

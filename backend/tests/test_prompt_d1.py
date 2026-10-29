@@ -152,3 +152,4 @@ def test_verification_centre_and_bulk_retry():
             assert man_res["new_status"] == "VERIFIED"
     finally:
         db.close()
+

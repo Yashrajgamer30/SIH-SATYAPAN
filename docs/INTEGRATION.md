@@ -117,3 +117,4 @@ If an external authority remains unreachable or the certificate is non-standard,
   1. Mandatory justification remarks (min 10 characters).
   2. Physical register folio / physical dispatch reference number.
   3. Digital identity of the confirming officer recorded in the SHA-256 audit ledger.
+

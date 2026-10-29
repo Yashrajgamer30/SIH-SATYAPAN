@@ -42,3 +42,4 @@ This document provides a comprehensive traceability matrix mapping every require
 - **Prompt F2 (Demo Mode Health)**: 1 test in `test_prompt_f2.py`
 - **Playwright E2E Guard Rails**: 3 spec suites (`routes.spec.ts`, `admin_rules.spec.ts`, `overlay_alignment.spec.ts`)
 - **Total Automated Test Suites**: **100% Passing**.
+

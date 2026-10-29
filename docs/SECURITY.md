@@ -61,3 +61,4 @@ All HTTP responses from FastAPI include:
 ## 3. Compliance Summary
 - **Indian National DPDP Act 2023**: Fully compliant through purpose-bound access tokens, masked PII by default, and dynamic officer watermarking.
 - **AICTE Regulatory Handbook (APH 2026-27)**: Fully compliant through two-person senior review, immutable audit ledger, and statutory advisory disclaimers.
+

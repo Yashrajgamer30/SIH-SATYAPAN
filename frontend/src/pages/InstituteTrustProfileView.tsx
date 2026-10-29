@@ -1,3 +1,4 @@
+3
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
@@ -33,6 +34,7 @@ export const InstituteTrustProfileView: React.FC = () => {
   const { instId } = useParams<{ instId?: string }>();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<any>(null);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -254,13 +256,12 @@ export const InstituteTrustProfileView: React.FC = () => {
                     Academic Year {flag.academic_year}
                   </span>
                   <span
-                    className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                      flag.severity === 'NONE'
+                    className={`px-2 py-0.5 rounded text-[10px] font-bold ${flag.severity === 'NONE'
                         ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
                         : flag.severity === 'LOW'
-                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'
-                        : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
-                    }`}
+                          ? 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'
+                          : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                      }`}
                   >
                     {flag.severity}
                   </span>

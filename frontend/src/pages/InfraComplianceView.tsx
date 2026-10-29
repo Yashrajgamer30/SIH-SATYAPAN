@@ -365,3 +365,4 @@ export const InfraComplianceView: React.FC = () => {
     </div>
   );
 };
+
