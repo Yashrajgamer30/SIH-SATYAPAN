@@ -96,11 +96,18 @@ def test_acknowledgement_verification_and_pii_privacy():
     try:
         officer = db.query(User).filter(User.role == UserRole.OFFICIAL_SCRUTINY).first()
 
-        # 1. Acknowledgement QR Verification
+        # 1. Acknowledgement QR Verification (both synthetic hash and existing DB application)
         ack_res = verify_submission_acknowledgement(ack_hash="7f83b1657ff1fc53b92dc18148a1d65d", db=db)
         assert ack_res["status"] == "VERIFIED_AUTHENTIC"
         assert ack_res["is_valid"] is True
         assert "AICTE" in ack_res["statutory_seal"]
+
+        existing_app = db.query(Application).first()
+        if existing_app:
+            ack_db_res = verify_submission_acknowledgement(ack_hash=existing_app.id, db=db)
+            assert ack_db_res["status"] == "VERIFIED_AUTHENTIC"
+            assert ack_db_res["is_valid"] is True
+            assert ack_db_res["application_no"] == existing_app.application_no
 
         # 2. Purpose-Bound Document Access
         purpose_req = PurposeAccessRequest(
@@ -132,3 +139,4 @@ def test_acknowledgement_verification_and_pii_privacy():
         assert len(pii_res["revealed_value"]) > 6
     finally:
         db.close()
+

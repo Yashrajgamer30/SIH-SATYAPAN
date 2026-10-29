@@ -8,7 +8,7 @@ from sqlalchemy import select
 
 from app.core.database import get_db
 from app.core.auth import get_current_user, verify_institute_access
-from app.models.schemas import User, UserRole, Application, Document, VerificationStatus, DataAccessLog
+from app.models.schemas import User, UserRole, Application, Institute, Document, VerificationStatus, DataAccessLog
 from app.core.storage import storage_vault, validate_file_magic_bytes
 from app.core.security import generate_signed_document_token, verify_signed_document_token
 from app.core.audit import write_audit_event
