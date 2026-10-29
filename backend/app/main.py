@@ -75,6 +75,16 @@ app.include_router(documents_router)
 app.include_router(demo_router)
 app.include_router(mock_authorities_router)
 
+# Also mount under /api prefix for API clients expecting /api/auth/...
+app.include_router(auth_router, prefix="/api")
+app.include_router(institute_router, prefix="/api")
+app.include_router(official_router, prefix="/api")
+app.include_router(events_router, prefix="/api")
+app.include_router(audit_router, prefix="/api")
+app.include_router(documents_router, prefix="/api")
+app.include_router(demo_router, prefix="/api")
+app.include_router(mock_authorities_router, prefix="/api")
+
 # Also mount under /api/v1 prefix
 app.include_router(auth_router, prefix=settings.API_V1_STR)
 app.include_router(institute_router, prefix=settings.API_V1_STR)
