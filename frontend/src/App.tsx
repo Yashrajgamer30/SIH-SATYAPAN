@@ -26,6 +26,7 @@ import { InstituteTrustProfileView } from './pages/InstituteTrustProfileView';
 import { InspectionPlannerView } from './pages/InspectionPlannerView';
 import { WhatIfSimulatorView } from './pages/institute/WhatIfSimulatorView';
 import { AcknowledgementVerifyView } from './pages/AcknowledgementVerifyView';
+import { DemoHealthView } from './pages/DemoHealthView';
 import { StaticInfoPage } from './pages/StaticInfoPage';
 import { Styleguide } from './pages/Styleguide';
 import { PlaceholderPageView } from './pages/PlaceholderPageView';
@@ -150,6 +151,34 @@ const SessionWatchdog: React.FC = () => {
   return null;
 };
 
+// Hidden Demo Reset Shortcut Watchdog (Ctrl+Shift+D)
+const DemoShortcutListener: React.FC = () => {
+  useEffect(() => {
+    const handleKey = async (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'd') {
+        e.preventDefault();
+        if (window.confirm('AICTE SATYAPAN DEMO MODE: Reset database, files and Demo Pack to pristine state?')) {
+          try {
+            const res = await fetch('http://localhost:8000/demo/reset', { method: 'POST' });
+            if (res.ok) {
+              alert('✓ AICTE SATYAPAN Demo data restored in under 5 seconds. Reloading...');
+              window.location.reload();
+            } else {
+              alert('Failed to reset demo data.');
+            }
+          } catch (err: any) {
+            alert(`Reset error: ${err.message}`);
+          }
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, []);
+
+  return null;
+};
+
 export function App() {
   return (
     <ThemeProvider>
@@ -157,6 +186,7 @@ export function App() {
         <RouteTitleHandler />
         <SessionWatchdog />
         <SessionTimeoutModal />
+        <DemoShortcutListener />
 
         <Routes>
           {/* Public Route Group: /login only */}
@@ -169,6 +199,7 @@ export function App() {
 
           {/* Legacy & Shortcut Redirects */}
           <Route path="/rules" element={<Navigate to="/official/admin/rules" replace />} />
+          <Route path="/demo/health" element={<DemoHealthView />} />
           <Route path="/verify/acknowledgement/:ackHash" element={<AcknowledgementVerifyView />} />
           <Route path="/verify/acknowledgement" element={<AcknowledgementVerifyView />} />
           <Route path="/policies" element={<StaticInfoPage />} />

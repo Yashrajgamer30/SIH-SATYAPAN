@@ -43,6 +43,14 @@ export const GovFooter: React.FC = () => {
           </div>
 
           <div className="flex flex-col items-center md:items-end gap-1.5">
+            <Link
+              to="/demo/health"
+              className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 font-mono font-bold uppercase tracking-wider text-[10px] hover:bg-emerald-500/30 transition-colors cursor-pointer"
+              title="Click to open Grand Finale Pre-Presentation Health Inspection"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              DEMO MODE: ACTIVE (HEALTH CHECK)
+            </Link>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-saffron-500/10 text-saffron-500 border border-saffron-500/30 font-bold uppercase tracking-wider text-[10px]">
               <ShieldCheck className="w-3.5 h-3.5" />
               {t('prototypeNotice')}
