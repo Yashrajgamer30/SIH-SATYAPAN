@@ -17,9 +17,10 @@ WORKDIR /app
 COPY backend/requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend source code and seed demo pack
+# Copy backend source code, evaluation data, and seed demo pack
 COPY backend /app/backend
 COPY seed /app/seed
+COPY ml /app/ml
 
 WORKDIR /app/backend
 
