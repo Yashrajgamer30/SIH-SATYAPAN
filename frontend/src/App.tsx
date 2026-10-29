@@ -21,6 +21,11 @@ import { VerificationCentreView } from './pages/VerificationCentreView';
 import { InfraComplianceView } from './pages/InfraComplianceView';
 import { AuditSecurityCentreView } from './pages/AuditSecurityCentreView';
 import { AnalyticsEvaluationView } from './pages/AnalyticsEvaluationView';
+import { CrossInstituteNetworkView } from './pages/CrossInstituteNetworkView';
+import { InstituteTrustProfileView } from './pages/InstituteTrustProfileView';
+import { InspectionPlannerView } from './pages/InspectionPlannerView';
+import { WhatIfSimulatorView } from './pages/institute/WhatIfSimulatorView';
+import { AcknowledgementVerifyView } from './pages/AcknowledgementVerifyView';
 import { StaticInfoPage } from './pages/StaticInfoPage';
 import { Styleguide } from './pages/Styleguide';
 import { PlaceholderPageView } from './pages/PlaceholderPageView';
@@ -164,6 +169,8 @@ export function App() {
 
           {/* Legacy & Shortcut Redirects */}
           <Route path="/rules" element={<Navigate to="/official/admin/rules" replace />} />
+          <Route path="/verify/acknowledgement/:ackHash" element={<AcknowledgementVerifyView />} />
+          <Route path="/verify/acknowledgement" element={<AcknowledgementVerifyView />} />
           <Route path="/policies" element={<StaticInfoPage />} />
           <Route path="/accessibility" element={<StaticInfoPage />} />
           <Route path="/terms" element={<StaticInfoPage />} />
@@ -195,6 +202,8 @@ export function App() {
             <Route path="students" element={<StudentsView />} />
             <Route path="new-application" element={<NewApplicationWizard />} />
             <Route path="new-app" element={<Navigate to="/institute/new-application" replace />} />
+            <Route path="readiness-simulator" element={<WhatIfSimulatorView />} />
+            <Route path="simulator" element={<Navigate to="/institute/readiness-simulator" replace />} />
             <Route path="track" element={<TrackApplicationsView />} />
             <Route path="track-app" element={<Navigate to="/institute/track" replace />} />
             <Route path="documents" element={<DocumentsVaultView />} />
@@ -230,6 +239,11 @@ export function App() {
             <Route path="applications/:appId" element={<ScrutinyDetailRouteWrapper />} />
             <Route path="verification-centre" element={<VerificationCentreView />} />
             <Route path="infra-compliance" element={<InfraComplianceView />} />
+            <Route path="cross-network" element={<CrossInstituteNetworkView />} />
+            <Route path="inspection-planner" element={<InspectionPlannerView />} />
+            <Route path="inspections" element={<Navigate to="/official/inspection-planner" replace />} />
+            <Route path="trust-profile" element={<InstituteTrustProfileView />} />
+            <Route path="institutes/:instId/trust-profile" element={<InstituteTrustProfileView />} />
             <Route
               path="decisions"
               element={

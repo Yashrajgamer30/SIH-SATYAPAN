@@ -6,6 +6,8 @@ import {
   Eye, Check, UserCheck, Shield, ChevronRight, Layers, FileCheck
 } from 'lucide-react';
 import { AdvisoryBanner } from '../components/StatusBadges';
+import { InspectionBriefModal } from '../components/inspection/InspectionBriefModal';
+import { PurposeBoundAccessModal } from '../components/common/PurposeBoundAccessModal';
 
 const API_BASE = 'http://localhost:8000';
 
@@ -161,6 +163,19 @@ export const ScrutinyDetail: React.FC<ScrutinyDetailProps> = ({ appId = '1', onB
 
   // Explain-Why Drawer State
   const [explainDrawerFinding, setExplainDrawerFinding] = useState<ReviewDossier['findings'][0] | null>(null);
+
+  // Milestone E Differentiators State
+  const [showInspectionBrief, setShowInspectionBrief] = useState(false);
+  const [purposeModalDoc, setPurposeModalDoc] = useState<{ id: string; title: string } | null>(null);
+  const [caseNotes, setCaseNotes] = useState<Array<{ id: string; author_name: string; created_at: string; content: string }>>([
+    {
+      id: 'note-1',
+      author_name: 'Dr. V. K. Sharma (Senior Regional Officer)',
+      created_at: new Date().toISOString(),
+      content: 'Noticed Fire NOC stamp discrepancy. @scrutiny Please cross-reference with municipal fire division records before deciding.'
+    }
+  ]);
+  const [newNote, setNewNote] = useState('');
 
   // Simulated current user role from localStorage
   const currentRole = localStorage.getItem('satyapan_demo_role') || 'OFFICIAL_SCRUTINY';
@@ -345,6 +360,24 @@ export const ScrutinyDetail: React.FC<ScrutinyDetailProps> = ({ appId = '1', onB
               <Clock className="w-3.5 h-3.5 text-blue-600" />
               <span>{summary.sla_days_left}d remaining</span>
             </div>
+          </div>
+
+          {/* Differentiators: Trust Profile & Inspection Brief */}
+          <div className="flex items-center gap-2 border-l border-slate-200 pl-3">
+            <button
+              onClick={() => navigate(`/official/institutes/${summary.institute.id}/trust-profile`)}
+              className="px-2.5 py-1 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded cursor-pointer transition-colors"
+              title="Open Institute Trust Profile & Historical Audits"
+            >
+              Trust Profile
+            </button>
+            <button
+              onClick={() => setShowInspectionBrief(true)}
+              className="px-2.5 py-1 text-xs font-semibold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded cursor-pointer transition-colors"
+              title="Generate Inspection Brief PDF"
+            >
+              Inspection Brief
+            </button>
           </div>
         </div>
       </div>
@@ -978,6 +1011,28 @@ export const ScrutinyDetail: React.FC<ScrutinyDetailProps> = ({ appId = '1', onB
             </div>
           </div>
         </div>
+      )}
+
+      {/* Milestone E Modals */}
+      {showInspectionBrief && (
+        <InspectionBriefModal
+          appId={String(appId || '1')}
+          isOpen={true}
+          onClose={() => setShowInspectionBrief(false)}
+        />
+      )}
+
+      {purposeModalDoc && (
+        <PurposeBoundAccessModal
+          documentId={purposeModalDoc.id}
+          documentTitle={purposeModalDoc.title}
+          isOpen={true}
+          onClose={() => setPurposeModalDoc(null)}
+          onAccessGranted={(watermark) => {
+            alert(`Decryption granted under statutory purpose.\nDynamic watermark applied: ${watermark}`);
+            navigate(`/official/applications/${appId}/students/1/documents/${purposeModalDoc.id}/scan`);
+          }}
+        />
       )}
     </div>
   );

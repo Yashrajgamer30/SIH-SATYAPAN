@@ -9,7 +9,7 @@ import { BreadcrumbItem } from '../components/design-system/Breadcrumb';
 import {
   LayoutDashboard, Building, Users, GraduationCap, PlusCircle,
   FileSearch, FolderLock, DownloadCloud, Bell, HelpCircle,
-  ChevronLeft, ChevronRight, LogOut, Menu
+  ChevronLeft, ChevronRight, LogOut, Menu, Sparkles
 } from 'lucide-react';
 
 interface RouteMeta {
@@ -133,6 +133,7 @@ export const InstituteLayout: React.FC<{ children?: React.ReactNode }> = ({ chil
     { id: 'profile', path: '/institute/profile', label: 'Institute Profile', icon: Building },
     { id: 'faculty', path: '/institute/faculty', label: 'Faculty', icon: Users },
     { id: 'students', path: '/institute/students', label: 'Students', icon: GraduationCap },
+    { id: 'simulator', path: '/institute/readiness-simulator', label: 'Readiness Simulator', icon: Sparkles },
     { id: 'new-app', path: '/institute/new-application', label: 'New Application', icon: PlusCircle },
     { id: 'track', path: '/institute/track', label: 'Track Applications', icon: FileSearch },
     { id: 'vault', path: '/institute/documents', label: 'Documents Vault', icon: FolderLock },

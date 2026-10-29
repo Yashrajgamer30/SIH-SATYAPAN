@@ -196,9 +196,48 @@ export const NewApplicationWizard: React.FC = () => {
     fetchProfile();
   }, [token]);
 
-  // 3. Autosave Every 20 Seconds
+  // 3. Offline-Safe Autosave Every 20 Seconds (Differentiator 12)
+  const [offlineRestored, setOfflineRestored] = useState(false);
+
+  useEffect(() => {
+    // Check for local draft on mount
+    try {
+      const local = localStorage.getItem('satyapan_offline_wizard_draft');
+      if (local) {
+        const parsed = JSON.parse(local);
+        if (parsed.appDetails) {
+          setAppDetails(parsed.appDetails);
+          if (parsed.currentStep) setCurrentStep(parsed.currentStep);
+          if (parsed.selectedCategoryCode) setSelectedCategoryCode(parsed.selectedCategoryCode);
+          if (parsed.uploadedDocs) setUploadedDocs(parsed.uploadedDocs);
+          setLastSaved(`Restored from local storage (${parsed.timestamp})`);
+          setOfflineRestored(true);
+        }
+      }
+    } catch (e) {
+      console.warn('Could not restore local draft:', e);
+    }
+  }, []);
+
   const performDraftSave = async () => {
     setIsSaving(true);
+    const nowTime = new Date().toLocaleTimeString();
+
+    // 1. LocalStorage Offline Save
+    try {
+      const draftPayload = {
+        currentStep,
+        appDetails,
+        uploadedDocs,
+        selectedCategoryCode,
+        timestamp: nowTime
+      };
+      localStorage.setItem('satyapan_offline_wizard_draft', JSON.stringify(draftPayload));
+    } catch (e) {
+      console.warn('Local storage save failed:', e);
+    }
+
+    // 2. Server Sync
     try {
       const resp = await fetch('http://localhost:8000/institute/applications/draft', {
         method: 'POST',
@@ -222,9 +261,11 @@ export const NewApplicationWizard: React.FC = () => {
         setApplicationId(json.application_id);
         setApplicationNo(json.application_no);
         setLastSaved(json.last_saved);
+      } else {
+        setLastSaved(`Offline draft saved locally at ${nowTime}`);
       }
     } catch (e) {
-      console.warn('Draft autosave failed:', e);
+      setLastSaved(`Offline draft saved locally at ${nowTime}`);
     } finally {
       setIsSaving(false);
     }
@@ -360,6 +401,21 @@ export const NewApplicationWizard: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {offlineRestored && (
+        <div className="p-3 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-xl flex items-center justify-between text-xs text-blue-900 dark:text-blue-200">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
+            <span><strong>Offline Draft Restored:</strong> Your previous application data and checklist have been restored from local storage.</span>
+          </div>
+          <button
+            onClick={() => setOfflineRestored(false)}
+            className="text-[11px] font-semibold underline text-blue-700 hover:text-blue-900 cursor-pointer"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* 1. Government Form Stepper Header */}
       <div className="p-6 rounded-2xl bg-white dark:bg-navy-900 border border-slate-200/80 dark:border-navy-700/80 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-100 dark:border-navy-800">

@@ -5,10 +5,11 @@ import { useAuthStore } from '../context/authStore';
 import { UtilityBar, GovFooter, AshokaEmblem, CommandPalette } from '../components/design-system';
 import { PageContainer } from '../components/layout/PageContainer';
 import { BreadcrumbItem } from '../components/design-system/Breadcrumb';
+import { TimeSavedBadge } from '../components/common/TimeSavedBadge';
 import {
   LayoutDashboard, ListOrdered, FileText, CheckCircle, Building2,
   Gavel, ShieldCheck, BarChart3, Settings, Search, Bell, Menu,
-  ChevronLeft, ChevronRight, LogOut, ExternalLink
+  ChevronLeft, ChevronRight, LogOut, ExternalLink, Share2, Navigation
 } from 'lucide-react';
 
 interface RouteMeta {
@@ -135,6 +136,8 @@ export const OfficialsLayout: React.FC<{ children?: React.ReactNode }> = ({ chil
     { id: 'applications', path: '/official/applications', label: 'Applications', icon: FileText },
     { id: 'verification-centre', path: '/official/verification-centre', label: 'Verification Centre', icon: CheckCircle },
     { id: 'infra-compliance', path: '/official/infra-compliance', label: 'Infra Compliance', icon: Building2 },
+    { id: 'cross-network', path: '/official/cross-network', label: 'Cross Network', icon: Share2 },
+    { id: 'inspection-planner', path: '/official/inspection-planner', label: 'Inspection Planner', icon: Navigation },
     { id: 'decisions', path: '/official/decisions', label: 'Decisions', icon: Gavel },
     { id: 'audit-security', path: '/official/audit-security', label: 'Audit & Security', icon: ShieldCheck },
     { id: 'analytics', path: '/official/analytics', label: 'Analytics', icon: BarChart3 },
@@ -211,6 +214,9 @@ export const OfficialsLayout: React.FC<{ children?: React.ReactNode }> = ({ chil
 
           {/* Right: Quick actions, notifications, user profile */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* Live 'Time Saved' Impact Counter */}
+            <TimeSavedBadge />
+
             {/* Notification Bell */}
             <button
               type="button"

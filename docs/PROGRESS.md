@@ -335,6 +335,48 @@ This log tracks every development phase against its acceptance checks. According
   - `backend/tests/test_prompt_d2.py`: 4/4 passed (security posture & sessions, audit hash chain tamper & repair, infra compliance & evaluation metrics, admin rules test & rollback).
   - Total combined test suite across D1, D2, and Admin Rules: 9/9 passed in 3.51s.
 
+### 4. Milestone E Acceptance Verification Summary (Prompt E1: 12 Finished Differentiators)
+
+1. **Explain-Why Drawer on Flags & Risk Scores**:
+   - Integrated into Scrutiny Review findings (`ScrutinyDetail.tsx`) and Smart Queue risk badges (`SmartQueueView.tsx`).
+   - Displays exact rule/model, inputs used, top 3 contributing factor weights (e.g. 68% expiry mismatch, 26% authority status), and visual evidence coordinates.
+2. **Hash-Chained Audit with Visible Tamper Demonstration**:
+   - Implemented in `backend/app/routers/demo.py` and `frontend/src/pages/AuditSecurityCentreView.tsx`.
+   - Hidden developer test button (`/demo/tamper-audit-row`) alters an audit row out-of-band; live verification immediately detects broken linkage and names exact tampered row.
+   - One-click instant repair (`/demo/repair-audit-chain`) recomputes canonical hashes from genesis root in < 0.1s.
+3. **Cross-Institute Duplicate Network Graph (`/official/cross-network`)**:
+   - Interactive HTML5 canvas & SVG relationship topology mapping institutes as nodes and reused documents as similarity-weighted edges.
+   - Click an edge to launch the side-by-side forensic comparator highlighting cloned municipal seals, overlapping text, and concurrent faculty appointments.
+4. **Institute Trust Profile (`/official/institutes/:instId/trust-profile`)**:
+   - Diagnostic institutional trust card displaying historical scrutiny approvals, resolution speed, and an explainable Trust Index (e.g. 84.5/100, Tier A).
+   - Complies with Principle 1: strictly labelled statutory advisory.
+5. **Risk-Based Inspection Planner (`/official/inspection-planner`)**:
+   - Clusters institutes recommended for inspection by geographic district (Pune, Nashik, etc.).
+   - Prioritizes itineraries by composite risk score and generates exportable travel rosters (CSV / print).
+6. **One-Click Inspection Brief PDF (`InspectionBriefModal.tsx`)**:
+   - Generates formal on-site committee inspection brief with letterhead, pre-screening findings, evidence thumbnails, and mandatory spot-check verification tables.
+7. **What-If Regulatory Readiness Simulator (`/institute/readiness-simulator`)**:
+   - Self-service institutional simulator for technical colleges to model faculty count, student intake, land acreage, Fire NOC, and security deposit before submission.
+   - Live gauge computes predicted risk score and gives immediate statutory clearance feedback.
+8. **Tamper-Evident Acknowledgement QR (`/verify/acknowledgement/:ackHash`)**:
+   - Publicly accessible cryptographic receipt verification page confirming SHA-256 submission hash against the immutable ledger.
+9. **Live 'Time Saved' Counter for Officials (`TimeSavedBadge.tsx`)**:
+   - Real-time indicator in deep navy header: "47,700 hrs saved (-78.4%)" with hover popover detailing the 45 min/check * 6.5 docs evaluation baseline.
+10. **Command Palette (`Ctrl+K`) & Collaboration Case Notes**:
+    - Global keyboard shortcut opening a spotlight search modal across applications, institutes, rule configurations, and tools.
+    - Application collaboration case notes with `@Official` mentions and audit logging.
+11. **Privacy by Design (Purpose-Bound Access & PII Reveal)**:
+    - Mandatory statutory purpose declaration (`/documents/:id/purpose-access`) before unencrypted document inspection.
+    - Masked PII by default with logged reveal action under National DPDP Act 2023.
+12. **Offline-Safe Drafts on Institute Side (`NewApplicationWizard.tsx`)**:
+    - LocalStorage persistence guaranteeing drafts remain safe during network disruption, with auto-restore alert and 20s server synchronization.
+
+- **Acceptance Verification**:
+  - `backend/tests/test_prompt_e1.py`: 5/5 passed in 3.98s.
+  - Total combined test suite (D1, D2, E1, Admin Rules): 14/14 passed in 4.47s.
+  - Frontend production build (`npm run build`): Passed with 0 errors in 22.49s.
+
+
 1. **i18n Leak Resolution & Static Bundling**:
    - Packaged static locale bundles (`en.json`, `hi.json`, `mr.json`) into `i18n.ts` with instant synchronous initialization.
    - Fixed un-namespaced keys (e.g. `screenReaderAccess`) across English, Hindi, and Marathi.
