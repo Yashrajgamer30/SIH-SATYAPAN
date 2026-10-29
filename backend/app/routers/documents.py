@@ -174,8 +174,8 @@ def get_document_page_png(document_id: str, page_num: int = 1):
     """
     Serves document page as a fixed 150 DPI raster image (PNG).
     """
-    from app.services.document_renderer import render_page_png
     try:
+        from app.services.document_renderer import render_page_png
         png_bytes, _, _ = render_page_png(document_id, page_num)
         return Response(
             content=png_bytes,
@@ -185,6 +185,8 @@ def get_document_page_png(document_id: str, page_num: int = 1):
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail=f"Document {document_id} not found.")
     except Exception as e:
+        import logging
+        logging.getLogger("documents").exception(f"Failed to render document page: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -195,12 +197,14 @@ def get_document_metadata(document_id: str, page_num: int = 1):
     Returns document metadata including 150 DPI pixel dimensions (page_width, page_height)
     and exact bounding boxes for OCR tokens, text fields, QR codes, seals, and signatures.
     """
-    from app.services.document_renderer import extract_document_page_data
     try:
+        from app.services.document_renderer import extract_document_page_data
         return extract_document_page_data(document_id, page_num)
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail=f"Document {document_id} not found.")
     except Exception as e:
+        import logging
+        logging.getLogger("documents").exception(f"Failed to extract document metadata: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

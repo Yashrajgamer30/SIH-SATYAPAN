@@ -11,7 +11,7 @@ Sets needs_inspection when evidence is blurry, poorly lit, or inconsistent.
 import os
 import cv2
 import numpy as np
-from typing import Dict, Any
+from typing import Dict, Any, Tuple
 
 
 def compute_laplacian_blur_score(image: np.ndarray) -> float:

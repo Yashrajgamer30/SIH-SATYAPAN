@@ -12,7 +12,7 @@ import hmac
 import hashlib
 import cv2
 import numpy as np
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Tuple
 
 HMAC_SECRET_KEY = b"SATYAPAN_REGULATORY_HMAC_SECRET_2026"
 
