@@ -271,6 +271,36 @@ This log tracks every development phase against its acceptance checks. According
 - **Build Verification**:
   - Full TypeScript check, i18n key audit, and Vite production bundle passed in 20.71s with zero errors.
 
+---
+
+## Milestone D - Prompt D1: Queue, Review, Decisions & Verification Centre
+- **1. Smart Scrutiny Queue** (`/official/smart-queue` & `GET /official/queue`):
+  - Applications dynamically ranked by combined priority: **65% Multi-Modal AI Risk Score + 35% SLA Turnaround Urgency**.
+  - Multi-parameter filtering: State, Academic Category, Risk Band (HIGH/MEDIUM/LOW), Status, and Assignee.
+  - 5 Instant Saved Views: *All Applications*, *Critical Risk (≥ 50)*, *Approaching SLA (≤ 7 Days)*, *Deficiency In-Flight*, *My Assigned Queue*.
+  - Bulk Assignment: Multi-row checkbox selection with modal to assign batches of applications to scrutiny officers.
+  - Risk Badge with interactive hover popover: **'Why this score'** detailing top 3 contributing factors.
+- **2. Application Review Dossier** (`/official/applications/:appId` & `GET /official/applications/:id/review`):
+  - **Tab 1 - Summary**: Comprehensive institutional profile, cycle, metadata, risk metrics, and quick scan action.
+  - **Tab 2 - Diff View (Master vs Submitted)**: Side-by-side comparison of AICTE Master Registry baseline vs submitted application with highlighted discrepancy tags.
+  - **Tab 3 - Students & Documents**: Uploaded documents with direct links to Scan View + enrolled student cohort statistics.
+  - **Tab 4 - AI Findings**: Automated inspection flags with Explain-Why drawer integrating model inputs and confidence weights.
+  - **Tab 5 - Infra Evidence**: Physical norms gallery (classrooms, labs, library, workshop, hostel) with area estimates, *Meets / Needs Evidence / Recommend Inspection* status.
+  - **Tab 6 - Cross-Verification**: External authority corroboration summary across all 6 statutory statuses.
+  - **Tab 7 - Timeline**: Chronological event history from submission to scrutiny.
+  - **Tab 8 - Audit Trail**: Cryptographic SHA-256 chained transaction logs.
+- **3. Decisions & Two-Person Senior Confirmation Rule** (`POST /official/applications/:id/decision` & `confirm-decision`):
+  - Human official actions: `Approve`, `Reject`, `Raise deficiency`, `Recommend inspection` with mandatory justification remarks.
+  - Two-Person Rule: Adverse actions initiated by `OFFICIAL_SCRUTINY` are held in `AWAITING_SENIOR_CONFIRMATION` with an explicit senior review banner until confirmed by an `OFFICIAL_SENIOR`. AI never triggers decisions.
+- **4. Cross-Verification Centre** (`/official/verification-centre` & `/official/verifications`):
+  - Full coverage of all 6 exact statutory statuses: `VERIFIED`, `MISMATCH_DETECTED`, `EXPIRED`, `VERIFICATION_PENDING`, `SOURCE_UNAVAILABLE`, `MANUAL_REVIEW_REQUIRED`.
+  - Bulk retry action for `SOURCE_UNAVAILABLE` gateway reconnection.
+  - Manual confirmation workflow modal recording physical register numbers, override remarks, and audit entries.
+- **Automated Test Suite**:
+  - Created `backend/tests/test_prompt_d1.py` covering smart queue ranking, review dossier 8 tabs, two-person rule decision lifecycle, and verification bulk retry / manual confirmation.
+  - 8/8 backend test suite passed 100%. Frontend production build passed in 22.30s.
+
+
 
 
 

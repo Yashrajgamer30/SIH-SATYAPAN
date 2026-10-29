@@ -16,6 +16,8 @@ import { OfficialsDashboard } from './pages/OfficialsDashboard';
 import { AdminRuleBuilder } from './pages/AdminRuleBuilder';
 import { ScanView } from './pages/ScanView';
 import { ScrutinyDetail } from './pages/ScrutinyDetail';
+import { SmartQueueView } from './pages/SmartQueueView';
+import { VerificationCentreView } from './pages/VerificationCentreView';
 import { StaticInfoPage } from './pages/StaticInfoPage';
 import { Styleguide } from './pages/Styleguide';
 import { PlaceholderPageView } from './pages/PlaceholderPageView';
@@ -79,8 +81,8 @@ const ScrutinyDetailRouteWrapper: React.FC = () => {
 
   return (
     <ScrutinyDetail
-      appId={parseInt(appId || '1', 10) || 1}
-      onBack={() => navigate('/official/dashboard')}
+      appId={appId || '1'}
+      onBack={() => navigate('/official/smart-queue')}
     />
   );
 };
@@ -220,34 +222,10 @@ export function App() {
             <Route index element={<Navigate to="/official/dashboard" replace />} />
             <Route path="dashboard" element={<OfficialsDashboard />} />
             <Route path="command" element={<Navigate to="/official/dashboard" replace />} />
-            <Route
-              path="smart-queue"
-              element={
-                <PlaceholderPageView
-                  title="Smart Scrutiny Queue"
-                  description="6 high-priority applications queued based on automated multi-modal risk scoring."
-                />
-              }
-            />
-            <Route
-              path="applications"
-              element={
-                <PlaceholderPageView
-                  title="Regulatory Applications Repository"
-                  description="Comprehensive technical institution approval applications for academic cycle 2026-27."
-                />
-              }
-            />
+            <Route path="smart-queue" element={<SmartQueueView />} />
+            <Route path="applications" element={<Navigate to="/official/smart-queue" replace />} />
             <Route path="applications/:appId" element={<ScrutinyDetailRouteWrapper />} />
-            <Route
-              path="verification-centre"
-              element={
-                <PlaceholderPageView
-                  title="Cross-Verification Centre"
-                  description="DigiLocker, Mahabhumi Land Records, State Fire Services and Corporate Affairs cross-checking services."
-                />
-              }
-            />
+            <Route path="verification-centre" element={<VerificationCentreView />} />
             <Route
               path="infra-compliance"
               element={
