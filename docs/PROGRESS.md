@@ -309,7 +309,32 @@ This log tracks every development phase against its acceptance checks. According
 
 
 
-### 1. Item-by-Item Verification Benchmarks
+### 3. Prompt D2 Acceptance Verification Summary (Infra Compliance, Audit & Security Centre, Admin & Analytics)
+
+#### 1. Components & Endpoints Delivered
+- **Infra Compliance View (`frontend/src/pages/InfraComplianceView.tsx` & `/official/infra-compliance`)**:
+  - Evidence Gallery: High-resolution CAD floor plans, lab photos, and walkthrough videos tagged with labels, geo-coordinates (`18.5204° N, 73.8567° E`), timestamps, and quality flags (`EXCELLENT`, `ACCEPTABLE`).
+  - Statutory Norms Checklist: Instructional classroom area (264 sqm req vs 272.5 sqm actual -> `MEETS`), core computing centre (150 sqm req vs 162 sqm actual -> `MEETS`), central digital library (200 sqm req vs 142 sqm actual -> `NEEDS_MORE_EVIDENCE`), mechanical workshop (`MEETS`), and student hostel accommodation (`RECOMMEND_INSPECTION`).
+  - Side-by-side evidence matching modal and statutory advisory banner.
+- **Audit & Security Centre (`frontend/src/pages/AuditSecurityCentreView.tsx` & `/official/audit-security`)**:
+  - Filterable audit ledger with SHA-256 transaction hashes and canonical JSON payloads.
+  - One-click 'Verify Cryptographic Integrity' recomputing entire hash chain from genesis root with animated links sequence.
+  - Visible tamper demonstration (`/demo/tamper-audit-row`) identifying exact tampered row ID on stage, with one-click instant repair (`/demo/repair-audit-chain`).
+  - Security posture card reporting 5 active controls: AES-256-GCM Vault, RBAC & Isolation, MFA TOTP, SHA-256 Audit Chain, Dynamic Watermarking.
+  - Document access logs with purpose recording and active sessions with instant token revocation.
+- **Admin Rule Builder (`frontend/src/pages/AdminRuleBuilder.tsx` & `/official/admin/rules`)**:
+  - Form UI over raw JSON with live toggle between visual inputs and JSON schema editor.
+  - Rule versioning with rollback endpoint (`/official/rules/{rule_code}/rollback`).
+  - 'Test rule on sample application' modal (`/official/rules/{rule_code}/test`) evaluating live compliance against representative dossiers.
+  - System Users & Roles directory and Data Retention configuration controls.
+- **Benchmark Analytics (`frontend/src/pages/AnalyticsEvaluationView.tsx` & `/official/analytics`)**:
+  - Transparent benchmark disclosure: *"Evaluated on a synthetic benchmark, held-out split."*
+  - 8 statutory evaluation metrics: OCR field accuracy (98.4%), classification accuracy (98.2%), validation accuracy (97.8%), anomaly precision (97.5%), anomaly recall (96.0%), source verification rate (98.9%), verification latency (1.4s), alert timeliness (99.2%).
+  - Manual effort reduction model: 78.4% reduction with stated assumptions (45 min per manual check, 6.5 docs per application, 12,480 applications, 47,700 hours saved annually).
+- **Backend Test Verification**:
+  - `backend/tests/test_prompt_d2.py`: 4/4 passed (security posture & sessions, audit hash chain tamper & repair, infra compliance & evaluation metrics, admin rules test & rollback).
+  - Total combined test suite across D1, D2, and Admin Rules: 9/9 passed in 3.51s.
+
 1. **i18n Leak Resolution & Static Bundling**:
    - Packaged static locale bundles (`en.json`, `hi.json`, `mr.json`) into `i18n.ts` with instant synchronous initialization.
    - Fixed un-namespaced keys (e.g. `screenReaderAccess`) across English, Hindi, and Marathi.

@@ -18,6 +18,9 @@ import { ScanView } from './pages/ScanView';
 import { ScrutinyDetail } from './pages/ScrutinyDetail';
 import { SmartQueueView } from './pages/SmartQueueView';
 import { VerificationCentreView } from './pages/VerificationCentreView';
+import { InfraComplianceView } from './pages/InfraComplianceView';
+import { AuditSecurityCentreView } from './pages/AuditSecurityCentreView';
+import { AnalyticsEvaluationView } from './pages/AnalyticsEvaluationView';
 import { StaticInfoPage } from './pages/StaticInfoPage';
 import { Styleguide } from './pages/Styleguide';
 import { PlaceholderPageView } from './pages/PlaceholderPageView';
@@ -226,15 +229,7 @@ export function App() {
             <Route path="applications" element={<Navigate to="/official/smart-queue" replace />} />
             <Route path="applications/:appId" element={<ScrutinyDetailRouteWrapper />} />
             <Route path="verification-centre" element={<VerificationCentreView />} />
-            <Route
-              path="infra-compliance"
-              element={
-                <PlaceholderPageView
-                  title="Infrastructure Compliance"
-                  description="Automated GIS master plan overlays and built-up instructional area CAD checks."
-                />
-              }
-            />
+            <Route path="infra-compliance" element={<InfraComplianceView />} />
             <Route
               path="decisions"
               element={
@@ -244,24 +239,8 @@ export function App() {
                 />
               }
             />
-            <Route
-              path="audit-security"
-              element={
-                <PlaceholderPageView
-                  title="Cryptographic Audit Ledger"
-                  description="Immutable SHA-256 chained transaction logs of all official decisions and system actions."
-                />
-              }
-            />
-            <Route
-              path="analytics"
-              element={
-                <PlaceholderPageView
-                  title="Regional Analytics & Reports"
-                  description="State-wise compliance indices, disposal rates, and anomaly detection distribution metrics."
-                />
-              }
-            />
+            <Route path="audit-security" element={<AuditSecurityCentreView />} />
+            <Route path="analytics" element={<AnalyticsEvaluationView />} />
             <Route path="admin/rules" element={<AdminRuleBuilder />} />
             <Route
               path="*"
