@@ -1,3 +1,4 @@
+import { API_BASE } from '../../config/api';
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../../context/authStore';
 import {
@@ -37,7 +38,7 @@ export const DocumentsVaultView: React.FC = () => {
   const fetchVault = async () => {
     setLoading(true);
     try {
-      const resp = await fetch('http://localhost:8000/institute/vault', {
+      const resp = await fetch(`${API_BASE}/institute/vault`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (resp.ok) {

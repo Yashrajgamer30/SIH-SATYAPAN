@@ -1,3 +1,4 @@
+import { API_BASE } from './config/api';
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
@@ -159,7 +160,7 @@ const DemoShortcutListener: React.FC = () => {
         e.preventDefault();
         if (window.confirm('AICTE SATYAPAN DEMO MODE: Reset database, files and Demo Pack to pristine state?')) {
           try {
-            const res = await fetch('http://localhost:8000/demo/reset', { method: 'POST' });
+            const res = await fetch(`${API_BASE}/demo/reset`, { method: 'POST' });
             if (res.ok) {
               alert('✓ AICTE SATYAPAN Demo data restored in under 5 seconds. Reloading...');
               window.location.reload();

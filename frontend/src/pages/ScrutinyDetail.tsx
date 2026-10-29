@@ -8,8 +8,7 @@ import {
 import { AdvisoryBanner } from '../components/StatusBadges';
 import { InspectionBriefModal } from '../components/inspection/InspectionBriefModal';
 import { PurposeBoundAccessModal } from '../components/common/PurposeBoundAccessModal';
-
-const API_BASE = 'http://localhost:8000';
+import { API_BASE } from '../config/api';
 
 interface ScrutinyDetailProps {
   appId?: string | number;

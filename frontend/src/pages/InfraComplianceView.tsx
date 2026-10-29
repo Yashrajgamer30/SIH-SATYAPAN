@@ -4,8 +4,7 @@ import {
   AlertTriangle, Eye, ShieldAlert, Check, X, Filter, RefreshCw, ZoomIn
 } from 'lucide-react';
 import { AdvisoryBanner } from '../components/StatusBadges';
-
-const API_BASE = 'http://localhost:8000';
+import { API_BASE } from '../config/api';
 
 interface GalleryItem {
   id: string;

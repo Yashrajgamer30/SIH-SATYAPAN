@@ -4,8 +4,7 @@ import {
   FileSearch, Cpu, ArrowUpRight, Info, RefreshCw, AlertTriangle
 } from 'lucide-react';
 import { AdvisoryBanner } from '../components/StatusBadges';
-
-const API_BASE = 'http://localhost:8000';
+import { API_BASE } from '../config/api';
 
 interface EvalData {
   benchmark_disclosure: string;

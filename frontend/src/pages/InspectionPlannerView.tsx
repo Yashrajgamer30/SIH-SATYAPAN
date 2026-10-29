@@ -1,3 +1,4 @@
+import { API_BASE } from '../config/api';
 import React, { useState, useEffect } from 'react';
 import {
   MapPin,
@@ -46,7 +47,7 @@ export const InspectionPlannerView: React.FC = () => {
   const fetchPlannerData = async () => {
     try {
       setLoading(true);
-      const res = await fetch('http://localhost:8000/official/inspection-planner');
+      const res = await fetch(`${API_BASE}/official/inspection-planner`);
       if (!res.ok) throw new Error('Failed to load planner data');
       const data = await res.json();
       setInspections(data.inspections || []);

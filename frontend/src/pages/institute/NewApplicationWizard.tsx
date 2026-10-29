@@ -1,3 +1,4 @@
+import { API_BASE } from '../../config/api';
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuthStore } from '../../context/authStore';
 import {
@@ -150,7 +151,7 @@ export const NewApplicationWizard: React.FC = () => {
   useEffect(() => {
     const fetchCats = async () => {
       try {
-        const resp = await fetch('http://localhost:8000/institute/categories');
+        const resp = await fetch(`${API_BASE}/institute/categories`);
         if (resp.ok) {
           const json = await resp.json();
           setCategories(json);
@@ -168,7 +169,7 @@ export const NewApplicationWizard: React.FC = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const resp = await fetch('http://localhost:8000/institute/profile', {
+        const resp = await fetch(`${API_BASE}/institute/profile`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (resp.ok) {
@@ -239,7 +240,7 @@ export const NewApplicationWizard: React.FC = () => {
 
     // 2. Server Sync
     try {
-      const resp = await fetch('http://localhost:8000/institute/applications/draft', {
+      const resp = await fetch(`${API_BASE}/institute/applications/draft`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -299,7 +300,7 @@ export const NewApplicationWizard: React.FC = () => {
 
     try {
       // First ensure draft is saved
-      const draftResp = await fetch('http://localhost:8000/institute/applications/draft', {
+      const draftResp = await fetch(`${API_BASE}/institute/applications/draft`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -316,7 +317,7 @@ export const NewApplicationWizard: React.FC = () => {
       const targetAppId = draftJson.application_id;
       setApplicationId(targetAppId);
 
-      const resp = await fetch(`http://localhost:8000/institute/applications/${targetAppId}/pre-submission-check`, {
+      const resp = await fetch(`${API_BASE}/institute/applications/${targetAppId}/pre-submission-check`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -353,7 +354,7 @@ export const NewApplicationWizard: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      const resp = await fetch(`http://localhost:8000/institute/applications/${applicationId || 'app-default'}/submit`, {
+      const resp = await fetch(`${API_BASE}/institute/applications/${applicationId || 'app-default'}/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

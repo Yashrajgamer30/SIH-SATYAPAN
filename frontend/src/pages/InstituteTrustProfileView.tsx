@@ -1,3 +1,4 @@
+import { API_BASE } from '../config/api';
 3
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -44,7 +45,7 @@ export const InstituteTrustProfileView: React.FC = () => {
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`http://localhost:8000/official/institutes/${instId || '1'}/trust-profile`);
+      const res = await fetch(`${API_BASE}/official/institutes/${instId || '1'}/trust-profile`);
       if (!res.ok) throw new Error('Failed to load trust profile');
       const data = await res.json();
       setProfile(data);

@@ -36,7 +36,7 @@ interface AuthState {
   checkSessionExpiry: () => void;
 }
 
-const API_BASE = 'http://localhost:8000';
+import { API_BASE } from '../config/api';
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: (() => {

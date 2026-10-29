@@ -1,3 +1,4 @@
+import { API_BASE } from '../../config/api';
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../../context/authStore';
 import {
@@ -58,7 +59,7 @@ export const TrackApplicationsView: React.FC = () => {
     setLoading(true);
     try {
       // Fetch tracking for default or current application
-      const resp = await fetch('http://localhost:8000/institute/applications/app-default/tracking', {
+      const resp = await fetch(`${API_BASE}/institute/applications/app-default/tracking`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (resp.ok) {
@@ -91,7 +92,7 @@ export const TrackApplicationsView: React.FC = () => {
 
     setSubmittingReply(true);
     try {
-      const resp = await fetch(`http://localhost:8000/institute/deficiencies/${defId}/reply`, {
+      const resp = await fetch(`${API_BASE}/institute/deficiencies/${defId}/reply`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

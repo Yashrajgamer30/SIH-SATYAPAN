@@ -1,3 +1,4 @@
+import { API_BASE } from '../config/api';
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -38,7 +39,7 @@ export const DemoHealthView: React.FC = () => {
   const fetchHealth = async () => {
     try {
       setLoading(true);
-      const res = await fetch('http://localhost:8000/demo/health');
+      const res = await fetch(`${API_BASE}/demo/health`);
       if (res.ok) {
         const data = await res.json();
         setHealthData(data);
@@ -103,7 +104,7 @@ export const DemoHealthView: React.FC = () => {
     setResetting(true);
     setResetFeedback(null);
     try {
-      const res = await fetch('http://localhost:8000/demo/reset', { method: 'POST' });
+      const res = await fetch(`${API_BASE}/demo/reset`, { method: 'POST' });
       if (res.ok) {
         const json = await res.json();
         setResetFeedback(json.message || 'Demo data successfully restored in under 10 seconds.');

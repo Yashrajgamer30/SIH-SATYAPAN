@@ -1,3 +1,4 @@
+import { API_BASE } from '../../config/api';
 import React, { useState } from 'react';
 import { ShieldAlert, Lock, Unlock, Eye, CheckCircle2, AlertTriangle, FileText } from 'lucide-react';
 
@@ -29,7 +30,7 @@ export const PurposeBoundAccessModal: React.FC<PurposeBoundAccessModalProps> = (
     setError(null);
 
     try {
-      const res = await fetch(`http://localhost:8000/documents/${documentId}/purpose-access`, {
+      const res = await fetch(`${API_BASE}/documents/${documentId}/purpose-access`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -1,3 +1,4 @@
+import { API_BASE } from '../../config/api';
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../../context/authStore';
 import { useTheme } from '../../context/ThemeContext';
@@ -50,7 +51,7 @@ export const SahayakHelpView: React.FC = () => {
   const fetchFaqs = async () => {
     setLoadingFaqs(true);
     try {
-      const resp = await fetch(`http://localhost:8000/institute/sahayak/faqs?language=${language}`);
+      const resp = await fetch(`${API_BASE}/institute/sahayak/faqs?language=${language}`);
       if (resp.ok) {
         const json = await resp.json();
         setFaqs(json);
@@ -82,7 +83,7 @@ export const SahayakHelpView: React.FC = () => {
     setIsAsking(true);
 
     try {
-      const resp = await fetch('http://localhost:8000/institute/sahayak/ask', {
+      const resp = await fetch(`${API_BASE}/institute/sahayak/ask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

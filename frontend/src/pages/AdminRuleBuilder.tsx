@@ -5,8 +5,7 @@ import {
   Users, Settings, Code, FileText, CheckCircle2, X
 } from 'lucide-react';
 import { AdvisoryBanner } from '../components/StatusBadges';
-
-const API_BASE = 'http://localhost:8000';
+import { API_BASE } from '../config/api';
 
 interface RuleItem {
   rule_code: string;

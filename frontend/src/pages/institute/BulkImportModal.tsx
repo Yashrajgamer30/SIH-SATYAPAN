@@ -1,3 +1,4 @@
+import { API_BASE } from '../../config/api';
 import React, { useState, useRef } from 'react';
 import { useAuthStore } from '../../context/authStore';
 import {
@@ -55,7 +56,7 @@ export const BulkImportModal: React.FC<BulkImportModalProps> = ({
   if (!isOpen) return null;
 
   const handleDownloadTemplate = () => {
-    window.open('http://localhost:8000/institute/students/template', '_blank');
+    window.open(`${API_BASE}/institute/students/template`, '_blank');
   };
 
   const handleFileChange = (file: File) => {
@@ -98,7 +99,7 @@ export const BulkImportModal: React.FC<BulkImportModalProps> = ({
       formData.append('file', selectedFile);
 
       const resp = await fetch(
-        `http://localhost:8000/institute/students/bulk-import?import_valid_only=${importValidOnly}`,
+        `${API_BASE}/institute/students/bulk-import?import_valid_only=${importValidOnly}`,
         {
           method: 'POST',
           headers: {

@@ -1,3 +1,4 @@
+import { API_BASE } from '../../config/api';
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../../context/authStore';
 import { BulkImportModal } from './BulkImportModal';
@@ -106,7 +107,7 @@ export const StudentsView: React.FC = () => {
       if (gender !== 'ALL') params.append('gender', gender);
       if (status !== 'ALL') params.append('status', status);
 
-      const resp = await fetch(`http://localhost:8000/institute/students?${params.toString()}`, {
+      const resp = await fetch(`${API_BASE}/institute/students?${params.toString()}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (resp.ok) {
@@ -196,7 +197,7 @@ export const StudentsView: React.FC = () => {
     setSubmitting(true);
     try {
       if (drawerMode === 'add') {
-        const resp = await fetch('http://localhost:8000/institute/students', {
+        const resp = await fetch(`${API_BASE}/institute/students`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -222,7 +223,7 @@ export const StudentsView: React.FC = () => {
         if (formData.mobile.trim()) {
           updatePayload.mobile = formData.mobile.trim();
         }
-        const resp = await fetch(`http://localhost:8000/institute/students/${selectedStudent.id}`, {
+        const resp = await fetch(`${API_BASE}/institute/students/${selectedStudent.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -249,7 +250,7 @@ export const StudentsView: React.FC = () => {
     if (!confirm(`Are you sure you want to remove ${name} from institutional enrolments?`)) return;
 
     try {
-      const resp = await fetch(`http://localhost:8000/institute/students/${id}`, {
+      const resp = await fetch(`${API_BASE}/institute/students/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -264,7 +265,7 @@ export const StudentsView: React.FC = () => {
   const handleExport = (format: 'xlsx' | 'csv') => {
     const params = new URLSearchParams({ format });
     if (programme !== 'ALL') params.append('programme', programme);
-    window.open(`http://localhost:8000/institute/export/students?${params.toString()}`, '_blank');
+    window.open(`${API_BASE}/institute/export/students?${params.toString()}`, '_blank');
   };
 
   return (

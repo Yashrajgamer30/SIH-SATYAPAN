@@ -1,3 +1,4 @@
+import { API_BASE } from '../config/api';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
@@ -66,7 +67,7 @@ export const InstituteDashboard: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const resp = await fetch('http://localhost:8000/institute/dashboard', {
+      const resp = await fetch(`${API_BASE}/institute/dashboard`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

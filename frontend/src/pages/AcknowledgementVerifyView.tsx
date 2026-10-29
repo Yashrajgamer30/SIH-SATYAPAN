@@ -1,3 +1,4 @@
+import { API_BASE } from '../config/api';
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
@@ -21,7 +22,7 @@ export const AcknowledgementVerifyView: React.FC = () => {
     const verify = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`http://localhost:8000/documents/verify-acknowledgement/${ackHash || 'demo-ack'}`);
+        const res = await fetch(`${API_BASE}/documents/verify-acknowledgement/${ackHash || 'demo-ack'}`);
         if (res.ok) {
           const json = await res.json();
           setData(json);

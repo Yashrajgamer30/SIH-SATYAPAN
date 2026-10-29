@@ -1,3 +1,4 @@
+import { API_BASE } from '../config/api';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Share2,
@@ -58,7 +59,7 @@ export const CrossInstituteNetworkView: React.FC = () => {
   const fetchNetwork = async () => {
     try {
       setLoading(true);
-      const res = await fetch('http://localhost:8000/official/cross-network');
+      const res = await fetch(`${API_BASE}/official/cross-network`);
       if (!res.ok) throw new Error('Failed to fetch');
       const data = await res.json();
 

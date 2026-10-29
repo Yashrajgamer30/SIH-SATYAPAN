@@ -1,3 +1,4 @@
+import { API_BASE } from '../config/api';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -88,7 +89,7 @@ export const OfficialsDashboard: React.FC<OfficialsDashboardProps> = ({ onSelect
     setLoading(true);
     setError(null);
     try {
-      const resp = await fetch('http://localhost:8000/official/dashboard', {
+      const resp = await fetch(`${API_BASE}/official/dashboard`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -190,7 +191,7 @@ export const OfficialsDashboard: React.FC<OfficialsDashboardProps> = ({ onSelect
     // Connect SSE Stream for real-time alert ticker
     let eventSource: EventSource | null = null;
     try {
-      eventSource = new EventSource('http://localhost:8000/events');
+      eventSource = new EventSource(`${API_BASE}/events`);
       eventSource.onopen = () => {
         setSseStatus('live');
         setLastCheckedTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));

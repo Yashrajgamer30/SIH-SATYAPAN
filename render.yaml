@@ -1,0 +1,44 @@
+# ==============================================================================
+# AICTE SATYAPAN - Render Blueprint Specification
+# Deploys Backend (Docker with OCR & CV) + Frontend (Static React SPA) on Render
+# ==============================================================================
+services:
+  # ----------------------------------------------------------------------------
+  # 1. Backend Web Service (FastAPI + OCR + PyPDFium2 + Cryptographic Ledger)
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: satyapan-backend
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: oregon
+    healthCheckPath: /demo/health
+    envVars:
+      - key: DEMO_MODE
+        value: "true"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: AES_STORAGE_KEY_HEX
+        value: a1b2c3d4e5f60718293a4b5c6d7e8f90123456789abcdef0123456789abcdef0
+
+  # ----------------------------------------------------------------------------
+  # 2. Frontend Static Site (Vite + React 18 + TailwindCSS + Lucide + i18n)
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: satyapan-frontend
+    env: static
+    plan: free
+    region: oregon
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    routes:
+      # Mandatory SPA rewrite for React Router navigation
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: satyapan-backend
+          property: host

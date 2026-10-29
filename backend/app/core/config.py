@@ -41,6 +41,15 @@ class Settings(BaseSettings):
         "http://localhost:8000"
     ]
 
+    def __init__(self, **values):
+        super().__init__(**values)
+        extra = os.getenv("CORS_ORIGINS", "")
+        if extra:
+            for item in extra.split(","):
+                item = item.strip()
+                if item and item not in self.CORS_ORIGINS:
+                    self.CORS_ORIGINS.append(item)
+
     class Config:
         case_sensitive = True
         env_file = ".env"

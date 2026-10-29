@@ -1,3 +1,4 @@
+import { API_BASE } from '../../config/api';
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../../context/authStore';
 import {
@@ -40,7 +41,7 @@ export const ReportsAndDownloadsView: React.FC = () => {
   const fetchComparison = async () => {
     setLoadingCompare(true);
     try {
-      const resp = await fetch('http://localhost:8000/institute/compare-previous', {
+      const resp = await fetch(`${API_BASE}/institute/compare-previous`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (resp.ok) {
@@ -61,7 +62,7 @@ export const ReportsAndDownloadsView: React.FC = () => {
   }, [activeTab]);
 
   const handleExport = (resource: string, format: 'xlsx' | 'csv') => {
-    window.open(`http://localhost:8000/institute/export/${resource}?format=${format}`, '_blank');
+    window.open(`${API_BASE}/institute/export/${resource}?format=${format}`, '_blank');
   };
 
   const reportCards = [

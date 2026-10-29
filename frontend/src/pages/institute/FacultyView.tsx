@@ -1,3 +1,4 @@
+import { API_BASE } from '../../config/api';
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../../context/authStore';
 import {
@@ -81,7 +82,7 @@ export const FacultyView: React.FC = () => {
       if (search.trim()) params.append('search', search.trim());
       if (department !== 'ALL') params.append('department', department);
 
-      const resp = await fetch(`http://localhost:8000/institute/faculty?${params.toString()}`, {
+      const resp = await fetch(`${API_BASE}/institute/faculty?${params.toString()}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (resp.ok) {
@@ -159,7 +160,7 @@ export const FacultyView: React.FC = () => {
     setSubmitting(true);
     try {
       if (drawerMode === 'add') {
-        const resp = await fetch('http://localhost:8000/institute/faculty', {
+        const resp = await fetch(`${API_BASE}/institute/faculty`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -183,7 +184,7 @@ export const FacultyView: React.FC = () => {
         if (formData.pan.trim()) {
           updatePayload.pan = formData.pan.trim();
         }
-        const resp = await fetch(`http://localhost:8000/institute/faculty/${selectedFaculty.id}`, {
+        const resp = await fetch(`${API_BASE}/institute/faculty/${selectedFaculty.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -211,7 +212,7 @@ export const FacultyView: React.FC = () => {
       return;
     }
     try {
-      const resp = await fetch(`http://localhost:8000/institute/faculty/${id}`, {
+      const resp = await fetch(`${API_BASE}/institute/faculty/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -224,7 +225,7 @@ export const FacultyView: React.FC = () => {
   };
 
   const handleExportXLSX = () => {
-    window.open(`http://localhost:8000/institute/export/faculty?format=xlsx`, '_blank');
+    window.open(`${API_BASE}/institute/export/faculty?format=xlsx`, '_blank');
   };
 
   return (

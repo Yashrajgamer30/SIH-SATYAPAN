@@ -1,3 +1,4 @@
+import { API_BASE } from '../../config/api';
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../../context/authStore';
 import {
@@ -56,7 +57,7 @@ export const InstituteProfileView: React.FC = () => {
   const fetchProfile = async () => {
     setLoading(true);
     try {
-      const resp = await fetch('http://localhost:8000/institute/profile', {
+      const resp = await fetch(`${API_BASE}/institute/profile`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (resp.ok) {

@@ -32,7 +32,7 @@ export interface BoundingBox {
   h: number;
 }
 
-const API_BASE = 'http://localhost:8000';
+import { API_BASE } from '../config/api';
 
 export const ScanView: React.FC<ScanViewProps> = ({
   onClose,

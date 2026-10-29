@@ -1,3 +1,4 @@
+import { API_BASE } from '../../config/api';
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../../context/authStore';
 import {
@@ -24,7 +25,7 @@ export const NotificationsView: React.FC = () => {
   const fetchNotifications = async () => {
     setLoading(true);
     try {
-      const resp = await fetch('http://localhost:8000/institute/notifications', {
+      const resp = await fetch(`${API_BASE}/institute/notifications`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (resp.ok) {
@@ -44,7 +45,7 @@ export const NotificationsView: React.FC = () => {
 
   const handleMarkAsRead = async (id: string) => {
     try {
-      await fetch(`http://localhost:8000/institute/notifications/${id}/read`, {
+      await fetch(`${API_BASE}/institute/notifications/${id}/read`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
